@@ -1474,7 +1474,7 @@ class MainCog(commands.Cog):
         e.add_field(name=get_txt(ctx.guild.id, "abouts")[8],
                     value=get_txt(ctx.guild.id, "abouts")[9].format(inf["points"], inf["monthlyPoints"]))
         e.add_field(name=get_txt(ctx.guild.id, "abouts")[10],
-                    value='[sevenc-nanashi/SevenBot-Issues](https://github.com/sevenc-nanashi/SevenBot-Issues)')
+                    value='[sevenc-nanashi/SevenBot](https://github.com/sevenc-nanashi/SevenBot)')
         e.add_field(name=get_txt(ctx.guild.id, "abouts")
                     [13], value=get_txt(ctx.guild.id, "abouts")[14])
         return await ctx.send(embed=e)
