@@ -486,7 +486,7 @@ class ToolCog(commands.Cog):
         await ctx.send(embed=e)
 
     @commands.command(aliases=["sf"])
-    async def snowflake(ctx, sf: int):
+    async def snowflake(self, ctx, sf: int):
         rawbin = str(bin(sf))[2:].zfill(64)
         bins = [rawbin[0:42], rawbin[42:47], rawbin[47:52], rawbin[52:]]
         res = []
