@@ -182,11 +182,11 @@ bot = SevenBot(command_prefix=prefix, help_command=None, allowed_mentions=discor
 
 
 @bot.command()
-async def reload_lang(self, ctx):
+async def reload_lang(ctx):
     global Texts
     importlib.reload(common_resources)
     Texts = common_resources.Texts
-    self.texts.update(common_resources.Texts)
+    bot.texts.update(common_resources.Texts)
     await ctx.reply("Done")
 
 
