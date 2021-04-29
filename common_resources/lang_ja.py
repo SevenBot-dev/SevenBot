@@ -302,7 +302,7 @@ JA_TEXTS = {  # noqa
     "afk_twitter_content": "!userはAFKになりました。\n理由：\n!reason\n\nPowered by #SevenBot - https://sevenbot.jp",
     "afk_twitter_content2": "!userのAFKは解除されました。\n\nPowered by #SevenBot - https://sevenbot.jp",
     "lookup": ["{}の情報", "ニックネーム", "ユーザー名", "アカウント作成日時", "サーバー参加日時", ["不明", "オンライン", "退席中", "取り込み中", "オフライン", "ステータス"], "ロール", "Warn回数", "{}回", "このサーバーにはいません。", ["はい", "いいえ"], "見付かりませんでした。", "(API経由)"],
-    "abouts": ["SevenBotについて", "開発者", "言語", "公式サーバー（GBan申請などもこちらから）", "サーバー数", "ユーザー数", "グローバルチャット数", "SevenNet数", "top.ggでの高評価数", "{}(今月に{}個)\n高評価は[こちら](https://top.gg/bot/718760319207473152)", "バグ報告", "招待リンク", "サポートサーバー", "スペシャルサンクス（敬称略）",
+    "abouts": ["SevenBotについて", "開発者", "言語", "公式サーバー（GBan申請などもこちらから）", "サーバー数", "ユーザー数", "グローバルチャット数", "SevenNet数", "top.ggでの高評価数", "{}(今月に{}個)\n高評価は[こちら](https://top.gg/bot/718760319207473152)", "ソースコード", "招待リンク", "サポートサーバー", "スペシャルサンクス（敬称略）",
                "開発支援：[Discord Bot Portal JP](https://discord.gg/FWw6VqQ), [discord.py](https://discord.gg/nXzj3dg), [pythonjp](https://discord.gg/M5NdnCV), [Discord Developers](https://discord.gg/developers)\nサーバー提供：[CyberRex](https://twitter.com/0xerrebyc)", "サーバー", "人"],
     "tree": "このサーバーのチャンネル",
     "ch": {
