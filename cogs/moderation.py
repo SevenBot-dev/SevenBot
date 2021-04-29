@@ -1,7 +1,5 @@
 import asyncio
 import math
-from cogs.fun import Official_emojis
-from cogs.batch import Guild_settings
 import datetime
 import io
 import json
