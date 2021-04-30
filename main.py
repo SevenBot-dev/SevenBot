@@ -60,7 +60,7 @@ intent.typing = False
 # intent.members=True
 # intent.messages=True
 # intent.reactions=True
-
+ready_fired = False
 saving = False
 Save_game = discord.Game(name="Saving..." + "⠀" * 100)
 Save_game2 = discord.Game(name="Complete!" + "⠀" * 100)
@@ -100,7 +100,10 @@ class SevenBot(commands.Bot):
         self.check(commands.cooldown(2, 2))
 
     async def on_ready(self):
-        global Guild_settings
+        global Guild_settings, ready_fired
+        if ready_fired:
+            return
+        ready_fired = True
         print("on_ready fired")
         Guild_settings = self.raw_config["gs"]
         for k, v in Channel_ids.items():
