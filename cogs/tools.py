@@ -74,7 +74,7 @@ class ToolCog(commands.Cog):
             a = [j for j in js if j["uid"] == message.author.id][0]
             for ac in a["urls"]:
                 rids = re.match(Message_url_re, ac)
-                ids = [int(i) for i in [rids[2], rids[3], rids[4]]]
+                ids = [int(i) for i in [rids[1], rids[2], rids[3]]]
                 c = self.bot.get_channel(ids[1])
                 t_txt = Texts[Guild_settings[message.guild.id]
                               ["lang"]]["afk_off"]
