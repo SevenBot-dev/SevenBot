@@ -144,4 +144,6 @@ nohup.out
 *.swp
 tokens.py
 .git-old/
+.git-old2/
 *.OTF
+htsvoices/
