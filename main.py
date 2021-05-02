@@ -43,6 +43,9 @@ Channel_ids = {
     "boot_log": 747764100922343554,
     "error": 763877469928554517
 }
+Premium_guild = 715540925081714788
+Premium_role = 779685018964066336
+Save_channel_id = 765489262123548673
 
 
 def prefix(bot, message):
@@ -61,14 +64,19 @@ intent.typing = False
 # intent.messages=True
 # intent.reactions=True
 
-saving = False
-Save_game = discord.Game(name="Saving..." + "⠀" * 100)
-Save_game2 = discord.Game(name="Complete!" + "⠀" * 100)
+# Save_game = discord.Game(name="Saving..." + "⠀" * 100)
+# Save_game2 = discord.Game(name="Complete!" + "⠀" * 100)
 print("Loading save from attachment...", end="")
-r = requests.get("https://discord.com/api/v8/channels/765489262123548673/messages?limit=1", headers={"authorization": "Bot " + TOKEN})
-r.raise_for_status()
-s = requests.get(r.json()[0]["attachments"][0]["url"])
-s.raise_for_status()
+try:
+    r = requests.get(f"https://discord.com/api/v8/channels/{Save_channel_id}/messages?limit=1", headers={"authorization": "Bot " + TOKEN})
+    r.raise_for_status()
+    s = requests.get(r.json()[0]["attachments"][0]["url"])
+    s.raise_for_status()
+    raw_save = s.content.decode("utf8")
+except requests.exceptions.HTTPError:
+    print("\nUnable to get save, loaded save.sample.")
+    with open("./save.sample", "r", encoding="utf8") as f:
+        raw_save = f.read()
 print("Done")
 print("Loading saves from db...", end="")
 gs = {}
@@ -89,7 +97,7 @@ class SevenBot(commands.Bot):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.consts = {"qu": {}, "ch": {}, "oe": {}, "ne": [], "tc": {}}
-        self.raw_config = ast.literal_eval(s.content.decode("utf8"))
+        self.raw_config = ast.literal_eval(raw_save)
         self.raw_config["gs"] = gs
         self.dbclient = motor.AsyncIOMotorClient(cstr)
         self.db = self.dbclient.sevenbot
@@ -122,7 +130,7 @@ class SevenBot(commands.Bot):
         print("on_ready done")
 
     def is_premium(self, user: Union[discord.User, discord.Member]):
-        return (self.get_guild(715540925081714788).get_member(user.id) and (self.get_guild(715540925081714788).get_member(user.id).premium_since or 779685018964066336 in [r.id for r in self.get_guild(715540925081714788).get_member(user.id).roles]))
+        return (self.get_guild(Premium_guild).get_member(user.id) and (self.get_guild(Premium_guild).get_member(user.id).premium_since or Premium_role in [r.id for r in self.get_guild(715540925081714788).get_member(user.id).roles]))
 
     async def save(self):
         # await self.change_presence(activity=Save_game, status=discord.Status.dnd)
@@ -150,7 +158,7 @@ class SevenBot(commands.Bot):
                 if not self.get_guild(gk["gid"]):
                     await self.db.guild_settings.delete_one({"gid": gk["gid"]})
 
-        sio = await self.loop.run_in_executor(None, lambda: io.StringIO(str(self.raw_config)))
+        sio = await self.loop.run_in_executor(None, lambda: io.StringIO(str({k: v for k, v in self.raw_config.items() if k != "gs"})))
         await (await self.fetch_channel(765489262123548673)).send(
             file=discord.File(sio, filename=f"save_{datetime.datetime.now()}.txt"))
         sio.close()
