@@ -54,7 +54,7 @@ class BatchCog(commands.Cog):
     @tasks.loop(seconds=10)
     async def batch_change_activity(self):
         s = getattr(self.bot, "status", None)
-        n = s or (f'sb#help to Help | {len(self.bot.guilds)} Servers | ' + ("https://sevenbot.jp" if sys.platform == "linux" else "Running on dev machine..."))
+        n = s or (f'sb#help to Help | {len(self.bot.guilds)} Servers | ' + ("https://sevenbot.jp" if sys.platform == "linux" else "Running on develop PC..."))
         if not self.bot.get_guild(715540925081714788).me.activity or self.bot.get_guild(715540925081714788).me.activity.name.replace("⠀", "") != n:
             await self.bot.change_presence(activity=discord.Game(name=n + "⠀" * 50), status=discord.Status.online if sys.platform == "linux" else discord.Status.idle)
 
