@@ -11,6 +11,9 @@ import _pathmagic  # type: ignore # noqa
 from common_resources.consts import (Info, Success, Error, Chat, Process, Owner_ID, Official_discord_id)
 
 
+ret = {}
+
+
 class AdminCog(commands.Cog):
     def __init__(self, bot):
         global Guild_settings, Official_emojis, Global_chat, Global_mute, Private_chats, Sevennet_channels, GBan, Blacklists
@@ -256,20 +259,26 @@ class AdminCog(commands.Cog):
     @commands.command(hidden=True, name="exec")
     @commands.is_owner()
     async def _exec(self, ctx, *, script):
-        script = script.lstrip("```py").rstrip("```")
+        script = script.removeprefix("```py").removesuffix("```")
         async with aiohttp.ClientSession() as session:
+            ret[ctx.message.id] = ""
+
+            async def get_msg(url):
+                return await commands.MessageConverter().convert(ctx, url)
+
+            def _print(*txt):
+                ret[ctx.message.id] += " ".join(map(str, txt))
             exec(
-                'async def get_msg(url):\n'
-                + '    return await commands.MessageConverter().convert(ctx, url)\n'
-                + 'async def __ex(self,_bot,_ctx,ctx,session): '
-                + ''.join(f'\n    {l}' for l in script.split('\n'))
+                'async def __ex(self,_bot,_ctx,ctx,session,print,get_msg): '
+                + '\n'.join(f'    {l}' for l in script.split('\n'))
             )
-            r = await locals()['__ex'](self, self.bot, ctx, ctx, session)
+            r = await locals()['__ex'](self, self.bot, ctx, ctx, session, _print, get_msg)
         try:
-            await ctx.send(f"```\n{r}\n```")
+            await ctx.send(f"stdout:```\n{ret[ctx.message.id]}\n```\nreturn:```\n{r}\n```")
         except BaseException:
             pass
         await ctx.message.add_reaction(Official_emojis["check8"])
+        del ret[ctx.message.id]
 
     @commands.command(hidden=True, name="eval")
     @commands.is_owner()
