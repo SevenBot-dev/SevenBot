@@ -72,7 +72,7 @@ class BatchCog(commands.Cog):
             "cpu": cpu,
             "mem": {
                 "percent": mem.percent,
-                "gb": mem.total / gb
+                "gb": mem.used / gb
             },
             "time": time.time(),
             "save": {
