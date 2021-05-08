@@ -2837,7 +2837,7 @@ class MainCog(commands.Cog):
                               "noperm"], color=Error)
             return await ctx.send(embed=e)
         e = discord.Embed(title=guild.name + " - "
-                          + f"`{guild.id}`", color=Info)
+                          + f"`{guild.id}`", color=Info, timestamp=guild.created_at)
         e.set_author(name=f"{guild.owner.display_name}({guild.owner}, ID:{guild.owner.id})",
                      icon_url=guild.owner.avatar_url_as(static_format="png"))
         e.set_thumbnail(url=guild.icon_url_as(static_format="png"))
@@ -2856,6 +2856,7 @@ class MainCog(commands.Cog):
             len([e for e in guild.emojis if e.animated]),
             guild.emoji_limit
         ))
+        e.set_footer(text=get_txt(ctx.guild.id, "serverinfo")["created_at"])
         return await ctx.send(embed=e)
 
     @commands.group(name="sevennet")
