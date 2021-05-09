@@ -50,7 +50,7 @@ JA_TEXTS = {  # noqa
     "djs_fail": "何も見つかりませんでした。",
     "djs_props": "プロパティ",
     "ltrans": "25ヶ国語再翻訳",
-    "dpy_docs": "https://discordpy.readthedocs.io/ja/latest/",
+    "dpy_docs": "https://discordpy.readthedocs.io/ja/stable/",
     "dpy_fail": "何も見付かりませんでした。",
     "dpy_title": "discord.py 属性検索",
     "dpy_more": "他`{}`個...",
@@ -620,7 +620,7 @@ JA_TEXTS = {  # noqa
         "image 5000": "[5000choyen-api](https://github.com/CyberRex0/5000choyen-api)を使って5000兆円欲しい！を生成します。\n上部: 上に入るテキスト（文字列）\n下部: 下に入るテキスト（文字列）",
         "develop_tool chr_info": "文字の情報を表示します。\nテキスト: 情報を表示するテキスト",
         "develop_tool rtfm": "リファレンスを検索します。",
-        "develop_tool rtfm dpy": "[discord.py](https://discordpy.readthedocs.io/ja/latest/)のリファレンスを検索します。\nキーワード: 検索するキーワード。",
+        "develop_tool rtfm dpy": "[discord.py](https://discordpy.readthedocs.io/ja/stable/)のリファレンスを検索します。\nキーワード: 検索するキーワード。",
         "develop_tool rtfm djs": "[discord.js](https://discord.js.org/#/docs/main)のリファレンスを検索します。\nキーワード: 検索するキーワード。",
         "snowflake": "Snowflake（DiscordのID）の情報を表示します。\nSnowflake: 情報を表示するSnowflake（数値）"
     },
