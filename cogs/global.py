@@ -503,7 +503,7 @@ class GlobalCog(commands.Cog):
                 Global_chat.append(ctx.channel.id)
             else:
                 def check(c):
-                    return (c.channel.id == ctx.author.dm_channel.id)
+                    return (c.channel.id == ctx.author.dm_channel.id and not c.author.bot)
                 if channel in list(Private_chats.keys()):
                     if Private_chat_pass[channel] == "":
                         e4 = discord.Embed(
