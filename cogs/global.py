@@ -503,7 +503,7 @@ class GlobalCog(commands.Cog):
                 Global_chat.append(ctx.channel.id)
             else:
                 def check(c):
-                    return (c.channel.id == ctx.author.dm_channel.id)
+                    return (c.channel.id == ctx.author.dm_channel.id and not c.author.bot)
                 if channel in list(Private_chats.keys()):
                     if Private_chat_pass[channel] == "":
                         e4 = discord.Embed(
@@ -656,13 +656,14 @@ class GlobalCog(commands.Cog):
                     # each = pv
                     break
             Private_chats[pk].remove(ctx.channel.id)
+            e = discord.Embed(
+                title=f"個人グローバルチャット`{pk}`退出", description=f"個人グローバルチャット`{pk}`から退出しました。", color=Success)
+            await ctx.send(embed=e)
             if Private_chats[pk] == []:
                 del Private_chats[pk]
                 del Private_chat_author[pk]
                 del Private_chat_pass[pk]
-            e = discord.Embed(
-                title=f"個人グローバルチャット`{pk}`退出", description=f"個人グローバルチャット`{pk}`から退出しました。", color=Success)
-            await ctx.send(embed=e)
+                return
             e2 = discord.Embed(title="グローバルチャットの仲間が抜けちゃった…",
                                description=f"{ctx.guild.name}がグローバルチャットから退出しました。", timestamp=ctx.message.created_at, color=Chat)
             e2.set_thumbnail(url=ctx.guild.icon_url)

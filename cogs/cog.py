@@ -250,7 +250,7 @@ translator = AsyncTranslator()
 
 class MainCog(commands.Cog):
     def __init__(self, bot):
-        global Guild_settings, Official_emojis, Texts, Global_chat, Private_chats, Bump_alerts, Dissoku_alerts, Command_counter, Global_mute, GBan, Levelup_off
+        global Guild_settings, Official_emojis, Texts, Global_chat, Private_chats, Bump_alerts, Dissoku_alerts, Command_counter, Global_mute, GBan, Levelup_off, Sevennet_channels, Sevennet_posts
         global get_txt, is_command
         self.bot = bot
         if not self.bot.consts.get("gcm"):
@@ -265,6 +265,8 @@ class MainCog(commands.Cog):
             Bump_alerts = self.bot.raw_config["ba"]
             Dissoku_alerts = self.bot.raw_config["da"]
             Command_counter = self.bot.raw_config["cc"]
+            Sevennet_channels = self.bot.raw_config["snc"]
+            Sevennet_posts = self.bot.raw_config["snp"]
             Global_mute = self.bot.raw_config["gm"]
             GBan = self.bot.raw_config["gb"]
             Levelup_off = self.bot.raw_config["lo"]
@@ -1474,7 +1476,7 @@ class MainCog(commands.Cog):
         e.add_field(name=get_txt(ctx.guild.id, "abouts")[8],
                     value=get_txt(ctx.guild.id, "abouts")[9].format(inf["points"], inf["monthlyPoints"]))
         e.add_field(name=get_txt(ctx.guild.id, "abouts")[10],
-                    value='[sevenc-nanashi/SevenBot](https://github.com/sevenc-nanashi/SevenBot)')
+                    value='[SevenBot-dev/SevenBot](https://github.com/SevenBot-dev/SevenBot)')
         e.add_field(name=get_txt(ctx.guild.id, "abouts")
                     [13], value=get_txt(ctx.guild.id, "abouts")[14])
         return await ctx.send(embed=e)
@@ -2837,7 +2839,7 @@ class MainCog(commands.Cog):
                               "noperm"], color=Error)
             return await ctx.send(embed=e)
         e = discord.Embed(title=guild.name + " - "
-                          + f"`{guild.id}`", color=Info)
+                          + f"`{guild.id}`", color=Info, timestamp=guild.created_at)
         e.set_author(name=f"{guild.owner.display_name}({guild.owner}, ID:{guild.owner.id})",
                      icon_url=guild.owner.avatar_url_as(static_format="png"))
         e.set_thumbnail(url=guild.icon_url_as(static_format="png"))
@@ -2856,6 +2858,7 @@ class MainCog(commands.Cog):
             len([e for e in guild.emojis if e.animated]),
             guild.emoji_limit
         ))
+        e.set_footer(text=get_txt(ctx.guild.id, "serverinfo")["created_at"])
         return await ctx.send(embed=e)
 
     @commands.group(name="sevennet")
