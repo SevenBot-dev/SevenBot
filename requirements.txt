@@ -15,7 +15,7 @@ cffi==1.14.5
 chardet==4.0.0
 colorama==0.4.4
 cryptography==3.4.7
-dblpy==1.0.0
+topgg==1.0.1
 debtcollector==2.2.0
 discord-ext-levenshtein==0.3.0
 discord.py==1.7.1
