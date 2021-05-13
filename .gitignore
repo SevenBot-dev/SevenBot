@@ -147,4 +147,6 @@ tokens.py
 .git-old2/
 *.OTF
 htsvoices/
+*.htsvoice
 *_docs/
+*.git
