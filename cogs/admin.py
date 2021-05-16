@@ -274,7 +274,10 @@ class AdminCog(commands.Cog):
             )
             r = await locals()['__ex'](self, self.bot, ctx, ctx, session, _print, get_msg)
         try:
-            await ctx.send(f"stdout:```\n{ret[ctx.message.id]}\n```\nreturn:```\n{r}\n```")
+            if ret[ctx.message.id]:
+                await ctx.send(f"stdout:```\n{ret[ctx.message.id]}\n```")
+            if r:
+                await ctx.send(f"return:```\n{r}\n```")
         except BaseException:
             pass
         await ctx.message.add_reaction(Official_emojis["check8"])
