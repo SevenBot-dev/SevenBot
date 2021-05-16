@@ -722,7 +722,7 @@ class MainCog(commands.Cog):
             flag = (ids[0] == message.guild.id)
             if not flag:
                 try:
-                    flag = (self.bot.get_guild(
+                    flag = bool(self.bot.get_guild(
                         ids[0]).get_member(message.author.id))
                 except AttributeError:
                     flag = False
@@ -868,7 +868,7 @@ class MainCog(commands.Cog):
         if not self.bot.consts.get("ads"):
             await self.on_message_ad(await self.bot.get_channel(800628621010141224).fetch_message(800634459178663946))
         ad = random.choice(self.bot.consts["ads"])
-        show_ad = not self.bot.is_premium(ctx.author)
+        show_ad = False
         if datail is None:
             desc = get_txt(ctx.guild.id, "help_categories")[1] + "\n**`uses`** - " + \
                 get_txt(ctx.guild.id, "help_category_helps")["uses"] + "\n"
@@ -3583,7 +3583,7 @@ def setup(_bot):
     async def on_error(_, *args, **__):
         try:
             ex = sys.exc_info()[1]
-            print(ex)
+            print(traceback.format_exc())
             if not bot.is_ready():
                 return
             if isinstance(ex, (AttributeError, aiohttp.client_exceptions.ClientOSError)):
