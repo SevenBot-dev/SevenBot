@@ -1461,11 +1461,11 @@ class MainCog(commands.Cog):
         e = discord.Embed(
             title=get_txt(ctx.guild.id, "abouts")[0], color=Bot_info, url="https://sevenbot.jp")
         e.add_field(name=Texts[Guild_settings[ctx.guild.id]
-                               ["lang"]]["abouts"][1], value="[名無し。(@MNoNamer)](http://twitter.com/MNoNamer)")
+                               ["lang"]]["abouts"][1], value="[名無し。(@sevenc-nanashi)](https://github.com/sevenc-nanashi)")
         e.add_field(name=get_txt(ctx.guild.id, "abouts")[
                     2], value=f"`python {platform.python_version()}`,`discord.py {discord.__version__}`")
         e.add_field(name=get_txt(ctx.guild.id, "abouts")[3],
-                    value="https://discord.gg/YpgHwz8")
+                    value="https://discord.gg/GknwhnwbAV")
         e.add_field(name=get_txt(ctx.guild.id, "abouts")[4],
                     value=f"{len(self.bot.guilds)}" + get_txt(ctx.guild.id, "abouts")[-2])
         e.add_field(name=get_txt(ctx.guild.id, "abouts")[5],
