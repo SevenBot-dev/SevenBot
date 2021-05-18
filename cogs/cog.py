@@ -735,6 +735,8 @@ class MainCog(commands.Cog):
                 try:
                     m = await c.fetch_message(ids[2])
                     mc = m.content
+                    if m.author.id != message.author.id:
+                        return
                     if len(mc.splitlines()) > 10:
                         mc = "\n".join(mc.splitlines()[:10]) + "\n..."
                     if len(mc) > 1000:
