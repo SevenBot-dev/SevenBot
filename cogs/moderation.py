@@ -293,16 +293,19 @@ class ModerationCog(commands.Cog):
         await ctx.send(embed=e)
 
     @fatal_role.command(name="dm")
+    @commands.cooldown(5, 600, commands.BucketType.guild)
     async def fatal_role_dm(self, ctx, role: discord.Role, *, message):
         c = 0
         s = 0
         e = 0
+        await ctx.send(f"送信を開始します。およそ{6 * len(role.members) / 60}分かかります。")
         em = discord.Embed(title=get_txt(ctx.guild.id, "fatal_role_dm_title").format(
             ctx.guild.name), description=message, color=Chat)
         em.set_author(name=f"{ctx.author}(ID:{ctx.author.id})",
                       icon_url=ctx.author.avatar_url)
         for m in role.members:
             c += 1
+            await asyncio.sleep(5)
             try:
 
                 await m.send(embed=em)
