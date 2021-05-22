@@ -48,7 +48,7 @@ class ToolCog(commands.Cog):
         global Guild_settings, Official_emojis, Texts, Global_chat, Private_chats, get_txt, Sevennet_channels
 
         self.bot = _bot
-        Guild_settings = self.bot.raw_config["gs"]
+        Guild_settings = self.bot.guild_settings
         get_txt = self.bot.get_txt
         Texts = self.bot.texts
         Official_emojis = self.bot.consts["oe"]

@@ -256,7 +256,7 @@ class MainCog(commands.Cog):
         if not self.bot.consts.get("gcm"):
             self.bot.consts["gcm"] = collections.defaultdict(dict)
         try:
-            Guild_settings = self.bot.raw_config["gs"]
+            Guild_settings = self.bot.guild_settings
             get_txt = self.bot.get_txt
             Official_emojis = self.bot.consts["oe"]
             is_command = self.bot.is_command
@@ -3551,8 +3551,8 @@ class MainCog(commands.Cog):
                         res[gid][ds] = dsv
                         fixed.append(ds)
         try:
-            self.bot.raw_config["gs"].clear()
-            self.bot.raw_config["gs"].update(res)
+            self.bot.guild_settings.clear()
+            self.bot.guild_settings.update(res)
         except Exception as e:
             raise e
         print(id(Guild_settings))

@@ -56,7 +56,7 @@ class TtsCog(commands.Cog):
         global Guild_settings, Official_emojis, Tts_channels, Tts_settings
         global get_txt
         self.bot = bot
-        Guild_settings = bot.raw_config["gs"]
+        Guild_settings = bot.guild_settings
         get_txt = bot.get_txt
         Official_emojis = bot.consts["oe"]
         Tts_channels = bot.consts["tc"]

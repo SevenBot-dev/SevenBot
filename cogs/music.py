@@ -79,7 +79,7 @@ class MusicCog(commands.Cog):
         global Guild_settings, Official_emojis, Number_emojis, Favorite_songs, Texts
         global get_txt
         self.bot = bot
-        Guild_settings = bot.raw_config["gs"]
+        Guild_settings = bot.guild_settings
         Official_emojis = bot.consts["oe"]
         Texts = bot.texts
         Favorite_songs = bot.raw_config["fs"]

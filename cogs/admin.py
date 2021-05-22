@@ -19,7 +19,7 @@ class AdminCog(commands.Cog):
         global Guild_settings, Official_emojis, Global_chat, Global_mute, Private_chats, Sevennet_channels, GBan, Blacklists
         global get_txt
         self.bot = bot
-        Guild_settings = bot.raw_config["gs"]
+        Guild_settings = bot.guild_settings
         Global_chat = bot.raw_config["gc"]
         GBan = bot.raw_config["gb"]
         Blacklists = bot.raw_config["bs"]
@@ -240,8 +240,8 @@ class AdminCog(commands.Cog):
     #                         res[gid][ds] = dsv
     #                         fixed.append(ds)
     #         try:
-    #             self.bot.raw_config["gs"].clear()
-    #             self.bot.raw_config["gs"].update(res)
+    #             self.bot.guild_settings.clear()
+    #             self.bot.guild_settings.update(res)
     #         except Exception as e:
     #             raise e
     #         print(id(Guild_settings))

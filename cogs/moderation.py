@@ -70,7 +70,7 @@ class ModerationCog(commands.Cog):
         global Guild_settings, Official_emojis
         global get_txt
         self.bot = bot
-        Guild_settings = bot.raw_config["gs"]
+        Guild_settings = bot.guild_settings
         get_txt = bot.get_txt
         Official_emojis = bot.consts["oe"]
 

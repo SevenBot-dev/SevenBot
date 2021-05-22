@@ -32,7 +32,7 @@ class GlobalCog(commands.Cog):
         global Guild_settings, Official_emojis, Private_chats, Global_chat, Global_mute, Private_chat_pass, Private_chat_author
         global get_txt, is_command
         self.bot = bot
-        Guild_settings = bot.raw_config["gs"]
+        Guild_settings = bot.guild_settings
         Global_chat = bot.raw_config["gc"]
         Official_emojis = bot.consts["oe"]
         Private_chats = bot.raw_config["pc"]
