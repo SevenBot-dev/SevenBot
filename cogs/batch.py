@@ -33,7 +33,7 @@ class BatchCog(commands.Cog):
         global Guild_settings, Dissoku_alerts
         global get_txt
         self.bot = bot
-        Guild_settings = self.bot.raw_config["gs"]
+        Guild_settings = self.bot.guild_settings
         Dissoku_alerts = self.bot.raw_config["da"]
         get_txt = self.bot.get_txt
         Batchs.append(self.batch_change_activity.start())

@@ -11,7 +11,7 @@ class TemplateCog(commands.Cog):
         global Guild_settings, Texts
         global get_txt
         self.bot = bot
-        Guild_settings = bot.raw_config["gs"]
+        Guild_settings = bot.guild_settings
         Texts = bot.texts
         get_txt = bot.get_txt
 

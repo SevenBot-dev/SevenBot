@@ -98,7 +98,7 @@ class SevenBot(commands.Bot):
         super().__init__(*args, **kwargs)
         self.consts = {"qu": {}, "ch": {}, "oe": {}, "ne": [], "tc": {}}
         self.raw_config = ast.literal_eval(raw_save)
-        self.raw_config["gs"] = gs
+        self.guild_settings = gs
         self.dbclient = motor.AsyncIOMotorClient(cstr)
         self.db = self.dbclient.sevenbot
         self.web_pass = web_pass
@@ -110,7 +110,7 @@ class SevenBot(commands.Bot):
     async def on_ready(self):
         global Guild_settings
         print("on_ready fired")
-        Guild_settings = self.raw_config["gs"]
+        Guild_settings = self.guild_settings
         for k, v in Channel_ids.items():
             self.consts["ch"][k] = self.get_channel(v)
         self.DBL_client = topgg.DBLClient(self, dbl_token)

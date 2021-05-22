@@ -189,7 +189,7 @@ class FunCog(commands.Cog):
         get_txt = _bot.get_txt
         is_command = _bot.is_command
         Texts = _bot.texts
-        Guild_settings = _bot.raw_config["gs"]
+        Guild_settings = _bot.guild_settings
         Official_emojis = _bot.consts["oe"]
 
     @commands.Cog.listener("on_message")
