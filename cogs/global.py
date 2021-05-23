@@ -51,7 +51,7 @@ class GlobalCog(commands.Cog):
             ga = []
             deletes = []
             whname = "sevenbot-private-webhook-sgc"
-            each = Private_chat_info["sgc"]["channel"]
+            each = Private_chat_info["sgc"]["channels"]
             # print(message.content)
             try:
                 data = json.loads(message.content)
