@@ -155,7 +155,7 @@ class ToolCog(commands.Cog):
         e = discord.Embed(
             title=get_txt(ctx.guild.id, "afk_register"),
             description=get_txt(ctx.guild.id, "afk_register_desc"), color=Success)
-        await ctx.send(embed=e)
+        await ctx.reply(embed=e)
         self.bot.consts["afk"].append({"uid": ctx.author.id, "reason": reason, "urls": []})
 
         # ----Twitter----
@@ -207,7 +207,7 @@ class ToolCog(commands.Cog):
     @afk_twitter.command(name="deactivate", aliases=Deactivate_aliases)
     async def afk_twitter_off(self, ctx):
         await self.bot.db.twitter_keys.delete_one({"uid": ctx.author.id})
-        await ctx.send(embed=discord.Embed(title=get_txt(ctx.guild.id, "afk_twitter_off"), color=Success))
+        await ctx.reply(embed=discord.Embed(title=get_txt(ctx.guild.id, "afk_twitter_off"), color=Success))
 #     @_afk.command(name="list",aliases=["l"])
 #     async def afk_list(self, ctx):
 #         pass
@@ -233,7 +233,7 @@ class ToolCog(commands.Cog):
             async with session.post('https://7bot.ml/api', json=({"url": url, "shortId": shortid} if shortid else {"url": url})) as r:
                 r.raise_for_status()
                 e = discord.Embed(title=get_txt(ctx.guild.id, "short_ok"), description=(await r.json())["url"], color=Success)
-                msg = await ctx.send(embed=e)
+                msg = await ctx.reply(embed=e)
                 await msg.add_reaction(Official_emojis["down"])
                 try:
                     _ = await self.bot.wait_for("reaction_add", check=lambda r, u: r.message.id == msg.id and r.emoji == Official_emojis["down"] and not u.bot, timeout=30)
@@ -288,7 +288,7 @@ class ToolCog(commands.Cog):
         with open("./dpy_docs/attrs.txt", "w") as f:
             f.write("\n".join(attrs))
         Dpy_attrs = attrs.copy()
-        await ctx.send("d.py done")
+        await ctx.reply("d.py done")
 
         async with aiohttp.ClientSession() as s:
             async with s.get("https://raw.githubusercontent.com/discordjs/discord.js/docs/master.json") as r:
@@ -313,7 +313,7 @@ class ToolCog(commands.Cog):
         with open("./djs_docs/attrs.txt", "w") as f:
             f.write("\n".join(attrs))
         Djs_attrs = attrs.copy()
-        await ctx.send("d.js done")
+        await ctx.reply("d.js done")
 
     @commands.group(name="develop_tool", aliases=["dev", "develop"])
     async def develop_tool(self, ctx):
@@ -331,7 +331,7 @@ class ToolCog(commands.Cog):
             except ValueError:
                 res += f"`{c}` : unknown\n"
 
-        await ctx.send(res)
+        await ctx.reply(res)
 
     @develop_tool.group(name="rtfm", aliases=["rtfd"], invoke_without_command=True)
     async def rtfm(self, ctx):
@@ -417,7 +417,7 @@ class ToolCog(commands.Cog):
                 res2 += get_txt(ctx.guild.id, "dpy_more").format(pres.count("\n") - res_i)
             val = res2
         e.add_field(name=get_txt(ctx.guild.id, "dpy_methods") + '(`' + str(pres.count("\n")) + '`)', value=val)
-        await ctx.send(embed=e)
+        await ctx.reply(embed=e)
 
     @rtfm.command("djs")
     async def rtfm_djs(self, ctx, *, text):
@@ -483,7 +483,7 @@ class ToolCog(commands.Cog):
                 res2 += get_txt(ctx.guild.id, "djs_more").format(pres.count("\n") - res_i)
             val = res2
         e.add_field(name=get_txt(ctx.guild.id, "djs_methods") + '(`' + str(pres.count("\n")) + '`)', value=val)
-        await ctx.send(embed=e)
+        await ctx.reply(embed=e)
 
     @commands.command(aliases=["sf"])
     async def snowflake(self, ctx, sf: int):
@@ -495,12 +495,12 @@ class ToolCog(commands.Cog):
         dt_utc_aware = datetime.datetime.fromtimestamp((res[0] + 1420070400000) / 1000.0, datetime.timezone.utc)
         res[0] = str(dt_utc_aware)
         e = discord.Embed(title=get_txt(ctx.guild.id, "snowflake")[0], description=get_txt(ctx.guild.id, "snowflake")[1].format(*res), color=Info)
-        await ctx.send(embed=e)
+        await ctx.reply(embed=e)
 
     @commands.command()
     @commands.cooldown(10, 5)
     async def webshot(self, ctx, *, url):
-        msg = await ctx.send(embed=SEmbed("取得中です。しばらくお待ち下さい。", color=Process))
+        msg = await ctx.reply(embed=SEmbed("取得中です。しばらくお待ち下さい。", color=Process))
         async with aiohttp.ClientSession() as s:
             async with s.post("https://api.sevenbot.jp/webshot", json={"password": self.bot.web_pass, "url": url}) as r:
                 temp = await self.bot.get_channel(765528694500360212).send(file=discord.File(io.BytesIO(await r.read()), filename="result.png"))

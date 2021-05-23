@@ -53,11 +53,6 @@ sac = 0
 TRANSLATOR = AsyncTranslator()
 
 
-async def hasnt_admin(ctx):
-    r = Guild_settings[ctx.guild.id]["hasnt_admin"]
-    await ctx.send(r)
-
-
 def to_lts(s):
     s = math.floor(s)
     res = str((s // 60) % 60).zfill(2) + ":" + str(s % 60).zfill(2)
@@ -121,11 +116,6 @@ def death_generator(message):
 
 def split_n(text, n):
     return re.split(f"(.{{{n}}})", text)[1::2]
-
-
-async def admin_mute(ctx):
-    global Guild_settings
-    await ctx.send(get_txt(ctx.guild.id, "only_admin"))
 
 
 class NotADatetimeFormat(commands.BadArgument):
@@ -738,7 +728,7 @@ class FunCog(commands.Cog):
                           description=get_txt(ctx.guild.id, "big-number")["waiting_desc"].format(Official_emojis["check5"], Official_emojis["check6"]), color=Gaming)
         e.add_field(name=get_txt(ctx.guild.id, "big-number")
                     ["players"].format(1), value=ctx.author.mention)
-        msg = await ctx.send(embed=e)
+        msg = await ctx.reply(embed=e)
         Bignum_join[msg] = [ctx.author.mention]
         await msg.add_reaction(Official_emojis["check5"])
         await msg.add_reaction(Official_emojis["check6"])
@@ -749,7 +739,7 @@ class FunCog(commands.Cog):
                           description=get_txt(ctx.guild.id, "ww")["waiting_desc"].format(Official_emojis["check5"], Official_emojis["check6"]), color=Gaming)
         e.add_field(name=get_txt(ctx.guild.id, "ww")[
                     "players"].format(1), value=ctx.author.mention)
-        msg = await ctx.send(embed=e)
+        msg = await ctx.reply(embed=e)
         Wolf_join[msg.id] = [ctx.author.mention]
         await msg.add_reaction(Official_emojis["check5"])
         await msg.add_reaction(Official_emojis["check6"])
@@ -760,20 +750,20 @@ class FunCog(commands.Cog):
         if rtype.lower() not in ("alive", "dead"):
             e = discord.Embed(title=get_txt(ctx.guild.id, "ww")[
                               "role_type"], color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         if role is None:
             Guild_settings[ctx.guild.id]["ww_role"][rtype.lower()] = None
             e = discord.Embed(title=get_txt(ctx.guild.id, "ww")["role_set_none"].format(
                 get_txt(ctx.guild.id, "ww")[f"role_{rtype.lower()}"]), color=Success)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         if role.position > ctx.author.top_role.position and ctx.author.id != ctx.guild.owner_id:
             e = discord.Embed(title=get_txt(ctx.guild.id, "role_link")[
                               "no_role_perm"], color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         Guild_settings[ctx.guild.id]["ww_role"][rtype.lower()] = role.id
         e = discord.Embed(title=get_txt(ctx.guild.id, "ww")["role_set"].format(get_txt(
             ctx.guild.id, "ww")[f"role_{rtype.lower()}"], "`@" + role.name + "`"), color=Success)
-        return await ctx.send(embed=e)
+        return await ctx.reply(embed=e)
 
     @commands.command(aliases=["ree"])
     async def reencode(self, ctx, *, text):
@@ -788,11 +778,11 @@ class FunCog(commands.Cog):
         if target.bot:
             e = discord.Embed(title=get_txt(
                 ctx.guild.id, "ox_bot"), color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         elif target.id == ctx.author.id:
             e = discord.Embed(title=get_txt(
                 ctx.guild.id, "ox_self"), color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         base_im = Image.new("RGBA", (480, 480), rgb_tuple(0x36393f))
         try:
             async with timeout(5):
@@ -804,7 +794,7 @@ class FunCog(commands.Cog):
         except asyncio.TimeoutError:
             e = discord.Embed(title=get_txt(
                 ctx.guild.id, "ox_connection_timeout"), color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         size = (640, 640)
         avater1 = Image.open(f).resize(size)
         avater2 = Image.open(f2).resize(size)
@@ -830,7 +820,7 @@ class FunCog(commands.Cog):
         except asyncio.TimeoutError:
             e = discord.Embed(title=get_txt(
                 ctx.guild.id, "ox_timeout"), color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
             return
         sendio.close()
         draw = ImageDraw.Draw(base_im)
@@ -842,7 +832,7 @@ class FunCog(commands.Cog):
         e = discord.Embed(title=get_txt(ctx.guild.id, "ox_title"), description=get_txt(
             ctx.guild.id, "ox_prepare"), color=Gaming)
 
-        msg = await ctx.send(embed=e)
+        msg = await ctx.reply(embed=e)
         loop = asyncio.get_event_loop()
         for n in Number_emojis[1:10]:
             loop.create_task(msg.add_reaction(n))
@@ -919,7 +909,7 @@ class FunCog(commands.Cog):
             except asyncio.TimeoutError:
                 e = discord.Embed(title=get_txt(
                     ctx.guild.id, "ox_user_timeout"), color=Error)
-                return await ctx.send(embed=e)
+                return await ctx.reply(embed=e)
             fields[Number_emojis.index(r.emoji) - 1] = index % 2 + 1
             await msg.clear_reaction(r.emoji)
             index += 1
@@ -1039,7 +1029,7 @@ class FunCog(commands.Cog):
                 e.set_image(url=res["message"])
                 e.set_footer(text="Powered by NekoBot API",
                              icon_url="https://images.discordapp.net/avatars/310039170792030211/237b80900f1dc974efcd1758701b594d.png")
-                await ctx.send(embed=e)
+                await ctx.reply(embed=e)
 
     @_image.command(name="kemomimi", aliases=["kemo", "kemonomimi"])
     @commands.cooldown(1, 2)
@@ -1051,7 +1041,7 @@ class FunCog(commands.Cog):
                 e.set_image(url=res["message"])
                 e.set_footer(text="Powered by NekoBot API",
                              icon_url="https://images.discordapp.net/avatars/310039170792030211/237b80900f1dc974efcd1758701b594d.png")
-                await ctx.send(embed=e)
+                await ctx.reply(embed=e)
 
     @_image.command(name="food")
     @commands.cooldown(1, 2)
@@ -1063,13 +1053,13 @@ class FunCog(commands.Cog):
                 e.set_image(url=res["message"])
                 e.set_footer(text="Powered by NekoBot API",
                              icon_url="https://images.discordapp.net/avatars/310039170792030211/237b80900f1dc974efcd1758701b594d.png")
-                await ctx.send(embed=e)
+                await ctx.reply(embed=e)
 
     @_image.command(name="5000")
     @commands.cooldown(1, 2)
     async def _image_5000(self, ctx, top, bottom):
         e = SEmbed(color=0xff0000, image_url=f"https://gsapi.cyberrex.ml/image?top={urllib.parse.quote(top)}&bottom={urllib.parse.quote(bottom)}", footer="Powered by 5000choyen-api")
-        await ctx.send(embed=e)
+        await ctx.reply(embed=e)
 
     @_image.command(name="httpcat", aliases=["hcat", "http"])
     @commands.cooldown(1, 2)
@@ -1078,7 +1068,7 @@ class FunCog(commands.Cog):
         e.set_image(url=f'https://http.cat/{num}')
         e.set_footer(text="Powered by HTTP Cats",
                      icon_url="https://i.imgur.com/fEXdAAB.png")
-        await ctx.send(embed=e)
+        await ctx.reply(embed=e)
 
     @_image.command(name="github")
     @commands.cooldown(1, 2)
@@ -1107,7 +1097,7 @@ class FunCog(commands.Cog):
         amsg = await self.bot.get_channel(765528694500360212).send(file=discord.File(tmpio, filename="result.png"))
         e.set_image(url=amsg.attachments[0].url)
         tmpio.close()
-        await ctx.send(embed=e)
+        await ctx.reply(embed=e)
 
     @_image.command(name="ps4")
     @commands.cooldown(1, 2)
@@ -1115,7 +1105,7 @@ class FunCog(commands.Cog):
         if not ctx.message.attachments:
             e = discord.Embed(title=get_txt(
                 ctx.guild.id, "no_attachments"), color=Error)
-            await ctx.send(embed=e)
+            await ctx.reply(embed=e)
             return
         image_byte = await ctx.message.attachments[0].read()
         Ps4_X = 7
@@ -1153,7 +1143,7 @@ class FunCog(commands.Cog):
             name=f"{ctx.author.display_name}(ID:{ctx.author.id})", icon_url=ctx.author.avatar_url)
         e.set_image(url=amsg.attachments[0].url)
         sendio.close()
-        await ctx.send(embed=e)
+        await ctx.reply(embed=e)
         await ctx.message.delete()
 
     @_image.command(name="switch")
@@ -1161,7 +1151,7 @@ class FunCog(commands.Cog):
         if not ctx.message.attachments:
             e = discord.Embed(title=get_txt(
                 ctx.guild.id, "no_attachments"), color=Error)
-            await ctx.send(embed=e)
+            await ctx.reply(embed=e)
             return
         image_byte = await ctx.message.attachments[0].read()
         readio = io.BytesIO(image_byte)
@@ -1204,7 +1194,7 @@ class FunCog(commands.Cog):
             name=f"{ctx.author.display_name}(ID:{ctx.author.id})", icon_url=ctx.author.avatar_url)
         e.set_image(url=amsg.attachments[0].url)
         sendio.close()
-        await ctx.send(embed=e)
+        await ctx.reply(embed=e)
         await ctx.message.delete()
 
     @commands.command(aliases=["lainan", "ltalk"])
@@ -1218,7 +1208,7 @@ class FunCog(commands.Cog):
 
     @commands.command(aliases=["sdeath"])
     async def sudden_death(self, ctx, *, text):
-        await ctx.send("```\n" + death_generator(text) + "\n```")
+        await ctx.reply("```\n" + death_generator(text) + "\n```")
 
     @commands.command(aliases=["cword"])
     @commands.is_nsfw()
@@ -1239,14 +1229,14 @@ class FunCog(commands.Cog):
                 res = urllib.parse.unquote(await r.text(), encoding="eucjp")
                 if "すみません" in res:
                     e = SEmbed("復元に失敗しました。", res.split("~")[1], color=Error)
-                    await ctx.send(embed=e)
+                    await ctx.reply(embed=e)
                 else:
                     e = SEmbed(res.split("~")[1], color=Info)
                     for r in res.split("~")[2].split(",")[1:]:
                         e.fields.append(
                             SField(r.split("@")[0], r.split("@")[1], inline=False))
 
-                    m = await ctx.send(embed=e)
+                    m = await ctx.reply(embed=e)
                     await m.add_reaction(Official_emojis["check6"])
                     try:
                         _ = await self.bot.wait_for("reaction_add", check=lambda r, u: r.message.id == m.id and r.emoji == Official_emojis["check6"] and not u.bot)

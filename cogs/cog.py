@@ -774,7 +774,7 @@ class MainCog(commands.Cog):
         if un is None:
             e = discord.Embed(title=get_txt(ctx.guild.id, "getid_self")[0].format(
                 ctx.author.id), description=get_txt(ctx.guild.id, "getid_self")[1], color=Info)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         else:
             per = Texts[Guild_settings[ctx.guild.id]
                         ["lang"]]["getid_search"][3]
@@ -799,7 +799,7 @@ class MainCog(commands.Cog):
                         [1], inline=False, value=per)
             e.add_field(name=get_txt(ctx.guild.id, "getid_search")
                         [2], inline=False, value=inc)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
 
     @commands.command(name="tos")
     async def _tos(self, ctx):
@@ -817,7 +817,7 @@ class MainCog(commands.Cog):
                 embed.add_field(name=ts3[1], value=ts3[2], inline=False)
             else:
                 embed.add_field(name="⠀", value=ts3[0], inline=False)
-        await ctx.send(embed=embed)
+        await ctx.reply(embed=embed)
 
     @commands.command()
     async def tips(self, ctx, name=None):
@@ -834,7 +834,7 @@ class MainCog(commands.Cog):
         e = discord.Embed(title=get_txt(ctx.guild.id, "tips_title"),
                           description=desc, color=Bot_info)
         e.set_footer(text="ID: " + tid)
-        return await ctx.send(embed=e)
+        return await ctx.reply(embed=e)
 
     async def reset(self, ctx):
         Guild_settings[ctx.guild.id] = Default_settings
@@ -869,8 +869,6 @@ class MainCog(commands.Cog):
     async def help(self, ctx, *, datail=None):
         if not self.bot.consts.get("ads"):
             await self.on_message_ad(await self.bot.get_channel(800628621010141224).fetch_message(800634459178663946))
-        ad = random.choice(self.bot.consts["ads"])
-        show_ad = False
         if datail is None:
             desc = get_txt(ctx.guild.id, "help_categories")[1] + "\n**`uses`** - " + \
                 get_txt(ctx.guild.id, "help_category_helps")["uses"] + "\n"
@@ -881,24 +879,7 @@ class MainCog(commands.Cog):
                               description=desc, url="https://sevenbot.jp/commands", color=Bot_info)
             e.set_author(
                 name=f"{ctx.author.display_name}(ID:{ctx.author.id})", icon_url=ctx.author.avatar_url)
-            if not show_ad:
-                return await ctx.send(embed=e)
-            be = e.copy()
-            e.add_field(name=get_txt(ctx.guild.id, "help_ad")[0].format(
-                ad[2]), value="[" + get_txt(ctx.guild.id, "help_ad")[1] + "](" + ad[0] + ")")
-            if ad[1]:
-                e.set_image(url=ad[1])
-            m = await ctx.send(embed=e)
-            await m.add_reaction(Official_emojis["check6"])
-            try:
-                await self.bot.wait_for("reaction_add", check=lambda r, u: r.message.id == m.id and r.emoji == Official_emojis["check6"] and not u.bot)
-                await m.edit(embed=be)
-                try:
-                    await m.clear_reaction(Official_emojis["check6"])
-                except discord.errors.Forbidden:
-                    pass
-            except asyncio.TimeoutError:
-                pass
+            return await ctx.reply(embed=e)
         elif datail == "uses":
             desc = ""
             for cni, (cnk, cnv) in enumerate(sorted(Command_counter.items(), key=lambda x: x[1], reverse=True)[0:10]):
@@ -912,24 +893,7 @@ class MainCog(commands.Cog):
                 name=f"{ctx.author.display_name}(ID:{ctx.author.id})", icon_url=ctx.author.avatar_url)
             e.set_footer(
                 text=get_txt(ctx.guild.id, "help_categories")[3])
-            be = e.copy()
-            if not show_ad:
-                return await ctx.send(embed=e)
-            e.add_field(name=get_txt(ctx.guild.id, "help_ad")[0].format(
-                ad[2]), value="[" + get_txt(ctx.guild.id, "help_ad")[1] + "](" + ad[0] + ")")
-            if ad[1]:
-                e.set_image(url=ad[1])
-            m = await ctx.send(embed=e)
-            await m.add_reaction(Official_emojis["check6"])
-            try:
-                await self.bot.wait_for("reaction_add", check=lambda r, u: r.message.id == m.id and r.emoji == Official_emojis["check6"] and not u.bot)
-                await m.edit(embed=be)
-                try:
-                    await m.clear_reaction(Official_emojis["check6"])
-                except discord.errors.Forbidden:
-                    pass
-            except asyncio.TimeoutError:
-                pass
+            return await ctx.reply(embed=e)
         elif datail in Categories.keys():
             desc = ""
             for cn in Categories[datail]:
@@ -943,24 +907,7 @@ class MainCog(commands.Cog):
                 name=f"{ctx.author.display_name}(ID:{ctx.author.id})", icon_url=ctx.author.avatar_url)
             e.set_footer(
                 text=get_txt(ctx.guild.id, "help_categories")[3])
-            be = e.copy()
-            if not show_ad:
-                return await ctx.send(embed=e)
-            e.add_field(name=get_txt(ctx.guild.id, "help_ad")[0].format(
-                ad[2]), value="[" + get_txt(ctx.guild.id, "help_ad")[1] + "](" + ad[0] + ")")
-            if ad[1]:
-                e.set_image(url=ad[1])
-            m = await ctx.send(embed=e)
-            await m.add_reaction(Official_emojis["check6"])
-            try:
-                await self.bot.wait_for("reaction_add", check=lambda r, u: r.message.id == m.id and r.emoji == Official_emojis["check6"] and not u.bot)
-                await m.edit(embed=be)
-                try:
-                    await m.clear_reaction(Official_emojis["check6"])
-                except discord.errors.Forbidden:
-                    pass
-            except asyncio.TimeoutError:
-                pass
+            return await ctx.reply(embed=e)
         else:
             datail = datail.lower()
             if self.bot.get_command(datail):
@@ -968,7 +915,7 @@ class MainCog(commands.Cog):
                 if c.hidden:
                     e = SEmbed(title=get_txt(ctx.guild.id, "help_title") + " - " + str(c), description=get_txt(ctx.guild.id, "help_hidden"),
                                color=Bot_info, author=SAuthor(name=f"{ctx.author.display_name}(ID:{ctx.author.id})", icon_url=ctx.author.avatar_url))
-                    return await ctx.send(embed=e)
+                    return await ctx.reply(embed=e)
                 desc_txt = get_txt(ctx.guild.id, "help_datail").get(str(
                     c), get_txt(ctx.guild.id, "help_datail_none")).lstrip("\n ")
                 e = discord.Embed(
@@ -1010,45 +957,11 @@ class MainCog(commands.Cog):
                             value=get_txt(ctx.guild.id, "help_datail_count")[1].format(Command_counter.get(str(c).split()[0], 0)), inline=False)
                 e.set_author(
                     name=f"{ctx.author.display_name}(ID:{ctx.author.id})", icon_url=ctx.author.avatar_url)
-                if not show_ad:
-                    return await ctx.send(embed=e)
-                be = discord.Embed.from_dict(copy.deepcopy(e.to_dict()))
-                e.add_field(name=get_txt(ctx.guild.id, "help_ad")[0].format(
-                    ad[2]), value="[" + get_txt(ctx.guild.id, "help_ad")[1] + "](" + ad[0] + ")")
-                if ad[1]:
-                    e.set_image(url=ad[1])
-                m = await ctx.send(embed=e)
-                await m.add_reaction(Official_emojis["check6"])
-                try:
-                    await self.bot.wait_for("reaction_add", check=lambda r, u: r.message.id == m.id and r.emoji == Official_emojis["check6"] and not u.bot)
-                    await m.edit(embed=be)
-                    try:
-                        await m.clear_reaction(Official_emojis["check6"])
-                    except discord.errors.Forbidden:
-                        pass
-                except asyncio.TimeoutError:
-                    pass
+                return await ctx.reply(embed=e)
             else:
                 e = discord.Embed(title=get_txt(ctx.guild.id, "help_title") + " - " + datail,
                                   description=get_txt(ctx.guild.id, "help_none"), color=Bot_info)
-                be = e.copy()
-                if not show_ad:
-                    return await ctx.send(embed=e)
-                e.add_field(name=get_txt(ctx.guild.id, "help_ad")[0].format(
-                    ad[2]), value="[" + get_txt(ctx.guild.id, "help_ad")[1] + "](" + ad[0] + ")")
-                if ad[1]:
-                    e.set_image(url=ad[1])
-                m = await ctx.send(embed=e)
-                await m.add_reaction(Official_emojis["check6"])
-                try:
-                    await self.bot.wait_for("reaction_add", check=lambda r, u: r.message.id == m.id and r.emoji == Official_emojis["check6"] and not u.bot)
-                    await m.edit(embed=be)
-                    try:
-                        await m.clear_reaction(Official_emojis["check6"])
-                    except discord.errors.Forbidden:
-                        pass
-                except asyncio.TimeoutError:
-                    pass
+                return await ctx.reply(embed=e)
 
     @commands.group(name="channel_settings", aliases=["ch"])
     @commands.has_permissions(manage_channels=True)
@@ -1062,7 +975,7 @@ class MainCog(commands.Cog):
         await ctx.channel.edit(slowmode_delay=sec)
         e = discord.Embed(title=get_txt(ctx.guild.id, "ch")[
                           "slowmode"][0].format(sec), color=Success)
-        return await ctx.send(embed=e)
+        return await ctx.reply(embed=e)
 
     @channel_setting.group(name="commands", aliases=["cmd"])
     @commands.has_permissions(manage_channels=True)
@@ -1087,13 +1000,13 @@ class MainCog(commands.Cog):
         if ctx.channel.id not in Guild_settings[ctx.guild.id]["auto_parse"]:
             e = discord.Embed(
                 title="既に無効化されています。", description="", color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         else:
             Guild_settings[ctx.guild.id]["auto_parse"].remove(
                 ctx.channel.id)
             e = discord.Embed(title=f"`#{ctx.channel.name}`での自動パースを無効にしました。",
                               description="", color=Success)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
 
     @ch_auto_parse.command(name="activate", aliases=Activate_aliases)
     @commands.has_permissions(manage_channels=True)
@@ -1103,11 +1016,11 @@ class MainCog(commands.Cog):
                 ctx.channel.id)
             e = discord.Embed(title=f"`#{ctx.channel.name}`での自動パースを有効にしました。",
                               description="", color=Success)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         else:
             e = discord.Embed(
                 title="既に有効です。", description="", color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
 
     @channel_setting.group(name="2ch_link")
     @commands.has_permissions(manage_channels=True)
@@ -1124,13 +1037,13 @@ class MainCog(commands.Cog):
         if ctx.channel.id not in Guild_settings[ctx.guild.id]["2ch_link"]:
             e = discord.Embed(
                 title="既に無効化されています。", description="", color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         else:
             Guild_settings[ctx.guild.id]["2ch_link"].remove(
                 ctx.channel.id)
             e = discord.Embed(title=f"`#{ctx.channel.name}`での2ch風メッセージリンクを無効にしました。",
                               description="", color=Success)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
 
     @ch_2ch_link.command(name="activate", aliases=Activate_aliases)
     @commands.has_permissions(manage_channels=True)
@@ -1140,11 +1053,11 @@ class MainCog(commands.Cog):
                 ctx.channel.id)
             e = discord.Embed(title=f"`#{ctx.channel.name}`での2ch風メッセージリンクを有効にしました。",
                               description="", color=Success)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         else:
             e = discord.Embed(
                 title="既に有効です。", description="", color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
 
     @channel_setting.group(name="lainan_talk", invoke_without_command=True)
     @commands.has_permissions(manage_channels=True)
@@ -1158,13 +1071,13 @@ class MainCog(commands.Cog):
         if ctx.channel.id not in Guild_settings[ctx.guild.id]["lainan_talk"]:
             e = discord.Embed(
                 title="既に無効化されています。", description="", color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         else:
             Guild_settings[ctx.guild.id]["lainan_talk"].remove(
                 ctx.channel.id)
             e = discord.Embed(title=f"`#{ctx.channel.name}`でのLainan APIの返信を無効にしました。",
                               description="", color=Success)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
 
     @ch_lainan_talk.command(name="activate", aliases=Activate_aliases)
     @commands.has_permissions(manage_channels=True)
@@ -1174,11 +1087,11 @@ class MainCog(commands.Cog):
                 ctx.channel.id)
             e = discord.Embed(title=f"`#{ctx.channel.name}`でのLainan APIの返信を有効にしました。",
                               description="", color=Success)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         else:
             e = discord.Embed(
                 title="既に有効です。", description="", color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
 
     @ch_commands.command(name="deactivate", aliases=Deactivate_aliases)
     @commands.has_permissions(manage_channels=True)
@@ -1187,13 +1100,13 @@ class MainCog(commands.Cog):
         if ctx.channel.id in Guild_settings[ctx.guild.id]["deactivate_command"]:
             e = discord.Embed(
                 title="既に無効化されています。", description="", color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         else:
             Guild_settings[ctx.guild.id]["deactivate_command"].append(
                 ctx.channel.id)
             e = discord.Embed(title=f"`#{ctx.channel.name}`での管理者以外のコマンドを無効にしました。",
                               description="", color=Success)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
 
     @ch_commands.command(name="activate", aliases=Activate_aliases)
     @commands.has_permissions(manage_channels=True)
@@ -1203,11 +1116,11 @@ class MainCog(commands.Cog):
                 ctx.channel.id)
             e = discord.Embed(title=f"`#{ctx.channel.name}`でのコマンドを有効にしました。",
                               description="", color=Success)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         else:
             e = discord.Embed(
                 title="既に有効です。", description="", color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
 
     @channel_setting.group(name="level")
     @commands.has_permissions(manage_channels=True)
@@ -1224,13 +1137,13 @@ class MainCog(commands.Cog):
         if ctx.channel.id not in Guild_settings[ctx.guild.id]["level_ignore_channel"]:
             e = discord.Embed(
                 title="既に有効です。", color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         else:
             Guild_settings[ctx.guild.id]["level_ignore_channel"].remove(
                 ctx.channel.id)
             e = discord.Embed(
                 title="このチャンネルでのレベリングが有効になりました。", description="", color=Success)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
 
     @ch_level.command(name="deactivate", aliases=Deactivate_aliases)
     @commands.has_permissions(manage_channels=True)
@@ -1239,13 +1152,13 @@ class MainCog(commands.Cog):
         if ctx.channel.id in Guild_settings[ctx.guild.id]["level_ignore_channel"]:
             e = discord.Embed(
                 title="既に無効です。", description="", color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         else:
             Guild_settings[ctx.guild.id]["level_ignore_channel"].append(
                 ctx.channel.id)
             e = discord.Embed(
                 title="このチャンネルでのレベリングが無効になりました。", description="", color=Success)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
 
     @channel_setting.group(name="translate", aliases=["trans"])
     @commands.has_permissions(manage_channels=True)
@@ -1262,12 +1175,12 @@ class MainCog(commands.Cog):
         if ctx.channel.id in list(Guild_settings[ctx.guild.id]["trans_channel"].keys()):
             e = discord.Embed(
                 title="既に有効です。", color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         else:
             Guild_settings[ctx.guild.id]["trans_channel"][ctx.channel.id] = lang
             e = discord.Embed(
                 title="自動翻訳が有効になりました。", description="", color=Success)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
 
     @ch_trans.command(name="deactivate", aliases=Deactivate_aliases)
     @commands.has_permissions(manage_channels=True)
@@ -1276,12 +1189,12 @@ class MainCog(commands.Cog):
         if ctx.channel.id not in list(Guild_settings[ctx.guild.id]["trans_channel"].keys()):
             e = discord.Embed(
                 title="既に無効です。", description="", color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         else:
             del Guild_settings[ctx.guild.id]["trans_channel"][ctx.channel.id]
             e = discord.Embed(
                 title="自動翻訳が無効になりました。", description="", color=Success)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
 
     @channel_setting.group(name="auto_publish")
     @commands.has_permissions(manage_channels=True)
@@ -1298,16 +1211,16 @@ class MainCog(commands.Cog):
         if ctx.channel.id in Guild_settings[ctx.guild.id]["autopub"]:
             e = discord.Embed(
                 title="既に有効です。", color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         elif ctx.channel.type == discord.ChannelType.news:
             Guild_settings[ctx.guild.id]["autopub"].append(ctx.channel.id)
             e = discord.Embed(
                 title="自動公開が有効になりました。", color=Success)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         else:
             e = discord.Embed(
                 title="自動公開はアナウンスチャンネルでのみ使用できます。", color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
 
     @ch_autopub.command(name="deactivate", aliases=Deactivate_aliases)
     @commands.has_permissions(manage_channels=True)
@@ -1316,12 +1229,12 @@ class MainCog(commands.Cog):
         if ctx.channel.id not in Guild_settings[ctx.guild.id]["autopub"]:
             e = discord.Embed(
                 title="既に無効です。", color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         else:
             Guild_settings[ctx.guild.id]["autopub"].remove(ctx.channel.id)
             e = discord.Embed(
                 title="自動公開が無効になりました。", color=Success)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
 
     @commands.group(aliases=["ar"])
     async def autoreply(self, ctx):
@@ -1341,7 +1254,7 @@ class MainCog(commands.Cog):
         Guild_settings[ctx.guild.id]["autoreply"][rid] = [base, reply]
         e = discord.Embed(title=f"自動返信に`{base}`を追加しました。",
                           description=f"戻すには`sb#autoreply remove {base}`または`sb#autoreply remove {rid}`を使用してください", color=Success)
-        return await ctx.send(embed=e)
+        return await ctx.reply(embed=e)
 
     @autoreply.command(name="remove", aliases=["del", "delete", "rem"])
     @commands.has_guild_permissions(manage_messages=True)
@@ -1371,7 +1284,7 @@ class MainCog(commands.Cog):
             e = discord.Embed(
                 title=f"{count}個の自動返信を削除しました。", description=res, color=Success)
             Guild_settings[ctx.guild.id]["autoreply"] = new
-        return await ctx.send(embed=e)
+        return await ctx.reply(embed=e)
 
     @autoreply.command(name="list")
     async def ar_list(self, ctx):
@@ -1382,7 +1295,7 @@ class MainCog(commands.Cog):
         if gs["autoreply"] == {}:
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "ar_list_no"), description=get_txt(ctx.guild.id, "ar_list_desc"), color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         else:
             def make_new():
                 table = Texttable()
@@ -1406,7 +1319,7 @@ class MainCog(commands.Cog):
             res.append(b)
             e = discord.Embed(title=get_txt(ctx.guild.id, "ar_list")
                               + f" - {1}/{len(res)}", description=f"```asciidoc\n{res[0]}```", color=Info)
-            msg = await ctx.send(embed=e)
+            msg = await ctx.reply(embed=e)
             page = 0
             await msg.add_reaction(Official_emojis["left"])
             await msg.add_reaction(Official_emojis["right"])
@@ -1448,13 +1361,13 @@ class MainCog(commands.Cog):
             pre = "sb#"
         e = discord.Embed(title=get_txt(ctx.guild.id, "prefix_changed")[0].format(before, after),
                           description=get_txt(ctx.guild.id, "prefix_changed")[1].format(pre), color=Success)
-        return await ctx.send(embed=e)
+        return await ctx.reply(embed=e)
 
     @commands.command()
     async def invite(self, ctx):
         e = discord.Embed(
             title="招待URL", description="[https://sevenbot.jp/invite](https://discord.com/oauth2/authorize?client_id=718760319207473152&scope=bot&permissions=808840532&response_type=code&redirect_uri=https%3A%2F%2Fsevenbot.jp%2Fthanks)", color=Bot_info)
-        return await ctx.send(embed=e)
+        return await ctx.reply(embed=e)
 
     @commands.command()
     async def about(self, ctx):
@@ -1481,7 +1394,7 @@ class MainCog(commands.Cog):
                     value='[SevenBot-dev/SevenBot](https://github.com/SevenBot-dev/SevenBot)')
         e.add_field(name=get_txt(ctx.guild.id, "abouts")
                     [13], value=get_txt(ctx.guild.id, "abouts")[14])
-        return await ctx.send(embed=e)
+        return await ctx.reply(embed=e)
 
     @commands.Cog.listener(name="on_command_error")
     async def on_command_error(self, ctx, error):
@@ -1491,7 +1404,7 @@ class MainCog(commands.Cog):
         elif isinstance(error, MissingRequiredArgument) or isinstance(error, BadArgument):
             e = discord.Embed(title=get_txt(ctx.guild.id, "bad_arg"),
                               description=get_txt(ctx.guild.id, "see_help") + f"\n```\n{error}```", color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         elif isinstance(error, commands.MissingPermissions):
             res = ""
             for p in error.missing_perms:
@@ -1507,26 +1420,26 @@ class MainCog(commands.Cog):
                                        "permissions_text")[2][p] + "\n"
             e = discord.Embed(title=get_txt(ctx.guild.id, "missing_permissions")[0], description=get_txt(
                 ctx.guild.id, "missing_permissions")[1] + f"```\n{res}```", color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         elif isinstance(error, commands.errors.NotOwner):
             e = discord.Embed(title=get_txt(
                 ctx.guild.id, "only_admin"), color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         elif isinstance(error, commands.errors.CommandOnCooldown):
             e = discord.Embed(title=get_txt(ctx.guild.id, "cooldown"), description=get_txt(
                 ctx.guild.id, "cooldown_desc").format(round(error.retry_after, 2)), color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         elif isinstance(error, commands.errors.DisabledCommand):
             e = discord.Embed(title=get_txt(ctx.guild.id, "disabled"), color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         elif isinstance(error, commands.errors.NSFWChannelRequired):
             e = discord.Embed(title=get_txt(
                 ctx.guild.id, "not_nsfw"), color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         else:
             e = discord.Embed(title=get_txt(ctx.guild.id, "error"),
                               description=f"```\n{error}```", color=Error)
-            msg = await ctx.send(embed=e)
+            msg = await ctx.reply(embed=e)
             await msg.add_reaction(Official_emojis["down"])
             try:
                 error_msg = ''.join(
@@ -1557,24 +1470,7 @@ class MainCog(commands.Cog):
                     break
             e.fields[0].value += "```"
         if ctx.guild.id != DBL_id:
-            return await ctx.send(embed=e)
-
-    @commands.command()
-    async def report_global(self, ctx, mid):
-        for c in Global_chat:
-            c2 = self.bot.get_channel(c)
-            try:
-                m = await c2.fetch_message(mid)
-                if m is not None:
-                    break
-            except NotFound:
-                pass
-        e = discord.Embed(title=f"{m.author.name}", description=m.content)
-        e.set_footer(text=ctx.author.id)
-        await Channels["global_report"].send(embed=e)
-        e = discord.Embed(
-            title="報告しました", description="しばらくお待ち下さい。", color=Success)
-        return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
 
     @commands.command(aliases=["poll"])
     async def vote(self, ctx, title, time: convert_timedelta, multi: bool, *select):
@@ -1582,7 +1478,7 @@ class MainCog(commands.Cog):
             g = ctx.guild
             e = discord.Embed(title=get_txt(g.id, "vote_error")[0],
                               description=get_txt(g.id, "vote_error")[0], color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         dt = datetime.datetime.utcnow()
         g = ctx.guild
         dt += time
@@ -1601,7 +1497,7 @@ class MainCog(commands.Cog):
         e.set_author(
             name=f"{ctx.author.display_name}(ID:{ctx.author.id})", icon_url=ctx.author.avatar_url)
         e.set_footer(text=get_txt(ctx.guild.id, "voting")[5])
-        m = await ctx.send(embed=e)
+        m = await ctx.reply(embed=e)
         for sfi in range(len(select)):
             await m.add_reaction(Number_emojis[sfi + 1])
 
@@ -2057,7 +1953,7 @@ class MainCog(commands.Cog):
         ctime = ctx.message.created_at
         e = discord.Embed(title=get_txt(ctx.guild.id, "ping_title"),
                           description=get_txt(ctx.guild.id, "wait"), color=Bot_info)
-        msg = await ctx.send(embed=e)
+        msg = await ctx.reply(embed=e)
         ping = starttime - ctime
         e = discord.Embed(title=get_txt(ctx.guild.id, "ping_title"),
                           description=get_txt(ctx.guild.id, "ping_desc").format(round(self.bot.latency * 1000), round(ping.microseconds / 1000)), color=Bot_info)
@@ -2076,12 +1972,12 @@ class MainCog(commands.Cog):
         if Guild_settings[ctx.guild.id]["auth_role"] == 0 and role == 0:
             e = discord.Embed(title="ロールが登録されていません",
                               description="初回はロールを登録する必要があります", color=Error)
-            m = await ctx.send(embed=e)
+            m = await ctx.reply(embed=e)
             return
         elif role.position > ctx.author.top_role.position and not ctx.guild.owner_id == ctx.author.id:
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "no_role_perm").format(role.name), color=Error)
-            m = await ctx.send(embed=e)
+            m = await ctx.reply(embed=e)
             return
         if role != 0:
             Guild_settings[ctx.guild.id]["auth_role"] = role.id
@@ -2098,7 +1994,7 @@ class MainCog(commands.Cog):
         if Guild_settings[ctx.guild.id]["auth_role"] == 0 and role == 0:
             e = discord.Embed(title="ロールが登録されていません",
                               description="初回はロールを登録する必要があります", color=Error)
-            m = await ctx.send(embed=e)
+            m = await ctx.reply(embed=e)
             return
         if role == 0:
             role = ctx.guild.get_role(
@@ -2106,7 +2002,7 @@ class MainCog(commands.Cog):
         if role.position > ctx.author.top_role.position and not ctx.guild.owner_id == ctx.author.id:
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "no_role_perm").format(role.name), color=Error)
-            m = await ctx.send(embed=e)
+            m = await ctx.reply(embed=e)
             return
         if role != 0:
             Guild_settings[ctx.guild.id]["auth_role"] = role.id
@@ -2126,12 +2022,12 @@ class MainCog(commands.Cog):
         if Guild_settings[ctx.guild.id]["auth_role"] == 0 and role == 0:
             e = discord.Embed(title="ロールが登録されていません",
                               description="初回はロールを登録する必要があります", color=Error)
-            m = await ctx.send(embed=e)
+            m = await ctx.reply(embed=e)
             return
         elif role.position > ctx.author.top_role.position and not ctx.guild.owner_id == ctx.author.id:
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "no_role_perm").format(role.name), color=Error)
-            m = await ctx.send(embed=e)
+            m = await ctx.reply(embed=e)
             return
         if role != 0:
             Guild_settings[ctx.guild.id]["auth_role"] = role.id
@@ -2166,14 +2062,14 @@ class MainCog(commands.Cog):
                     value=res, inline=False)
         e.set_footer(text="Powered by async_google_trans_new",
                      icon_url="https://i.imgur.com/zPOogXx.png")
-        return await ctx.send(embed=e)
+        return await ctx.reply(embed=e)
 
     @commands.command(aliases=["lv"])
     async def level(self, ctx, user: discord.User = None):
         if not Guild_settings[ctx.guild.id]["level_active"]:
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "ls")["not_active"], description=get_txt(ctx.guild.id, "ls")["not_active_desc2"], color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         try:
             if user is None:
                 u = ctx.author
@@ -2182,7 +2078,7 @@ class MainCog(commands.Cog):
             if u.bot:
                 e = discord.Embed(
                     title=f"{u.display_name}のレベル", description="Botにはレベルがありません。", color=Level)
-                return await ctx.send(embed=e)
+                return await ctx.reply(embed=e)
             lv = Guild_settings[ctx.guild.id]["levels"][u.id]
             mc = Guild_settings[ctx.guild.id]["level_counts"][u.id]
             nm = lv * 10
@@ -2204,18 +2100,18 @@ class MainCog(commands.Cog):
             r += str(e)
             e = discord.Embed(
                 title=f"{u.display_name}のレベル", description=f"レベル: {lv}\n{r} {p}%\n次まで: {nm-mc}", color=Level)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         except KeyError:
             e = discord.Embed(
                 title=f"{u.display_name}のレベル", description="このユーザーはまだレベルを獲得していません。", color=Level)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
 
     @commands.command(aliases=["level_rank"])
     async def level_ranking(self, ctx):
         if not Guild_settings[ctx.guild.id]["level_active"]:
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "ls")["not_active"], description=get_txt(ctx.guild.id, "ls")["not_active_desc2"], color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         table = Texttable()
         table.set_deco(Texttable.HEADER)
         table.set_cols_dtype(['t', 't', 't',
@@ -2265,7 +2161,7 @@ class MainCog(commands.Cog):
         table.add_rows(res)
         e = discord.Embed(title=get_txt(ctx.guild.id, "ls")
                           ["rank_title"], description=f"```asciidoc\n{table.draw()}```", color=Info)
-        return await ctx.send(embed=e)
+        return await ctx.reply(embed=e)
 
     @commands.group(name="level_settings", aliases=["ls"])
     @commands.has_guild_permissions(manage_guild=True)
@@ -2282,12 +2178,12 @@ class MainCog(commands.Cog):
         if Guild_settings[ctx.guild.id]["level_active"]:
             e = discord.Embed(
                 title="既に有効です。", description="レベルシステムを無効にするには`sb#level_settings deactivate`を使用してください。", color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         else:
             Guild_settings[ctx.guild.id]["level_active"] = True
             e = discord.Embed(
                 title="レベルシステムが有効になりました。", description="レベルシステムを無効にするには`sb#level_settings deactivate`を使用してください。", color=Success)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
 
     @ls.command(name="deactivate", aliases=Deactivate_aliases)
     @commands.has_guild_permissions(manage_guild=True)
@@ -2296,19 +2192,19 @@ class MainCog(commands.Cog):
         if not Guild_settings[ctx.guild.id]["level_active"]:
             e = discord.Embed(
                 title="既に無効です。", description="レベルシステムを有効にするには`sb#level_settings activate`を使用してください。", color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         else:
             Guild_settings[ctx.guild.id]["level_active"] = False
             e = discord.Embed(
                 title="レベルシステムが無効になりました。", description="レベルシステムを有効にするには`sb#level_settings activate`を使用してください。", color=Success)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
 
     @ls.group(name="manage", invoke_without_command=True)
     async def ls_manage(self, ctx):
         if not Guild_settings[ctx.guild.id]["level_active"]:
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "ls")["not_active"], description=get_txt(ctx.guild.id, "ls")["not_active_desc"], color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         else:
             await self.bot.send_subcommands(ctx)
 
@@ -2317,11 +2213,11 @@ class MainCog(commands.Cog):
         if not Guild_settings[ctx.guild.id]["level_active"]:
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "ls")["not_active"], description=get_txt(ctx.guild.id, "ls")["not_active_desc"], color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         elif xp > 10000:
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "too_high"), color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         else:
             Guild_settings[ctx.guild.id]["level_counts"][ctx.author.id] += xp
             if ctx.author.id not in Guild_settings[ctx.guild.id]["level_counts"].keys():
@@ -2332,14 +2228,14 @@ class MainCog(commands.Cog):
                 Guild_settings[ctx.guild.id]["levels"][ctx.author.id] += 1
             e = discord.Embed(title=get_txt(ctx.guild.id, "ls")["manage"]["add"].format(
                 target.display_name, xp), color=Success)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
 
     @ls_manage.group(name="remove")
     async def ls_manage_remove(self, ctx, target: discord.Member, xp: int):
         if not Guild_settings[ctx.guild.id]["level_active"]:
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "ls")["not_active"], description=get_txt(ctx.guild.id, "ls")["not_active_desc"], color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         else:
             if ctx.author.id not in Guild_settings[ctx.guild.id]["level_counts"].keys():
                 Guild_settings[ctx.guild.id]["level_counts"][ctx.author.id] = 0
@@ -2357,7 +2253,7 @@ class MainCog(commands.Cog):
                     break
             e = discord.Embed(title=get_txt(ctx.guild.id, "ls")["manage"]["remove"].format(
                 target.display_name, xp), color=Success)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
 
     @ls_manage.group(name="reset")
     async def ls_manage_reset(self, ctx):
@@ -2366,13 +2262,13 @@ class MainCog(commands.Cog):
         elif not Guild_settings[ctx.guild.id]["level_active"]:
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "ls")["not_active"], description=get_txt(ctx.guild.id, "ls")["not_active_desc"], color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         else:
             Guild_settings[ctx.guild.id]["level_counts"] = {}
             Guild_settings[ctx.guild.id]["levels"] = {}
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "ls")["manage"]["reset"], color=Success)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
 
     @ls.command(name="channel")
     @commands.has_guild_permissions(manage_guild=True)
@@ -2383,7 +2279,7 @@ class MainCog(commands.Cog):
         elif not Guild_settings[ctx.guild.id]["level_active"]:
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "ls")["not_active"], description=get_txt(ctx.guild.id, "ls")["not_active_desc"], color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         else:
             if to is None:
                 Guild_settings[ctx.guild.id]["level_channel"] = False
@@ -2395,7 +2291,7 @@ class MainCog(commands.Cog):
                 d = f"レベルアップお知らせチャンネルは{to.mention}になりました。"
             e = discord.Embed(title="レベルアップお知らせチャンネル変更",
                               description=d, color=Success)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
 
     @ls.group(name="boost", aliases=["b"])
     async def ls_boost(self, ctx):
@@ -2404,7 +2300,7 @@ class MainCog(commands.Cog):
         elif not Guild_settings[ctx.guild.id]["level_active"]:
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "ls")["not_active"], description=get_txt(ctx.guild.id, "ls")["not_active_desc"], color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         else:
             await self.bot.send_subcommands(ctx)
 
@@ -2414,11 +2310,11 @@ class MainCog(commands.Cog):
         if not Guild_settings[ctx.guild.id]["level_active"]:
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "ls")["not_active"], description=get_txt(ctx.guild.id, "ls")["not_active_desc"], color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         else:
             Guild_settings[ctx.guild.id]["level_boosts"][target.id] = fax
             e = discord.Embed(title=get_txt(ctx.guild.id, "ls")["boost"]["add"].format(fax), color=Success)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
 
     @ls_boost.command(name="remove", aliases=["del", "delete", "rem"])
     async def ls_boost_remove(self, ctx, target: Union[discord.Role, discord.Member]):
@@ -2426,7 +2322,7 @@ class MainCog(commands.Cog):
         if not Guild_settings[ctx.guild.id]["level_active"]:
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "ls")["not_active"], description=get_txt(ctx.guild.id, "ls")["not_active_desc"], color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         else:
             try:
                 del Guild_settings[ctx.guild.id]["level_boosts"][target.id]
@@ -2435,7 +2331,7 @@ class MainCog(commands.Cog):
             except KeyError:
                 e = discord.Embed(title=get_txt(ctx.guild.id, "ls")[
                                   "boost"]["remove_fail"].format(target.name), color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
 
     @ls_boost.command(name="list")
     async def ls_boost_list(self, ctx):
@@ -2444,13 +2340,13 @@ class MainCog(commands.Cog):
         if not Guild_settings[ctx.guild.id]["level_active"]:
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "ls")["not_active"], description=get_txt(ctx.guild.id, "ls")["not_active_desc"], color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         else:
             gs = Guild_settings[g]
             if gs["level_boosts"] == {}:
                 e = discord.Embed(
                     title="登録されていません。", description="`sb#level_settings boost add`で登録してください。", color=Error)
-                return await ctx.send(embed=e)
+                return await ctx.reply(embed=e)
             else:
                 table = Texttable()
                 table.set_deco(Texttable.HEADER)
@@ -2469,7 +2365,7 @@ class MainCog(commands.Cog):
                 table.add_rows(res)
                 e = discord.Embed(title=get_txt(ctx.guild.id, "ls")
                                   ["boost"]["list"], description=f"```asciidoc\n{table.draw()}```", color=Info)
-                return await ctx.send(embed=e)
+                return await ctx.reply(embed=e)
 
     @ls.group(name="roles", aliases=["r"])
     async def ls_roles(self, ctx):
@@ -2478,7 +2374,7 @@ class MainCog(commands.Cog):
         elif not Guild_settings[ctx.guild.id]["level_active"]:
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "ls")["not_active"], description=get_txt(ctx.guild.id, "ls")["not_active_desc"], color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         else:
             await self.bot.send_subcommands(ctx)
 
@@ -2488,12 +2384,12 @@ class MainCog(commands.Cog):
         if not Guild_settings[ctx.guild.id]["level_active"]:
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "ls")["not_active"], description=get_txt(ctx.guild.id, "ls")["not_active_desc"], color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         else:
             Guild_settings[ctx.guild.id]["level_roles"][lv] = role.id
             e = discord.Embed(title=get_txt(ctx.guild.id, "ls")[
                               "roles"]["add"].format(lv), color=Success)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
 
     @ls_roles.command(name="remove", aliases=["del", "delete", "rem"])
     async def ls_role_remove(self, ctx, lv: int):
@@ -2501,7 +2397,7 @@ class MainCog(commands.Cog):
         if not Guild_settings[ctx.guild.id]["level_active"]:
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "ls")["not_active"], description=get_txt(ctx.guild.id, "ls")["not_active_desc"], color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         else:
             try:
                 del Guild_settings[ctx.guild.id]["level_roles"][lv]
@@ -2510,7 +2406,7 @@ class MainCog(commands.Cog):
             except KeyError:
                 e = discord.Embed(title=get_txt(ctx.guild.id, "ls")[
                                   "roles"]["remove_fail"].format(lv), color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
 
     @ls_roles.command(name="list")
     async def ls_role_list(self, ctx):
@@ -2519,13 +2415,13 @@ class MainCog(commands.Cog):
         if not Guild_settings[ctx.guild.id]["level_active"]:
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "ls")["not_active"], description=get_txt(ctx.guild.id, "ls")["not_active_desc"], color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         else:
             gs = Guild_settings[g]
             if gs["level_roles"] == {}:
                 e = discord.Embed(
                     title="登録されていません。", description="`sb#level_settings roles add`で登録してください。", color=Error)
-                return await ctx.send(embed=e)
+                return await ctx.reply(embed=e)
             else:
                 table = Texttable()
                 table.set_deco(Texttable.HEADER)
@@ -2540,7 +2436,7 @@ class MainCog(commands.Cog):
                 table.add_rows(res)
                 e = discord.Embed(title=get_txt(ctx.guild.id, "ls")
                                   ["roles"]["list"], description=f"```asciidoc\n{table.draw()}```", color=Info)
-                return await ctx.send(embed=e)
+                return await ctx.reply(embed=e)
 
     @commands.command(aliases=["recruit", "apply"])
     async def party(self, ctx, title, time: convert_timedelta, max: int):
@@ -2553,7 +2449,7 @@ class MainCog(commands.Cog):
         e.set_author(
             name=f"{ctx.author}(ID:{ctx.author.id})", icon_url=ctx.author.avatar_url)
         e.set_footer(text=get_txt(ctx.guild.id, "voting")[5])
-        m = await ctx.send(embed=e)
+        m = await ctx.reply(embed=e)
         await m.add_reaction(Official_emojis["check5"])
         await m.add_reaction(Official_emojis["check6"])
 
@@ -2564,11 +2460,11 @@ class MainCog(commands.Cog):
         if lang_to not in Texts.keys():
             e = discord.Embed(title=get_txt(ctx.guild.id, "change_lang")[0][0],
                               description=get_txt(ctx.guild.id, "change_lang")[0][1].format(lang_to), color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         Guild_settings[ctx.guild.id]["lang"] = lang_to
         e = discord.Embed(title=get_txt(ctx.guild.id, "change_lang")[1][0],
                           description=get_txt(ctx.guild.id, "change_lang")[1][1].format(lang_to), color=Success)
-        return await ctx.send(embed=e)
+        return await ctx.reply(embed=e)
 
     @commands.command()
     @commands.has_guild_permissions(kick_members=True)
@@ -2581,7 +2477,7 @@ class MainCog(commands.Cog):
         Guild_settings[ctx.guild.id]["event_message_channel"] = ctx.channel.id
         e = discord.Embed(
             title=f"イベントメッセージチャンネルを{rc}しました。", description="メッセージを登録するには`sb#event_send`を使用してください", color=Success)
-        return await ctx.send(embed=e)
+        return await ctx.reply(embed=e)
 
     @commands.command()
     @commands.has_guild_permissions(kick_members=True)
@@ -2591,11 +2487,11 @@ class MainCog(commands.Cog):
         if Guild_settings[ctx.guild.id]["event_message_channel"] == 0:
             e = discord.Embed(title="イベントメッセージチャンネルが設定されていません",
                               description="`sb#event_channel`で設定してください", color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         if etype not in list(Event_dict.keys()):
             e = discord.Embed(
                 title=f"イベント{etype}が見付かりませんでした", description="`sb#help event_send`で確認してください", color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         Guild_settings[ctx.guild.id]["event_messages"][etype] = message
         if message == "":
             d = "メッセージが送られなくなりました。"
@@ -2605,7 +2501,7 @@ class MainCog(commands.Cog):
                 "!count", str(len(ctx.guild.members))).replace("!mention", ctx.guild.me.mention)
         e = discord.Embed(
             title=f"{Event_dict[etype]}のメッセージを変更しました。", description=d, color=Success)
-        return await ctx.send(embed=e)
+        return await ctx.reply(embed=e)
 
     @commands.command()
     @commands.has_guild_permissions(manage_roles=True)
@@ -2613,13 +2509,13 @@ class MainCog(commands.Cog):
         if len(roles) > 10:
             e = discord.Embed(title="ロールが多すぎます。",
                               description="ロールは10個以下にして下さい。", color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         s = ""
         for r in roles:
             if (r.position > ctx.author.top_role.position and not ctx.guild.owner_id == ctx.author.id) or r.position > ctx.guild.me.top_role.position:
                 e = discord.Embed(title=get_txt(
                     ctx.guild.id, "no_role_perm").format(r.name), color=Error)
-                m = await ctx.send(embed=e)
+                m = await ctx.reply(embed=e)
                 return
         for sfi, sf in enumerate(roles):
             r = sf
@@ -2706,7 +2602,7 @@ class MainCog(commands.Cog):
             em.add_field(name=tpt["name"], value=r)
         em.set_footer(text=Texts[Guild_settings[ctx.guild.id]
                                  ["lang"]]["permission_value"] + str(hash(u)))
-        await ctx.send(embed=em)
+        await ctx.reply(embed=em)
 
     @commands.command(aliases=["get_rm"])
     async def get_role_member(self, ctx, role: discord.Role):
@@ -2723,7 +2619,7 @@ class MainCog(commands.Cog):
         if not ri == -1:
             e.set_footer(text=get_txt(ctx.guild.id, "get_rm_more").format(
                 str(len(role.members) - ri)))
-        return await ctx.send(embed=e)
+        return await ctx.reply(embed=e)
 
     @commands.command(aliases=["get_rc"])
     async def get_role_count(self, ctx, show_bot: bool = False):
@@ -2744,7 +2640,7 @@ class MainCog(commands.Cog):
                 r += f"{ui.mention} : {mci}{Texts[Guild_settings[ctx.guild.id]['lang']]['rc_people']} - {per}%\n"
         e = discord.Embed(
             title=get_txt(ctx.guild.id, "rc_title"), description=r, color=Info)
-        return await ctx.send(embed=e)
+        return await ctx.reply(embed=e)
 
     @commands.command(aliases=["cu"])
     @commands.cooldown(10, 10)
@@ -2768,7 +2664,7 @@ class MainCog(commands.Cog):
                           description=get_txt(ctx.guild.id, "norton_desc")[ind][1].format(url), color=0xffcd00)
         e.set_footer(text="Powered by Norton Safeweb",
                      icon_url="https://i.imgur.com/QUkiSHQ.png")
-        return await ctx.send(embed=e)
+        return await ctx.reply(embed=e)
 
     @commands.command(aliases=["user", "ui", "userinfo"])
     async def lookup(self, ctx, u: Union[discord.User, int] = None):
@@ -2782,7 +2678,7 @@ class MainCog(commands.Cog):
             except NotFound:
                 e = discord.Embed(title=get_txt(
                     ctx.guild.id, "lookup")[11], color=Error)
-                return await ctx.send(embed=e)
+                return await ctx.reply(embed=e)
         else:
             if ctx.guild.get_member(u.id) is not None:
                 u = ctx.guild.get_member(u.id)
@@ -2828,7 +2724,7 @@ class MainCog(commands.Cog):
                 name=get_txt(ctx.guild.id, "lookup")[6], value=rs.rstrip(","))
             e.add_field(name=Texts[Guild_settings[ctx.guild.id]
                                    ["lang"]]["lookup"][7], value=get_txt(ctx.guild.id, "lookup")[8].format(Guild_settings[ctx.guild.id]["warns"].get(u.id, 0)))
-        return await ctx.send(embed=e)
+        return await ctx.reply(embed=e)
 
     @commands.command(aliases=["guildinfo", "si", "gi"])
     async def serverinfo(self, ctx, guild: int = None):
@@ -2836,11 +2732,11 @@ class MainCog(commands.Cog):
         if guild is None:
             e = discord.Embed(title=get_txt(ctx.guild.id, "serverinfo")[
                               "unknown"], color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         if (not guild.get_member(ctx.author.id)) and not self.bot.is_owner(ctx.author):
             e = discord.Embed(title=get_txt(ctx.guild.id, "serverinfo")[
                               "noperm"], color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         e = discord.Embed(title=guild.name + " - "
                           + f"`{guild.id}`", color=Info, timestamp=guild.created_at)
         e.set_author(name=f"{guild.owner.display_name}({guild.owner}, ID:{guild.owner.id})",
@@ -2862,7 +2758,7 @@ class MainCog(commands.Cog):
             guild.emoji_limit
         ))
         e.set_footer(text=get_txt(ctx.guild.id, "serverinfo")["created_at"])
-        return await ctx.send(embed=e)
+        return await ctx.reply(embed=e)
 
     @commands.group(name="sevennet")
     @commands.has_guild_permissions(manage_channels=True)
@@ -2879,7 +2775,7 @@ class MainCog(commands.Cog):
         if ctx.channel.id in Sevennet_channels:
             e = discord.Embed(
                 title="既に有効です。", description="SevenNetチャンネルではないチャンネルで使用してください。", color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         else:
             e2 = discord.Embed(
                 title="SevenNetに仲間が入ってきた!", description=f"{ctx.guild.name}がSevenNetに参加しました！", timestamp=ctx.message.created_at, color=Chat)
@@ -2894,7 +2790,7 @@ class MainCog(commands.Cog):
                     await cn.send(embed=e2)
             e = discord.Embed(title=f"`#{ctx.channel.name}`はSevenNetチャンネルになりました。",
                               description="ルールを確認してください。", color=Success)
-            await ctx.send(embed=e)
+            await ctx.reply(embed=e)
             e3 = discord.Embed(title="SevenNetチャンネルのルールについて", color=Info)
             e3.add_field(name="宣伝禁止", value="宣伝はしないで下さい。", inline=False)
             e3.add_field(name="暴言・エロ画像など、不快に感じる行為禁止",
@@ -2917,7 +2813,7 @@ class MainCog(commands.Cog):
             Sevennet_channels.remove(ctx.channel.id)
             e = discord.Embed(title=f"`#{ctx.channel.name}`はSevenNetチャンネルではなくなりました。",
                               description="", color=Success)
-            await ctx.send(embed=e)
+            await ctx.reply(embed=e)
             e2 = discord.Embed(
                 title="SevenNetの仲間が抜けちゃった…", description=f"{ctx.guild.name}がSevenNetから退出しました。", timestamp=ctx.message.created_at, color=Chat)
             e2.set_thumbnail(url=ctx.guild.icon_url)
@@ -2931,7 +2827,7 @@ class MainCog(commands.Cog):
         else:
             e = discord.Embed(title="ここはSevenNetチャンネルではありません。",
                               description="SevenNetチャンネルで使用してください。", color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
 
     @commands.group()
     @commands.has_permissions(manage_guild=True)
@@ -2948,7 +2844,7 @@ class MainCog(commands.Cog):
             if l not in Stat_dict.keys():
                 e = discord.Embed(
                     title=f"統計{l}が見付かりませんでした。", description="`sb#help server_stat`で確認してください。", color=Error)
-                return await ctx.send(embed=e)
+                return await ctx.reply(embed=e)
         if Guild_settings[ctx.guild.id]["do_stat_channels"]:
             for sc in Guild_settings[ctx.guild.id]["stat_channels"].values():
                 c = self.bot.get_channel(sc)
@@ -2970,7 +2866,7 @@ class MainCog(commands.Cog):
         Guild_settings[ctx.guild.id]["do_stat_channels"] = True
         e = discord.Embed(title="統計チャンネルが有効になりました。",
                           description="無効化するには`sb#server_stat deactivate`を実行してください。", color=Success)
-        return await ctx.send(embed=e)
+        return await ctx.reply(embed=e)
 
     @server_stat.command(name="deactivate", aliases=Deactivate_aliases)
     @commands.has_permissions(manage_guild=True)
@@ -2985,7 +2881,7 @@ class MainCog(commands.Cog):
             Guild_settings[ctx.guild.id]["do_stat_channels"] = False
             e = discord.Embed(
                 title="統計チャンネルが無効になりました。", description="もう一度有効にするには`sb#server_stat activate`を使用してください。", color=Success)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
 
     @commands.command(name="ticket")
     @commands.has_guild_permissions(manage_guild=True, manage_channels=True)
@@ -3043,12 +2939,12 @@ class MainCog(commands.Cog):
         if Guild_settings[ctx.guild.id]["do_bump_alert"]:
             e = discord.Embed(title=get_txt(
                 ctx.guild.id, "activate_fail"), color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         else:
             Guild_settings[ctx.guild.id]["do_bump_alert"] = True
             e = discord.Embed(title=get_txt(ctx.guild.id, "activate").format(
                 "Bump通知"), color=Success)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
 
     @bump.command(name="deactivate", aliases=Deactivate_aliases)
     @commands.has_permissions(manage_messages=True)
@@ -3057,12 +2953,12 @@ class MainCog(commands.Cog):
         if not Guild_settings[ctx.guild.id]["do_bump_alert"]:
             e = discord.Embed(title=get_txt(
                 ctx.guild.id, "deactivate_fail"), color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         else:
             Guild_settings[ctx.guild.id]["do_bump_alert"] = False
             e = discord.Embed(title=get_txt(ctx.guild.id, "deactivate").format(
                 "Bump通知"), color=Success)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
 
     @bump.command(name="role")
     @commands.has_permissions(manage_messages=True)
@@ -3076,7 +2972,7 @@ class MainCog(commands.Cog):
             Guild_settings[ctx.guild.id]["bump_role"] = None
             e = discord.Embed(title=get_txt(
                 ctx.guild.id, "bump_role_set_none"), color=Success)
-        return await ctx.send(embed=e)
+        return await ctx.reply(embed=e)
 
     @commands.group(invoke_without_command=True)
     @commands.has_permissions(manage_messages=True)
@@ -3091,12 +2987,12 @@ class MainCog(commands.Cog):
         if Guild_settings[ctx.guild.id]["do_dissoku_alert"]:
             e = discord.Embed(title=get_txt(
                 ctx.guild.id, "activate_fail"), color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         else:
             Guild_settings[ctx.guild.id]["do_dissoku_alert"] = True
             e = discord.Embed(title=get_txt(ctx.guild.id, "activate").format(
                 "ディス速通知"), color=Success)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
 
     @dissoku.command(name="deactivate", aliases=Deactivate_aliases)
     @commands.has_permissions(manage_messages=True)
@@ -3105,12 +3001,12 @@ class MainCog(commands.Cog):
         if not Guild_settings[ctx.guild.id]["do_dissoku_alert"]:
             e = discord.Embed(title=get_txt(
                 ctx.guild.id, "deactivate_fail"), color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         else:
             Guild_settings[ctx.guild.id]["do_dissoku_alert"] = False
             e = discord.Embed(title=get_txt(ctx.guild.id, "deactivate").format(
                 "ディス速通知"), color=Success)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
 
     @dissoku.command(name="role")
     @commands.has_permissions(manage_messages=True)
@@ -3124,7 +3020,7 @@ class MainCog(commands.Cog):
             Guild_settings[ctx.guild.id]["dissoku_role"] = None
             e = discord.Embed(title=get_txt(
                 ctx.guild.id, "dissoku_role_set_none"), color=Success)
-        return await ctx.send(embed=e)
+        return await ctx.reply(embed=e)
 
     @commands.group()
     @commands.has_guild_permissions(manage_messages=True)
@@ -3140,12 +3036,12 @@ class MainCog(commands.Cog):
         if Guild_settings[ctx.guild.id]["expand_message"]:
             e = discord.Embed(title=get_txt(gi, "activate_fail"), description=Texts[Guild_settings[gi]
                                                                                     ["lang"]]["activate_desc"].format("sb#expand_message deactivate"), color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         else:
             Guild_settings[ctx.guild.id]["expand_message"] = True
             e = discord.Embed(title=get_txt(gi, "activate").format(
                 "メッセージ展開"), description=get_txt(gi, "activate_desc").format("sb#expand_message deactivate"), color=Success)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
 
     @expand_message.command(name="deactivate", aliases=Deactivate_aliases)
     @commands.has_guild_permissions(manage_messages=True)
@@ -3154,12 +3050,12 @@ class MainCog(commands.Cog):
         gi = ctx.guild.id
         if not Guild_settings[ctx.guild.id]["expand_message"]:
             e = discord.Embed(title=get_txt(gi, "deactivate_fail"), description=get_txt(ctx.guild.id, "deactivate_desc").format("sb#expand_message deactivate"), color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         else:
             Guild_settings[ctx.guild.id]["expand_message"] = False
             e = discord.Embed(title=get_txt(gi, "deactivate").format(
                 "メッセージ展開"), description=get_txt(gi, "deactivate_desc").format("sb#expand_message deactivate"), color=Success)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
 
     @commands.command(name="parse")
     async def text_parse(self, ctx):
@@ -3243,7 +3139,7 @@ class MainCog(commands.Cog):
         else:
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "parse")[1], description=err, color=Error)
-        return await ctx.send(embed=e)
+        return await ctx.reply(embed=e)
 
     @commands.group(aliases=["rl"])
     @commands.has_guild_permissions(manage_roles=True)
@@ -3258,25 +3154,25 @@ class MainCog(commands.Cog):
         if not target:
             e = discord.Embed(title=get_txt(ctx.guild.id, "role_link")[
                               "unknown_server"], color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         if target.get_member(ctx.author.id):
             if not target.get_member(ctx.author.id).guild_permissions.manage_roles:
                 e = discord.Embed(title=get_txt(ctx.guild.id, "role_link")[
                                   "no_role_perm"], color=Error)
-                return await ctx.send(embed=e)
+                return await ctx.reply(embed=e)
         else:
             e = discord.Embed(title=get_txt(ctx.guild.id, "role_link")[
                               "not_in_server"], color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         target_role = target.get_role(target_role)
         if not target_role:
             e = discord.Embed(title=get_txt(ctx.guild.id, "role_link")[
                               "unknown_role"], color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         elif target.get_member(ctx.author.id).top_role.position <= target_role.position and not target.owner_id == ctx.author.id:
             e = discord.Embed(title=get_txt(ctx.guild.id, "role_link")[
                               "no_role_perm"], color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         if role.id not in Guild_settings[ctx.guild.id]["role_link"].keys():
             Guild_settings[ctx.guild.id]["role_link"][role.id] = []
         Guild_settings[ctx.guild.id]["role_link"][role.id].append(
@@ -3287,7 +3183,7 @@ class MainCog(commands.Cog):
             [ctx.guild.id, role.id])
         e = discord.Embed(title=get_txt(ctx.guild.id, "role_link")["add"].format(role.name), description=get_txt(
             ctx.guild.id, "role_link")["add_desc"].format(ctx.guild.name, role.mention, target.name, "@" + target_role.name), color=Success)
-        return await ctx.send(embed=e)
+        return await ctx.reply(embed=e)
 
     @role_link.command(name="remove", aliases=["del", "delete", "rem"])
     async def role_link_remove(self, ctx, role: discord.Role, target_role: int):
@@ -3313,7 +3209,7 @@ class MainCog(commands.Cog):
         Guild_settings[g]["role_link"][role.id] = res.copy()
         e = discord.Embed(title=get_txt(ctx.guild.id, "role_link")[
                           "remove"].format(role.name), color=Success)
-        return await ctx.send(embed=e)
+        return await ctx.reply(embed=e)
 
     @role_link.command(name="update")
     async def role_link_update(self, ctx):
@@ -3327,7 +3223,7 @@ class MainCog(commands.Cog):
                             pass
         e = discord.Embed(title=get_txt(ctx.guild.id, "role_link")[
                           "update"], color=Success)
-        return await ctx.send(embed=e)
+        return await ctx.reply(embed=e)
 
     @role_link.command(name="list")
     async def role_link_list(self, ctx):
@@ -3337,7 +3233,7 @@ class MainCog(commands.Cog):
         if gs["role_link"] == {}:
             e = discord.Embed(
                 title="登録されていません。", description="`sb#role_link add`で登録してください。", color=Error)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
         else:
             table = Texttable()
             table.set_deco(Texttable.HEADER)
@@ -3358,7 +3254,7 @@ class MainCog(commands.Cog):
             table.add_rows(res)
             e = discord.Embed(title=get_txt(ctx.guild.id, "role_link")[
                               "list"], description=f"```asciidoc\n{table.draw()}```", color=Info)
-            return await ctx.send(embed=e)
+            return await ctx.reply(embed=e)
 #
 
     @commands.command(name="search_command", aliases=["search_cmd"])
@@ -3402,7 +3298,7 @@ class MainCog(commands.Cog):
                     [1], value=perf_res, inline=False)
         e.add_field(name=get_txt(ctx.guild.id, "getid_search")
                     [2], value=part_res, inline=False)
-        return await ctx.send(embed=e)
+        return await ctx.reply(embed=e)
 
     @commands.Cog.listener("on_guild_voice_update")
     async def on_voice_state_update(member, before, after):
@@ -3419,7 +3315,7 @@ class MainCog(commands.Cog):
         )
         ret = await locals()['__ex'](self, self.bot, ctx, ctx)
         try:
-            await ctx.send(ret)
+            await ctx.reply(ret)
         except BaseException:
             pass
         await ctx.message.add_reaction(Official_emojis["check8"])
@@ -3477,7 +3373,7 @@ class MainCog(commands.Cog):
         table.add_rows(res)
         e = discord.Embed(title=get_txt(ctx.guild.id, "vote_rank_title"),
                           description=f"```asciidoc\n{table.draw()}```", color=Info)
-        return await ctx.send(embed=e)
+        return await ctx.reply(embed=e)
 
     @commands.command(hidden=True)
     @commands.is_owner()
@@ -3529,10 +3425,10 @@ class MainCog(commands.Cog):
                 try:
                     await add_l(self.bot.get_command(c))
                 except Exception as e:
-                    await ctx.send(c)
+                    await ctx.reply(c)
                     raise e
         await self.bot.db.commands.insert_many(li)
-        await ctx.send(f"Done\nTook: {time.time() - start}")
+        await ctx.reply(f"Done\nTook: {time.time() - start}")
 
     @commands.command(hidden=True)
     @commands.is_owner()
