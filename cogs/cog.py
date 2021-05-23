@@ -2551,7 +2551,7 @@ class MainCog(commands.Cog):
         e.add_field(name="最大人数", value=f"{max}人", inline=False)
         e.add_field(name="参加者(現在0人)", value="現在参加者はいません", inline=False)
         e.set_author(
-            name=f"{ctx.author.name}(ID:{ctx.author.id})", icon_url=ctx.author.avatar_url)
+            name=f"{ctx.author}(ID:{ctx.author.id})", icon_url=ctx.author.avatar_url)
         e.set_footer(text=get_txt(ctx.guild.id, "voting")[5])
         m = await ctx.send(embed=e)
         await m.add_reaction(Official_emojis["check5"])
