@@ -26,7 +26,7 @@ def only_premium():
             return True
         e = discord.Embed(title=get_txt(ctx.guild.id, "premium"), description=get_txt(
             ctx.guild.id, "premium_desc"), color=Premium_color)
-        await ctx.send(embed=e)
+        await ctx.reply(embed=e)
         return False
     return commands.check(predicate)
 
@@ -75,14 +75,14 @@ class TtsCog(commands.Cog):
         if ctx.author.voice is None:
             e = discord.Embed(title=get_txt(ctx.guild.id, "tts_vc_none"), description=get_txt(
                 ctx.guild.id, "tts_vc_none_desc"), color=Error)
-            await ctx.send(embed=e)
+            await ctx.reply(embed=e)
             return
         await ctx.author.voice.channel.connect()
         Tts_channels[ctx.author.voice.channel.id] = copy.deepcopy(Tts_default)
         Tts_channels[ctx.author.voice.channel.id]["called_channel"] = ctx.channel.id
         e = discord.Embed(title=get_txt(ctx.guild.id, "tts_joined").format(
             ctx.author.voice.channel.name), color=Success)
-        await ctx.send(embed=e)
+        await ctx.reply(embed=e)
 
     @commands.Cog.listener(name="on_message")
     async def on_message(self, message):
@@ -173,25 +173,25 @@ class TtsCog(commands.Cog):
         if ctx.guild.voice_client is None:
             e = discord.Embed(title=get_txt(
                 ctx.guild.id, "tts_dc_none"), color=Error)
-            await ctx.send(embed=e)
+            await ctx.reply(embed=e)
             return
         ch = ctx.guild.voice_client.channel
         await ctx.guild.voice_client.disconnect()
         del Tts_channels[ch.id]
         e = discord.Embed(title=get_txt(ctx.guild.id, "tts_dc"), color=Success)
-        await ctx.send(embed=e)
+        await ctx.reply(embed=e)
 
     @tts.command(name="voice", aliases=["v"])
     async def tts_change_voice(self, ctx, voice):
         if voice.lower() not in "abcdefgh" or len(voice) != 1:
             e = discord.Embed(title=get_txt(
                 ctx.guild.id, "tts_voice_fail"), color=Error)
-            await ctx.send(embed=e)
+            await ctx.reply(embed=e)
             return
         elif voice.lower() not in "abcd" and not self.bot.is_premium(ctx.author):
             e = discord.Embed(title=get_txt(
                 ctx.guild.id, "tts_voice_fail_premium"), color=Premium_color)
-            await ctx.send(embed=e)
+            await ctx.reply(embed=e)
             return
         if not Tts_settings.get(ctx.author.id):
             Tts_settings[ctx.author.id] = {}
@@ -199,7 +199,7 @@ class TtsCog(commands.Cog):
             voice.lower())
         e = discord.Embed(title=get_txt(ctx.guild.id, "tts_voice_changed").format(
             voice.upper()), color=Success)
-        await ctx.send(embed=e)
+        await ctx.reply(embed=e)
 
     @tts.command(name="speed", aliases=["spd"])
     @only_premium()
@@ -207,14 +207,14 @@ class TtsCog(commands.Cog):
         if not 50 <= speed <= 400:
             e = discord.Embed(title=get_txt(
                 ctx.guild.id, "tts_speed_range"), color=Error)
-            await ctx.send(embed=e)
+            await ctx.reply(embed=e)
             return
         if not Tts_settings.get(ctx.author.id):
             Tts_settings[ctx.author.id] = {}
         Tts_settings[ctx.author.id]["speed"] = speed
         e = discord.Embed(title=get_txt(
             ctx.guild.id, "tts_speed_changed").format(speed), color=Success)
-        await ctx.send(embed=e)
+        await ctx.reply(embed=e)
 
     @tts.group(name="dicts", aliases=["d"])
     async def tts_dicts(self, ctx):
@@ -230,7 +230,7 @@ class TtsCog(commands.Cog):
         Guild_settings[ctx.guild.id]["tts_dicts"][rid] = [base, reply]
         e = discord.Embed(title=get_txt(ctx.guild.id, "tts_dicts_add"),
                           description=get_txt(ctx.guild.id, "tts_dicts_add_desc").format(base, rid), color=Success)
-        await ctx.send(embed=e)
+        await ctx.reply(embed=e)
 
     @tts_dicts.command(name="remove", aliases=["del", "delete", "rem"])
     # @commands.has_guild_permissions(manage_messages=True)
@@ -260,7 +260,7 @@ class TtsCog(commands.Cog):
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "tts_dicts_rem_success").format(count), description=res, color=Success)
             Guild_settings[ctx.guild.id]["tts_dicts"] = new
-        await ctx.send(embed=e)
+        await ctx.reply(embed=e)
 
     @tts_dicts.command(name="list")
     async def tts_dicts_list(self, ctx):
@@ -269,7 +269,7 @@ class TtsCog(commands.Cog):
         if gs["tts_dicts"] == {}:
             e = discord.Embed(
                 title="登録されていません。", description="`sb#tts dicts add`で登録してください。", color=Error)
-            await ctx.send(embed=e)
+            await ctx.reply(embed=e)
         else:
 
             table = Texttable()
@@ -283,7 +283,7 @@ class TtsCog(commands.Cog):
             table.add_rows(res)
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "tts_dicts_list"), description=f"```asciidoc\n{table.draw()}```", color=Info)
-            await ctx.send(embed=e)
+            await ctx.reply(embed=e)
 
     async def play_voice(self, txt, message):
         loop = asyncio.get_event_loop()

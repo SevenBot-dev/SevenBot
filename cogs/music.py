@@ -281,7 +281,7 @@ class MusicCog(commands.Cog):
 #             e = discord.Embed(title=get_txt(ctx.guild.id,"how_to_use"),
 #                               description="```\nmusic search_play youtube|yt\nmusic search_play niconico|nicovideo|nico```", color=Info)
 #
-#             await ctx.send(embed=e)
+#             await ctx.reply(embed=e)
     @music.command(name="search_play", aliases=["sp"])
     async def mus_yt_search_play(self, ctx, *, query):
         search_response = YTB.search().list(part='snippet', q=query,
@@ -300,7 +300,7 @@ class MusicCog(commands.Cog):
         if i2 == 0:
             e = discord.Embed(title=get_txt(ctx.guild.id, "yt_no_matches"),
                               description=get_txt(ctx.guild.id, "yt_search_try_again"), color=Error)
-            await ctx.send(embed=e)
+            await ctx.reply(embed=e)
             return
         e = discord.Embed(title=Texts[Guild_settings[ctx.guild.id]["lang"]]
                           ["yt_search_result"], description=f"{r}", color=Process)
@@ -371,7 +371,7 @@ class MusicCog(commands.Cog):
 #                 type="nico_api_die"
 #             e = discord.Embed(title=get_txt(ctx.guild.id,"nico_failed"),
 #                               description=get_txt(ctx.guild.id,type), color=Error)
-#             await ctx.send(embed=e)
+#             await ctx.reply(embed=e)
 #             return
 #         ms=[]
 #         for rr in req["data"]:
@@ -389,7 +389,7 @@ class MusicCog(commands.Cog):
 # #         if i2 == 0:
 # #             e = discord.Embed(title=get_txt(ctx.guild.id,"yt_no_matches"),
 # #                               description=get_txt(ctx.guild.id,"yt_search_try_again"), color=Error)
-# #             await ctx.send(embed=e)
+# #             await ctx.reply(embed=e)
 # #             return
 #         e = discord.Embed(title=Texts[Guild_settings[ctx.guild.id]["lang"]]
 #                           ["yt_search_result"], description=f"{r}", color=Process)
@@ -441,7 +441,7 @@ class MusicCog(commands.Cog):
         if ctx.author.id not in Favorite_songs.keys():
             e = discord.Embed(title=get_txt(ctx.guild.id, "yt_no_fav"),
                               description=get_txt(ctx.guild.id, "yt_no_fav_desc").format(Official_emojis["add"]), color=Error)
-            msg = await ctx.send(embed=e)
+            msg = await ctx.reply(embed=e)
             return
         res = Favorite_songs[ctx.author.id]
 
@@ -493,7 +493,7 @@ class MusicCog(commands.Cog):
         except IndexError:
             e = discord.Embed(title=get_txt(ctx.guild.id, "yt_no_matches"),
                               description=get_txt(ctx.guild.id, "yt_search_try_again"), color=Error)
-            await ctx.send(embed=e)
+            await ctx.reply(embed=e)
 
     def queue_add(id, u):
         global Queues
@@ -705,18 +705,18 @@ class MusicCog(commands.Cog):
         if not voice:
             e = discord.Embed(title=get_txt(g.id, "yt_not_connect"),
                               description=get_txt(g.id, "yt_not_connect2"), color=Error)
-            await ctx.send(embed=e)
+            await ctx.reply(embed=e)
             return
         q = Queues[voice.channel.id][0]
         if q == []:
             res = get_txt(g.id, "yt_queue_empty")
             e = discord.Embed(title=Texts[Guild_settings[g.id]["lang"]]
                               ["yt_queue_list"], description=res, color=Success)
-            await ctx.send(embed=e)
+            await ctx.reply(embed=e)
         else:
             e = discord.Embed(title=get_txt(g.id, "yt_queue_list"),
                               description=get_txt(g.id, "getting"), color=Process)
-            msg = await ctx.send(embed=e)
+            msg = await ctx.reply(embed=e)
             res = ""
             for ei, eq in enumerate(q):
                 info = await loop.run_in_executor(None, partial(ytdl.extract_info, eq, download=False, process=False))
@@ -753,19 +753,19 @@ class MusicCog(commands.Cog):
         if not voice:
             e = discord.Embed(title=get_txt(g.id, "yt_not_connect"),
                               description=get_txt(g.id, "yt_not_connect2"), color=Error)
-            await ctx.send(embed=e)
+            await ctx.reply(embed=e)
             return
         q = Queues[voice.channel.id]
         if q == []:
             res = get_txt(g.id, "yt_not_playing")
             e = discord.Embed(title=Texts[Guild_settings[g.id]["lang"]]
                               ["yt_current_song"], description=res, color=Success)
-            await ctx.send(embed=e)
+            await ctx.reply(embed=e)
         else:
             eq = Queues[voice.channel.id][0][Queues[voice.channel.id][1] - 1][0]
             e = discord.Embed(title=get_txt(g.id, "yt_current_song"),
                               description=get_txt(g.id, "getting"), color=Process)
-            msg = await ctx.send(embed=e)
+            msg = await ctx.reply(embed=e)
             info = await loop.run_in_executor(None, partial(ytdl.extract_info, eq, download=False, process=False))
             rf = info
 
@@ -813,7 +813,7 @@ class MusicCog(commands.Cog):
         if not voice:
             e = discord.Embed(title=get_txt(g.id, "yt_not_connect"),
                               description=get_txt(g.id, "yt_not_connect2"), color=Error)
-            await ctx.send(embed=e)
+            await ctx.reply(embed=e)
             return
         for v2 in v:
             if v2.channel.guild.id == g.id:
@@ -842,7 +842,7 @@ class MusicCog(commands.Cog):
         if not voice:
             e = discord.Embed(title=get_txt(g.id, "yt_not_connect"),
                               description=get_txt(g.id, "yt_not_connect2"), color=Error)
-            await ctx.send(embed=e)
+            await ctx.reply(embed=e)
             return
         for v2 in v:
             if v2.channel.guild.id == g.id:
@@ -851,12 +851,12 @@ class MusicCog(commands.Cog):
         if not volume:
             e = discord.Embed(title=get_txt(g.id, "yt_volume_now").format(
                 int(Queues[voice.channel.id][6] * 100)), color=Info)
-            await ctx.send(embed=e)
+            await ctx.reply(embed=e)
             return
         if volume <= 0 or volume > 200:
             e = discord.Embed(title=get_txt(
                 g.id, "yt_volume_range"), color=Error)
-            await ctx.send(embed=e)
+            await ctx.reply(embed=e)
             return
         Queues[voice.channel.id][6] = volume / 100.0
         e = discord.Embed(title=get_txt(g.id, "yt_volume"),
@@ -881,7 +881,7 @@ class MusicCog(commands.Cog):
         if not voice:
             e = discord.Embed(title=get_txt(g.id, "yt_not_connect"),
                               description=get_txt(g.id, "yt_not_connect2"), color=Error)
-            await ctx.send(embed=e)
+            await ctx.reply(embed=e)
             return
         try:
             Queues[voice.channel.id][0].pop(ind - 1)
@@ -915,7 +915,7 @@ class MusicCog(commands.Cog):
         if not voice:
             e = discord.Embed(title=get_txt(g.id, "yt_not_connect"),
                               description=get_txt(g.id, "yt_not_connect2"), color=Error)
-            await ctx.send(embed=e)
+            await ctx.reply(embed=e)
             return
         Queues[voice.channel.id][2] = True
         e = discord.Embed(title=get_txt(g.id, "yt_stop"),
@@ -942,7 +942,7 @@ class MusicCog(commands.Cog):
         if not voice:
             e = discord.Embed(title=get_txt(g.id, "yt_not_connect"),
                               description=get_txt(g.id, "yt_not_connect2"), color=Error)
-            await ctx.send(embed=e)
+            await ctx.reply(embed=e)
             return
         Queues[voice.channel.id][4] = not Queues[voice.channel.id][4]
         if Queues[voice.channel.id][4]:
@@ -972,7 +972,7 @@ class MusicCog(commands.Cog):
         if not voice:
             e = discord.Embed(title=get_txt(g.id, "yt_not_connect"),
                               description=get_txt(g.id, "yt_not_connect2"), color=Error)
-            await ctx.send(embed=e)
+            await ctx.reply(embed=e)
             return
         if not voice.is_paused():
             ym = get_txt(g.id, "yt_pause_activate")
@@ -1001,7 +1001,7 @@ class MusicCog(commands.Cog):
         if not voice:
             e = discord.Embed(title=get_txt(g.id, "yt_not_connect"),
                               description=get_txt(g.id, "yt_not_connect2"), color=Error)
-            await ctx.send(embed=e)
+            await ctx.reply(embed=e)
             return
 
         channel = voice.channel
@@ -1013,7 +1013,7 @@ class MusicCog(commands.Cog):
         await voice.disconnect()
         e = discord.Embed(title=get_txt(g.id, "yt_disconnect").format(
             channel.name), description=get_txt(g.id, "yt_reconnect"), color=Success)
-        await ctx.send(embed=e)
+        await ctx.reply(embed=e)
 
 
 def setup(_bot):
