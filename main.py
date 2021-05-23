@@ -100,7 +100,9 @@ class SevenBot(commands.Bot):
         self.raw_config = ast.literal_eval(raw_save)
         self.guild_settings = gs
         self.dbclient = motor.AsyncIOMotorClient(cstr)
+        self.sync_dbclient = tmp_client
         self.db = self.dbclient.sevenbot
+        self.sync_db = self.sync_dbclient.sevenbot
         self.web_pass = web_pass
         self.debug = len(sys.argv) != 1 and sys.argv[1] == "debug"
         self.texts = common_resources.Texts
