@@ -4,6 +4,7 @@ import datetime
 import io
 import json
 import random
+import time
 
 import discord
 from discord.ext import commands
@@ -355,7 +356,7 @@ class ModerationCog(commands.Cog):
         e = discord.Embed(
             title=f"`{len(res.keys())}`人のニックネームをエクスポートしました。", color=Success)
         sio = io.StringIO(json.dumps(res))
-        await ctx.send(embed=e, file=discord.File(sio, filename=f"nicks_of_{len(res.keys())}_members_in_{ctx.guild.id}.sbnicks"))
+        await ctx.send(embed=e, file=discord.File(sio, filename=f"{ctx.guild.id}_{int(time.time())}.sbnicks"))
         sio.close()
 
     @fatal_nick.command(name="import")
