@@ -206,6 +206,7 @@ class GlobalCog(commands.Cog):
         else:
             whname = "sevenbot-global-webhook"
             gms = self.bot.consts["gcm"][None]
+            channel = None
             each = Global_chat
         deletes = []
         gms[message.id] = []
