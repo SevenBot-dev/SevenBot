@@ -785,6 +785,23 @@ class GlobalCog(commands.Cog):
         await ctx.reply(embed=e)
         await ctx.send("プレビュー", embed=self.make_rule_embed(channel))
 
+    @rule_private_global.command(name="remove", aliases=["del", "delete", "rem"])
+    async def remove_rule_private_global(self, ctx, channel, name):
+        if await self.only_owner(ctx, channel, "ルール設定"):
+            return
+        if Private_chat_info[channel]["rule"].get(name):
+            del Private_chat_info[channel]["rule"][name]
+            e = discord.Embed(title=f"ルール設定 - `{channel}`", description="ルールを削除しました。", color=Success)
+            await ctx.reply(embed=e)
+            await ctx.send("プレビュー", embed=self.make_rule_embed(channel))
+        else:
+            e = discord.Embed(title=f"ルール設定 - `{channel}`", description="ルールが見付かりませんでした。", color=Error)
+            await ctx.reply(embed=e)
+
+    @rule_private_global.command(name="view", aliases=["show", "preview", "check"])
+    async def view_rule_private_global(self, ctx, channel):
+        await ctx.send(f"`{channel}`のルール", embed=self.make_rule_embed(channel), allowed_mentions=discord.AllowedMentions.none())
+
     @private_global.command(name="mute")
     async def mute_private_global(self, ctx, channel, uid: int):
         if await self.only_owner(ctx, channel, "ミュート"):
