@@ -9,8 +9,7 @@
 |ファイル名|説明|
 |--|--|
 |tokens.py|トークンやパスワードを詰め込んだファイル。tokens.py.sampleを置き換えてください。|
-|hiraw3.OTF|ヒラギノ角ゴ W3。お好きなフォントでどうぞ。|
-|hiraw6.OTF|ヒラギノ角ゴ W6。これも同じように。|
+|fonts/|使うフォント。midium.OTF、bold.OTFという名前で入れて下さい。|
 |htsvoices/|htsvoice。0~4.htsvoiceのように。|
 
 ## ライセンス

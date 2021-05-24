@@ -1753,9 +1753,9 @@ class MainCog(commands.Cog):
                     im = Image.open("./base_img/text_base.png").convert("RGBA")
                     im2 = Image.open("./base_img/text_base_fore.png")
                     draw = ImageDraw.Draw(im)
-                    fnt = ImageFont.truetype("./hiraw6.OTF", 32)
-                    tfnt = ImageFont.truetype("./hiraw3.OTF", 32)
-                    bfnt = ImageFont.truetype("./hiraw6.OTF", 64)
+                    fnt = ImageFont.truetype("./fonts/bold.OTF", 32)
+                    tfnt = ImageFont.truetype("./fonts/midium.OTF", 32)
+                    bfnt = ImageFont.truetype("./fonts/bold.OTF", 64)
                     auth_text = hashlib.md5(
                         str(time.time()).encode()).hexdigest()[0:8]
                     w, h = draw.textsize(auth_text, font=bfnt)
