@@ -61,7 +61,7 @@ class ToolCog(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if message.author.bot or message.channel.id in Sevennet_channels or message.channel.id in Global_chat or message.channel.id in flatten(list(Private_chats.values())) or message.channel.is_news():
+        if message.author.bot or message.channel.id in Sevennet_channels or message.channel.id in Global_chat or message.channel.id in flatten(list(Private_chats.values())) or (message.guild is not None and message.channel.is_news()):
             return
         asyncio.get_event_loop()
         js = self.bot.consts["afk"]
