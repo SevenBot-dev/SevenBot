@@ -14,7 +14,7 @@ class TopGG(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         # Autopost will post your guild count every 30 minutes
-        self.dblpy = topgg.DBLClient(self.bot, dbl_token, autopost=False)
+        self.dblpy = self.bot.DBL_client
         self.task = self.update_stats.start()
 
     @tasks.loop(minutes=30)

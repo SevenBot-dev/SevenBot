@@ -115,7 +115,7 @@ class SevenBot(commands.Bot):
         Guild_settings = self.guild_settings
         for k, v in Channel_ids.items():
             self.consts["ch"][k] = self.get_channel(v)
-        self.DBL_client = topgg.DBLClient(self, dbl_token)
+        self.DBL_client = topgg.DBLClient(self, dbl_token, autopost=True)
         g = self.get_guild(Official_discord_id)
         for oe in g.emojis:
             self.consts["oe"][oe.name] = oe
