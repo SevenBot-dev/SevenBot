@@ -207,7 +207,7 @@ class MusicCog(commands.Cog):
                         await message.remove_reaction(pl.emoji, user)
                     except Forbidden:
                         pass
-            if message.embeds[0].title.endswith("`" + get_txt(guild.id, "yt_played")) or message.embeds[0].title.endswith("`" + get_txt(guild.id, "yt_queued")):
+            if message.embeds[0].title and (message.embeds[0].title.endswith("`" + get_txt(guild.id, "yt_played")) or message.embeds[0].title.endswith("`" + get_txt(guild.id, "yt_queued"))):
                 try:
                     await message.remove_reaction(pl.emoji, user)
                 except Forbidden:
