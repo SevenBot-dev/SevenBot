@@ -13,4 +13,3 @@ while True:
     elif "origin/" in res.stdout:
         subprocess.run("git pull origin main".split(), stdout=subprocess.DEVNULL)
     time.sleep(10)
-
