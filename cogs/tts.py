@@ -3,7 +3,6 @@ import copy
 import hashlib
 import io
 import re
-import shlex
 import sys
 import time
 import unicodedata
@@ -61,6 +60,10 @@ class TtsCog(commands.Cog):
         Official_emojis = bot.consts["oe"]
         Tts_channels = bot.consts["tc"]
         Tts_settings = bot.raw_config["ts"]
+        self.make_session()
+
+    def make_session(self):
+        self.session = aiohttp.ClientSession()
 
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
@@ -86,6 +89,7 @@ class TtsCog(commands.Cog):
 
     @commands.Cog.listener(name="on_message")
     async def on_message(self, message):
+        # print("an")
         if message.author.bot:
             return
         elif not message.guild:
@@ -115,6 +119,7 @@ class TtsCog(commands.Cog):
             return
         elif unicodedata.category(message.content[0])[0] in "PS":
             return
+        # print("av")
         if self.session.closed:
             self.make_session()
         flag = False
@@ -290,6 +295,7 @@ class TtsCog(commands.Cog):
         txt = Emoji_re.sub(r":\1:", txt)
         txt = Codeblock_re.sub("", txt)
         txt = Url_re.sub("[URL]", txt)
+        txt = txt.lower()
         if isinstance(message, discord.Message):
             message = message
             user = message.author
@@ -300,7 +306,7 @@ class TtsCog(commands.Cog):
             message = None
 
         for dk, dv in Guild_settings[message.guild.id]["tts_dicts"].items():
-            txt = txt.replace(*dv)
+            txt = txt.replace(dv[0].lower(), dv[1].lower())
 
         ts = Tts_settings.get(user.id, {})
         global last_request
@@ -313,23 +319,25 @@ class TtsCog(commands.Cog):
                 mech = ['-x', r'E:\open_jtalk-1.11\bin\dic']
                 outwav = ['-ow', 'CON']
             else:
-                open_jtalk = [r'open_jtalk']
-                mech = ['-x', r'/usr/local/share/open_jtalk_dic_utf_8-1.07']
+                open_jtalk = [r'~/bin/open-jtalk/bin/open_jtalk']
+                mech = ['-x', r'~/bin/open-jtalk/dic']
                 outwav = ['-ow', '/dev/stdout']
             htsvoice = [
                 '-m', f'./htsvoices/{ts.get("speaker", user.id % 4)}.htsvoice']
             speed = ['-r', str(ts.get("speed", 100) / 100.0)]
-            cmd = ["echo", shlex.quote(
-                txt.replace("\n", " ")[:100]), "|"] + open_jtalk + mech + htsvoice + speed + outwav + ["/dev/stdin"]
+            cmd = open_jtalk + mech + htsvoice + speed + outwav
             # await message.channel.send(" ".join(cmd))
-            c = await asyncio.create_subprocess_shell((" ".join(cmd)).encode(), stdin=asyncio.subprocess.PIPE, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
+            loop.create_task(message.add_reaction(
+                Official_emojis["network"]))
+            c = await asyncio.create_subprocess_shell((" ".join(cmd)).encode(), stdin=asyncio.subprocess.PIPE, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.STDOUT)
             try:
-                await asyncio.wait_for(c.wait(), 2)
+                stdout, _ = await c.communicate((txt.replace("\n", " ")[:30] + "\n").encode("utf8"))
             except asyncio.TimeoutError:
                 c.terminate()
+            loop.create_task(message.remove_reaction(Official_emojis["network"], message.guild.me))
             # await c.wait()
             # await message.reply((await c.stderr.read()).decode())
-            bio = io.BytesIO(await c.stdout.read())
+            bio = io.BytesIO(stdout)
             bio.seek(0)
             msg = (await (self.bot.get_channel(765528694500360212)).send(file=discord.File(bio, filename="tmp.wav")))
             bio.close()
