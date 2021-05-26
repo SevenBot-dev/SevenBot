@@ -174,7 +174,7 @@ class SevenBot(commands.Bot):
         try:
             return Texts[Guild_settings[guild_id]["lang"]][name]
         except KeyError:
-            return "*" + name + "*"
+            return Texts["ja"].get(name, "*" + name + "*")
 
     def is_command(self, msg):
         return msg.content.startswith(tuple(self.command_prefix(bot, msg)))
