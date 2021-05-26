@@ -1,9 +1,7 @@
-import topgg
 import aiohttp
 from discord.ext import commands, tasks
 
 import _pathmagic  # type: ignore # noqa
-from common_resources.tokens import (dbl_token)
 
 
 class TopGG(commands.Cog):
