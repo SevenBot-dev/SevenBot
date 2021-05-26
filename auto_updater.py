@@ -1,7 +1,7 @@
 import time
 import subprocess
 
-cmd = "python3 main.py"
+cmd = "python3.9 main.py"
 p = subprocess.Popen("exec " + cmd, shell=True)
 
 while True:
