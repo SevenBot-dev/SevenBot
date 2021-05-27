@@ -1801,7 +1801,7 @@ class MainCog(commands.Cog):
                         await msg.delete(delay=5)
                 elif message.embeds[0].title.endswith("Web認証") and r not in user.roles:
                     async with aiohttp.ClientSession() as session:
-                        async with session.post('https://captcha.sevenbot.jp/session', json={"password": "(Web Password)", "uid": user.id, "gid": guild.id, "rid": r.id}) as r:
+                        async with session.post('https://captcha.sevenbot.jp/session', json={"password": "nmyy9SPBS5EtNLDR", "uid": user.id, "gid": guild.id, "rid": r.id}) as r:
                             r.raise_for_status()
                             session_id = (await r.json())["message"]
                     try:

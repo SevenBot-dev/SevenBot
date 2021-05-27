@@ -115,7 +115,6 @@ class SevenBot(commands.Bot):
         Guild_settings = self.guild_settings
         for k, v in Channel_ids.items():
             self.consts["ch"][k] = self.get_channel(v)
-        self.DBL_client = topgg.DBLClient(self, dbl_token, autopost=True)
         g = self.get_guild(Official_discord_id)
         for oe in g.emojis:
             self.consts["oe"][oe.name] = oe
@@ -129,6 +128,8 @@ class SevenBot(commands.Bot):
             if o.endswith(".py") and not o.startswith("_"):
                 bot.load_extension("cogs." + os.path.splitext(os.path.basename(o))[0])
         self.levenshtein = levenshtein.Levenshtein(self, max_length=1)
+        if not self.debug:
+            self.DBL_client = topgg.DBLClient(self, dbl_token, autopost=True)
         print("on_ready done")
 
     def is_premium(self, user: Union[discord.User, discord.Member]):
