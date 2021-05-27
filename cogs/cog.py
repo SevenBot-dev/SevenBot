@@ -35,6 +35,7 @@ from common_resources.consts import (Activate_aliases, Alert, Chat,
                                      Official_discord_id, Process, Success,
                                      Widget, Bot_info, Owner_ID, Event_dict, Stat_dict)
 from common_resources.tools import flatten, remove_emoji, convert_timedelta
+from common_resources.tokens import web_pass
 
 
 Categories = {
@@ -1801,7 +1802,7 @@ class MainCog(commands.Cog):
                         await msg.delete(delay=5)
                 elif message.embeds[0].title.endswith("Web認証") and r not in user.roles:
                     async with aiohttp.ClientSession() as session:
-                        async with session.post('https://captcha.sevenbot.jp/session', json={"password": "nmyy9SPBS5EtNLDR", "uid": user.id, "gid": guild.id, "rid": r.id}) as r:
+                        async with session.post('https://captcha.sevenbot.jp/session', json={"password": web_pass, "uid": user.id, "gid": guild.id, "rid": r.id}) as r:
                             r.raise_for_status()
                             session_id = (await r.json())["message"]
                     try:
