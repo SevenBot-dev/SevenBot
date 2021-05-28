@@ -101,6 +101,7 @@ Categories = {
     "settings": [
         "ww_role",
         "autoreply",
+        "timed_role",
         "channel_settings",
         "level_settings",
         "expand_message",
