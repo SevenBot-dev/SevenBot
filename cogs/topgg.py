@@ -1,9 +1,7 @@
-import topgg
 import aiohttp
 from discord.ext import commands, tasks
 
 import _pathmagic  # type: ignore # noqa
-from common_resources.tokens import (dbl_token)
 
 
 class TopGG(commands.Cog):
@@ -14,8 +12,9 @@ class TopGG(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         # Autopost will post your guild count every 30 minutes
-        self.dblpy = self.bot.DBL_client
-        self.task = self.update_stats.start()
+        if not self.bot.debug:
+            self.dblpy = self.bot.DBL_client
+            self.task = self.update_stats.start()
 
     @tasks.loop(minutes=30)
     async def update_stats(self):
