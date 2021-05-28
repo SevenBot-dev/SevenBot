@@ -10,7 +10,7 @@ from texttable import Texttable
 import _pathmagic  # type: ignore # noqa
 from common_resources.consts import (Activate_aliases, Deactivate_aliases,
                                      Info, Success, Error, Level)
-from common_resources.tools import remove_emoji
+from common_resources.tools import remove_emoji, chrsize_len
 
 
 class LevelCog(commands.Cog):
@@ -388,8 +388,8 @@ class LevelCog(commands.Cog):
             else:
                 table = Texttable()
                 table.set_deco(Texttable.HEADER)
-                table.set_cols_dtype(['t',
-                                      'f'])
+                table.set_cols_dtype(['t', 'f'])
+                table.set_cols_width([max([chrsize_len(str(c)) for c in gs["timed_role"].keys()]), max([chrsize_len(str(c)) for c in gs["timed_role"].values()])])
                 table.set_cols_align(["l", "l"])
                 res = [["ロール", "倍率"]]
                 for k, v in gs["level_boosts"].items():
