@@ -42,6 +42,8 @@ class AuthCog(commands.Cog):
         user = guild.get_member(pl.user_id)
         if message.embeds == []:
             return
+        elif message.author.id != self.bot.user.id:
+            return
 
         m0 = message.embeds[0]
         if message.embeds[0].title == "認証ボタン" or message.embeds[0].title.startswith("認証ボタン - "):
