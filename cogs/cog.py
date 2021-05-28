@@ -32,6 +32,7 @@ from common_resources.consts import (Activate_aliases, Alert, Chat,
                                      Official_discord_id, Success,
                                      Widget, Bot_info, Owner_ID, Event_dict, Stat_dict)
 from common_resources.tools import flatten, remove_emoji, convert_timedelta
+from common_resources.component import send_with_components, edit_with_components, Button
 
 
 Categories = {
@@ -1241,11 +1242,11 @@ class MainCog(commands.Cog):
             return await ctx.reply(embed=e)
         else:
             def make_new():
-                table = Texttable()
+                table = Texttable(max_width=80)
                 table.set_deco(Texttable.HEADER)
-                table.set_cols_dtype(['t', 't',
-                                      't'])
+                table.set_cols_dtype(['t', 't', 't'])
                 table.set_cols_align(["l", "l", "l"])
+                table.set_cols_width([8, 19, 20])
                 table.add_row(get_txt(ctx.guild.id, "ar_list_row"))
                 return table
             table = make_new()
@@ -1254,38 +1255,43 @@ class MainCog(commands.Cog):
                 b = table.draw()
                 table.add_row([k, v[0].replace("\n", get_txt(ctx.guild.id, "ar_list_br")),
                                v[1].replace("\n", get_txt(ctx.guild.id, "ar_list_br"))])
-                if len(table.draw()) > 2000:
+                if len(b) > 2000:
                     res.append(b)
                     table = make_new()
                     table.add_row([k, v[0].replace("\n", get_txt(ctx.guild.id, "ar_list_br")),
                                    v[1].replace("\n", get_txt(ctx.guild.id, "ar_list_br"))])
-            res.append(b)
+            res.append(table.draw())
             e = discord.Embed(title=get_txt(ctx.guild.id, "ar_list")
                               + f" - {1}/{len(res)}", description=f"```asciidoc\n{res[0]}```", color=Info)
-            msg = await ctx.reply(embed=e)
+            buttons = [
+                Button("前のページ", "left", 2, enabled=False),
+                Button("次のページ", "right", 2, enabled=len(res) > 1),
+                Button("終了", "exit", 4),
+            ]
+            msg = await send_with_components(ctx, embed=e, reference=ctx.message.to_reference(), components=buttons)
             page = 0
-            await msg.add_reaction(Official_emojis["left"])
-            await msg.add_reaction(Official_emojis["right"])
             while True:
                 try:
-                    r, u = await self.bot.wait_for("reaction_add", check=lambda r, u: r.message.id == msg.id and u.id == ctx.author.id and (r.emoji == Official_emojis["right"] or r.emoji == Official_emojis["left"]), timeout=60)
-                    if r.emoji == Official_emojis["left"]:
+                    cmp = await self.bot.wait_for("component_click", check=lambda cmp: cmp.message == msg and cmp.member == ctx.author, timeout=60)
+                    await cmp.defer_update()
+                    if cmp.custom_id == "left":
                         if page > 0:
                             page -= 1
-                        await msg.remove_reaction(Official_emojis["left"], u)
-                    elif r.emoji == Official_emojis["right"]:
+                        buttons[0].enabled = page != 0
+                    elif cmp.custom_id == "right":
                         if page < (len(res) - 1):
                             page += 1
-                        await msg.remove_reaction(Official_emojis["right"], u)
-                    else:
-                        continue
+                        buttons[1].enabled = page != (len(res) - 1)
+                    elif cmp.custom_id == "exit":
+                        break
                     e = discord.Embed(title=get_txt(
                         ctx.guild.id, "ar_list") + f" - {page+1}/{len(res)}", description=f"```asciidoc\n{res[page]}```", color=Info)
                     await msg.edit(embed=e)
                 except asyncio.TimeoutError:
                     break
-            await msg.remove_reaction(Official_emojis["left"], self.bot.user)
-            await msg.remove_reaction(Official_emojis["right"], self.bot.user)
+            for c in buttons:
+                c.enabled = False
+            await edit_with_components(msg, components=buttons)
 
     @commands.command()
     @commands.has_guild_permissions(manage_guild=True)
