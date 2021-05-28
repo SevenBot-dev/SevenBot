@@ -27,8 +27,10 @@ def to_lts(s):
     s = math.floor(s)
     res = str((s // 60) % 60).zfill(2) + ":" + str(s % 60).zfill(2)
     if s > 3600:
-        res = str(s // 3600).zfill(2) + ":" + res
-
+        if s > 3600 * 24:
+            res = str(s // 3600 * 24) + "d " + str(s // 3600 % 24).zfill(2) + ":" + res
+        else:
+            res = str(s // 3600).zfill(2) + ":" + res
     return res
 
 
