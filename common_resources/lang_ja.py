@@ -238,6 +238,7 @@ JA_TEXTS = {  # noqa
     "yt_now_playing": ["タイトル", "投稿者", "URL", "再生状況"],
     "yt_skip": "スキップしました。",
     "no_role_perm": "`@{}`をつける権限がありません。",
+    "no_role_perm_bot": "SevenBotに`@{}`をつける権限がありません。",
     "yt_queue_end_desc": "`sb#music play`などで登録してください。",
     "yt_footer": "キュー：{}/{} 形式：{}",
     "unknown_cmd": "不明なコマンドです。",

@@ -151,9 +151,16 @@ class AuthCog(commands.Cog):
                               description="初回はロールを登録する必要があります", color=Error)
             await ctx.reply(embed=e)
             return
-        elif role.position > ctx.author.top_role.position and not ctx.guild.owner_id == ctx.author.id:
+        if role != 0:
+            role = ctx.guild.get_role(Guild_settings[ctx.guild.id]["auth_role"])
+        if role.position > ctx.author.top_role.position and not ctx.guild.owner_id == ctx.author.id:
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "no_role_perm").format(role.name), color=Error)
+            await ctx.reply(embed=e)
+            return
+        elif role.position > ctx.me.top_role.position:
+            e = discord.Embed(
+                title=get_txt(ctx.guild.id, "no_role_perm_bot").format(role.name), color=Error)
             await ctx.reply(embed=e)
             return
         if role != 0:
@@ -175,10 +182,17 @@ class AuthCog(commands.Cog):
                               description="初回はロールを登録する必要があります", color=Error)
             m = await ctx.reply(embed=e)
             return
-        elif role.position > ctx.author.top_role.position and not ctx.guild.owner_id == ctx.author.id:
+        if role != 0:
+            role = ctx.guild.get_role(Guild_settings[ctx.guild.id]["auth_role"])
+        if role.position > ctx.author.top_role.position and not ctx.guild.owner_id == ctx.author.id:
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "no_role_perm").format(role.name), color=Error)
-            m = await ctx.reply(embed=e)
+            await ctx.reply(embed=e)
+            return
+        elif role.position > ctx.me.top_role.position:
+            e = discord.Embed(
+                title=get_txt(ctx.guild.id, "no_role_perm_bot").format(role.name), color=Error)
+            await ctx.reply(embed=e)
             return
         if role != 0:
             Guild_settings[ctx.guild.id]["auth_role"] = role.id
@@ -197,12 +211,16 @@ class AuthCog(commands.Cog):
                               description="初回はロールを登録する必要があります", color=Error)
             await ctx.reply(embed=e)
             return
-        if role == 0:
-            role = ctx.guild.get_role(
-                Guild_settings[ctx.guild.id]["auth_role"])
+        if role != 0:
+            role = ctx.guild.get_role(Guild_settings[ctx.guild.id]["auth_role"])
         if role.position > ctx.author.top_role.position and not ctx.guild.owner_id == ctx.author.id:
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "no_role_perm").format(role.name), color=Error)
+            await ctx.reply(embed=e)
+            return
+        elif role.position > ctx.me.top_role.position:
+            e = discord.Embed(
+                title=get_txt(ctx.guild.id, "no_role_perm_bot").format(role.name), color=Error)
             await ctx.reply(embed=e)
             return
         if role != 0:
@@ -224,13 +242,17 @@ class AuthCog(commands.Cog):
                               description="初回はロールを登録する必要があります", color=Error)
             m = await ctx.reply(embed=e)
             return
-        if role == 0:
-            role = ctx.guild.get_role(
-                Guild_settings[ctx.guild.id]["auth_role"])
+        if role != 0:
+            role = ctx.guild.get_role(Guild_settings[ctx.guild.id]["auth_role"])
         if role.position > ctx.author.top_role.position and not ctx.guild.owner_id == ctx.author.id:
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "no_role_perm").format(role.name), color=Error)
-            m = await ctx.reply(embed=e)
+            await ctx.reply(embed=e)
+            return
+        elif role.position > ctx.me.top_role.position:
+            e = discord.Embed(
+                title=get_txt(ctx.guild.id, "no_role_perm_bot").format(role.name), color=Error)
+            await ctx.reply(embed=e)
             return
         if role != 0:
             Guild_settings[ctx.guild.id]["auth_role"] = role.id
@@ -247,15 +269,17 @@ class AuthCog(commands.Cog):
         if role == 0:
             role = ctx.guild.get_role(
                 Guild_settings[ctx.guild.id]["auth_role"])
-        if Guild_settings[ctx.guild.id]["auth_role"] == 0 and role == 0:
-            e = discord.Embed(title="ロールが登録されていません",
-                              description="初回はロールを登録する必要があります", color=Error)
-            m = await ctx.reply(embed=e)
-            return
-        elif role.position > ctx.author.top_role.position and not ctx.guild.owner_id == ctx.author.id:
+        if role != 0:
+            role = ctx.guild.get_role(Guild_settings[ctx.guild.id]["auth_role"])
+        if role.position > ctx.author.top_role.position and not ctx.guild.owner_id == ctx.author.id:
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "no_role_perm").format(role.name), color=Error)
-            m = await ctx.reply(embed=e)
+            await ctx.reply(embed=e)
+            return
+        elif role.position > ctx.me.top_role.position:
+            e = discord.Embed(
+                title=get_txt(ctx.guild.id, "no_role_perm_bot").format(role.name), color=Error)
+            await ctx.reply(embed=e)
             return
         if role != 0:
             Guild_settings[ctx.guild.id]["auth_role"] = role.id
