@@ -8,10 +8,11 @@ from common_resources.consts import (Activate_aliases, Deactivate_aliases,
 
 class TemplateCog(commands.Cog):
     def __init__(self, bot):
-        global Guild_settings, Texts
+        global Guild_settings, Texts, Official_emojis
         global get_txt
         self.bot = bot
         Guild_settings = bot.guild_settings
+        Official_emojis = bot.consts["oe"]
         Texts = bot.texts
         get_txt = bot.get_txt
 
