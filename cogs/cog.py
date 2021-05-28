@@ -1239,7 +1239,7 @@ class MainCog(commands.Cog):
         gs = Guild_settings[g]
         if gs["autoreply"] == {}:
             e = discord.Embed(
-                title=get_txt(ctx.guild.id, "ar_list_no"), description=get_txt(ctx.guild.id, "ar_list_desc"), color=Error)
+                title=get_txt(ctx.guild.id, "ar_list_no"), description=get_txt(ctx.guild.id, "ar_list_no_desc"), color=Error)
             return await ctx.reply(embed=e)
         else:
             def make_new():
