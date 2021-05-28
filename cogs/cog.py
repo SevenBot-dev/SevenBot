@@ -173,7 +173,8 @@ Default_settings = {
     "warns": {},
     "warn_settings": {"punishments": {}, "auto": 0},
     "economy": {
-    }
+    },
+    "timed_role": {}
 }
 Last_favorite = {}
 Time_format = '%Y-%m-%d %H:%M:%S'
