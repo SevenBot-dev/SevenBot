@@ -1713,6 +1713,7 @@ class MainCog(commands.Cog):
                                 read_messages=True, send_messages=True)
                         }
                         cat = await guild.create_category_channel(name="チケット", overwrites=ow)
+                        Guild_settings[guild.id]["ticket_category"] = cat.id
                     ow = cat.overwrites
                     ow[user] = discord.PermissionOverwrite(
                         read_messages=True, send_messages=True)
