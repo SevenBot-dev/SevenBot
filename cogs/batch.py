@@ -25,7 +25,6 @@ Bump_id = 302050872383242240
 Dissoku_id = 761562078095867916
 Bump_color = 0x24b8b8
 Dissoku_color = 0x7289da
-Game_cache = [None, None, None, None]
 
 
 class BatchCog(commands.Cog):

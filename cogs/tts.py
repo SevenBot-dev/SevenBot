@@ -305,7 +305,7 @@ class TtsCog(commands.Cog):
             guild = message["guild"]
             message = None
 
-        for dk, dv in Guild_settings[message.guild.id]["tts_dicts"].items():
+        for _, dv in Guild_settings[message.guild.id]["tts_dicts"].items():
             txt = txt.replace(dv[0].lower(), dv[1].lower())
 
         ts = Tts_settings.get(user.id, {})

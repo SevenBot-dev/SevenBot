@@ -247,7 +247,7 @@ translator = AsyncTranslator()
 
 class MainCog(commands.Cog):
     def __init__(self, bot):
-        global Guild_settings, Official_emojis, Texts, Global_chat, Private_chats, Bump_alerts, Dissoku_alerts, Command_counter, Global_mute, GBan, Levelup_off, Sevennet_channels, Sevennet_posts
+        global Guild_settings, Official_emojis, Texts, Global_chat, Bump_alerts, Dissoku_alerts, Command_counter, Global_mute, GBan, Levelup_off, Sevennet_channels, Sevennet_posts
         global get_txt, is_command
         self.bot = bot
         if not self.bot.consts.get("gcm"):
@@ -258,7 +258,6 @@ class MainCog(commands.Cog):
             Official_emojis = self.bot.consts["oe"]
             is_command = self.bot.is_command
             Global_chat = self.bot.raw_config["gc"]
-            Private_chats = self.bot.raw_config["pc"]
             Bump_alerts = self.bot.raw_config["ba"]
             Dissoku_alerts = self.bot.raw_config["da"]
             Command_counter = self.bot.raw_config["cc"]
@@ -373,7 +372,7 @@ class MainCog(commands.Cog):
         global Guild_settings
         global Bump_alerts, Dissoku_alerts
         global Levelup_off, Afks
-        if message.author.id in GBan.keys() or message.channel.id in Sevennet_channels or message.channel.id in Global_chat or message.channel.id in flatten(list(Private_chats.values())):
+        if message.author.id in GBan.keys() or message.channel.id in self.bot.global_chats:
             return
         if not self.bot.is_ready():
             return
@@ -497,7 +496,7 @@ class MainCog(commands.Cog):
                 await msg.delete(delay=5)
                 return
         if message.author.bot:  # Dissoku_alerts
-            if (message.channel.id in Sevennet_channels or message.channel.id in Global_chat or message.channel.id in flatten(list(Private_chats.values()))) and message.author.id != self.bot.user.id and message.author.discriminator != "0000":
+            if message.channel.id in self.bot.global_chats and message.author.id != self.bot.user.id and message.author.discriminator != "0000":
                 await message.delete()
             if message.author.id == Bump_id and Guild_settings[message.guild.id]["do_bump_alert"]:
                 try:

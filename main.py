@@ -188,6 +188,10 @@ class SevenBot(commands.Bot):
                           description=desc, color=0x00ccff)
         await ctx.send(embed=e)
 
+    @property
+    def global_chats(self):
+        return set(self.raw_config["snc"]) | set(self.raw_config["gc"]) | set(self.consts["pci"])
+
 
 bot = SevenBot(command_prefix=prefix, help_command=None, allowed_mentions=discord.AllowedMentions(everyone=False, replied_user=False), intents=intent)
 

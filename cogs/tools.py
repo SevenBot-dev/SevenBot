@@ -20,7 +20,6 @@ from sembed import SEmbed
 
 import _pathmagic  # type: ignore # noqa: F401
 from common_resources.consts import (Deactivate_aliases, Info, Process, Success)
-from common_resources.tools import flatten
 from common_resources.tokens import (twitter_consumer_key, twitter_consumer_secret)
 
 
@@ -45,23 +44,20 @@ Message_url_re = re.compile(
 
 class ToolCog(commands.Cog):
     def __init__(self, _bot):
-        global Guild_settings, Official_emojis, Texts, Global_chat, Private_chats, get_txt, Sevennet_channels
+        global Guild_settings, Official_emojis, Texts, get_txt
 
         self.bot = _bot
         Guild_settings = self.bot.guild_settings
         get_txt = self.bot.get_txt
         Texts = self.bot.texts
         Official_emojis = self.bot.consts["oe"]
-        Global_chat = self.bot.raw_config["gc"]
-        Private_chats = self.bot.raw_config["pc"]
-        Sevennet_channels = self.bot.raw_config["snc"]
         Batch["sync_afk"] = self.sync_afk.start()
         if "afk" not in self.bot.consts.keys():
             self.bot.consts["afk"] = {}
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if message.author.bot or message.channel.id in Sevennet_channels or message.channel.id in Global_chat or message.channel.id in flatten(list(Private_chats.values())) or (message.guild is not None and message.channel.is_news()):
+        if message.author.bot or message.channel.id in self.bot.global_chats:
             return
         asyncio.get_event_loop()
         js = self.bot.consts["afk"]

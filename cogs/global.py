@@ -36,9 +36,13 @@ class GlobalCog(commands.Cog):
         Global_mute = bot.raw_config["gm"]
         get_txt = bot.get_txt
         is_command = bot.is_command
-        raw_info = self.bot.sync_db.private_chat.find({}, {"_id": False})
-        for info in raw_info:
-            Private_chat_info[info["name"]] = info
+        if self.bot.consts.get("pci"):
+            Private_chat_info = self.bot.consts["pci"]
+        else:
+            raw_info = self.bot.sync_db.private_chat.find({}, {"_id": False})
+            for info in raw_info:
+                Private_chat_info[info["name"]] = info
+            self.bot.consts["pci"] = Private_chat_info
 
     def make_rule_embed(self, channel):
         owner = self.bot.get_user(Private_chat_info[channel]["owner"])
@@ -359,7 +363,7 @@ class GlobalCog(commands.Cog):
 
     @commands.Cog.listener("on_message")
     async def on_message_global(self, message):
-        if (message.channel.id in Global_chat or message.channel.id in flatten([c["channels"] for c in Private_chat_info.values()])) and (not message.author.bot and not message.webhook_id):
+        if (message.channel.id in self.bot.global_chats) and (not message.author.bot and not message.webhook_id):
             if is_command(message):
                 pass
             else:

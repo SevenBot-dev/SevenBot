@@ -7,7 +7,6 @@ import io
 import math
 import random
 import re
-import ssl
 import time
 import urllib.error
 import urllib.parse
@@ -41,14 +40,10 @@ def flatten(l):
 Bot_info = 0x00ccff
 
 
-Nameless_ID = 686547120534454315
 Bignum_join = {}
 Wolf_join = {}
-Wolf_roles = {}
 i = 0
-lc = 0
 g = []
-sac = 0
 
 TRANSLATOR = AsyncTranslator()
 
@@ -63,8 +58,6 @@ def to_lts(s):
 
 
 Time_format = '%Y-%m-%d %H:%M:%S'
-
-context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
 
 Channel_ids = {
     "log": 756254787191963768,
@@ -144,19 +137,11 @@ def text_to_delta(delta, ctx):
         return res + str(s % 60) + get_txt(ctx.guild.id, "delta_txt")[3] + get_txt(ctx.guild.id, "delta_txt")[4]
 
 
-Save_game = discord.Game(name="Saving..." + "⠀" * 100)
-Save_game2 = discord.Game(name="Complete!" + "⠀" * 100)
-
-
 def rgb_tuple(i):
     return (i // 65536, i // 256 % 256, i % 256)
 
 
 Number_emojis = []
-Datetime_re = re.compile(
-    r"(\d+[w(週間?)(weeks?)])?(\d+[d(日)(days?)])? ?(\d+[:h(時間)(hours?)])?(\d+[:m(分)(minutes?)])?(\d+[s(秒)seconds?)]?)?")
-Datetime_args = ["weeks", "days", "hours", "minutes", "seconds"]
-Shard_re = re.compile(r"(\d+)([^\d]+)?")
 Bump_id = 302050872383242240
 Dissoku_id = 761562078095867916
 Trans = 0x1a73e8
@@ -821,7 +806,6 @@ class FunCog(commands.Cog):
             e = discord.Embed(title=get_txt(
                 ctx.guild.id, "ox_timeout"), color=Error)
             return await ctx.reply(embed=e)
-            return
         sendio.close()
         draw = ImageDraw.Draw(base_im)
         for i in range(1, 3):
