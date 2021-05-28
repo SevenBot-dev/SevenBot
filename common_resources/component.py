@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Union
 
+import discord
 from discord import File, AllowedMentions
 from discord import utils
 from discord.emoji import Emoji
@@ -178,3 +179,75 @@ async def send_with_components(channel, content=None, *, tts=False, embed=None, 
     if delete_after is not None:
         await ret.delete(delay=delete_after)
     return ret
+
+
+async def edit_with_components(message, **fields):
+    try:
+        content = fields['content']
+    except KeyError:
+        pass
+    else:
+        if content is not None:
+            fields['content'] = str(content)
+
+    try:
+        embed = fields['embed']
+    except KeyError:
+        pass
+    else:
+        if embed is not None:
+            fields['embed'] = embed.to_dict()
+
+    try:
+        suppress = fields.pop('suppress')
+    except KeyError:
+        pass
+    else:
+        flags = discord.MessageFlags._from_value(message.flags.value)
+        flags.suppress_embeds = suppress
+        fields['flags'] = flags.value
+
+    delete_after = fields.pop('delete_after', None)
+
+    try:
+        allowed_mentions = fields.pop('allowed_mentions')
+    except KeyError:
+        if message._state.allowed_mentions is not None and message.author.id == message._state.self_id:
+            fields['allowed_mentions'] = message._state.allowed_mentions.to_dict()
+    else:
+        if allowed_mentions is not None:
+            if message._state.allowed_mentions is not None:
+                allowed_mentions = message._state.allowed_mentions.merge(allowed_mentions).to_dict()
+            else:
+                allowed_mentions = allowed_mentions.to_dict()
+            fields['allowed_mentions'] = allowed_mentions
+
+    try:
+        attachments = fields.pop('attachments')
+    except KeyError:
+        pass
+    else:
+        fields['attachments'] = [a.to_dict() for a in attachments]
+
+    components2 = []
+    components = fields.get("components")
+    if components:
+        if isinstance(components[0], list):
+            components2 = [{
+                "type": 1,
+                "components": list(map(lambda b: b.to_dict(), c)),
+            }
+                for c in components]
+        else:
+            components2 = [{
+                "type": 1,
+                "components": list(map(lambda b: b.to_dict(), components)),
+            }]
+        fields["components"] = components2
+
+    if fields:
+        data = await message._state.http.edit_message(message.channel.id, message.id, **fields)
+        message._update(data)
+
+    if delete_after is not None:
+        await message.delete(delay=delete_after)
