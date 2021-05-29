@@ -19,6 +19,7 @@ from motor import motor_asyncio as motor
 from common_resources import consts as common_resources
 from common_resources.tokens import TOKEN, cstr, dbl_token, web_pass
 from common_resources.consts import Official_discord_id, Sub_discord_id
+from common_resources.tools import flatten
 
 logger = logging.getLogger('discord')
 logger.setLevel(logging.INFO)
@@ -190,7 +191,7 @@ class SevenBot(commands.Bot):
 
     @property
     def global_chats(self):
-        return set(self.raw_config["snc"]) | set(self.raw_config["gc"]) | set(self.consts["pci"])
+        return set(self.raw_config["snc"]) | set(self.raw_config["gc"]) | set(flatten(c["channels"].values() for c in self.consts["pci"]))
 
 
 bot = SevenBot(command_prefix=prefix, help_command=None, allowed_mentions=discord.AllowedMentions(everyone=False, replied_user=False), intents=intent)
