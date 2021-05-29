@@ -191,7 +191,8 @@ class SevenBot(commands.Bot):
 
     @property
     def global_chats(self):
-        return set(self.raw_config["snc"]) | set(self.raw_config["gc"]) | set(flatten(c["channels"].values() for c in self.consts["pci"]))
+        print(self.consts["pci"])
+        return set(self.raw_config["snc"]) | set(self.raw_config["gc"]) | set(flatten(c["channels"] for c in self.consts["pci"].values()))
 
 
 bot = SevenBot(command_prefix=prefix, help_command=None, allowed_mentions=discord.AllowedMentions(everyone=False, replied_user=False), intents=intent)
