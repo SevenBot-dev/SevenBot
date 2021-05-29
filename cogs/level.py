@@ -36,22 +36,22 @@ class LevelCog(commands.Cog):
             return
         if message.guild is None:
             if message.content == "level":
-                us = await self.bot.db.find_one({"uid": message.author.id})
+                us = await self.bot.db.user_settings.find_one({"uid": message.author.id})
                 if us is None:
-                    await self.bot.db.insert_one({
+                    await self.bot.db.user_settings.insert_one({
                         "uid": message.author.id,
                         "level_dm": False
                     })
                     res = False
                 elif us["level_dm"]:
-                    await self.bot.db.insert_one({
+                    await self.bot.db.user_settings.update_one({
                         "uid": message.author.id
                     }, {
                         "$set": {"level_dm": False}
                     })
                     res = False
                 else:
-                    await self.bot.db.insert_one({
+                    await self.bot.db.user_settings.update_one({
                         "uid": message.author.id
                     }, {
                         "$set": {"level_dm": True}
@@ -91,7 +91,7 @@ class LevelCog(commands.Cog):
                 e = discord.Embed(
                     title="レベルアップ！", description=f"{message.guild.name}でのあなたのレベルが{l}に上がりました！\n次まで： {l*10}\n{extra}", color=Level)
                 e.set_footer(text="`level` でレベルアップ通知を切り換え")
-                us = await self.bot.db.find_one({"uid": message.author.id})
+                us = await self.bot.db.user_settings.find_one({"uid": message.author.id})
                 if us is None or us["level_dm"]:
                     try:
                         await message.author.send(embed=e)
