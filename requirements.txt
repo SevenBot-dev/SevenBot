@@ -20,6 +20,7 @@ debtcollector==2.2.0
 discord-ext-levenshtein==0.3.0
 discord.py==1.7.1
 dnspython==2.1.0
+dpy-syntaxer==1.0.0
 emoji==1.2.0
 flake8==3.9.1
 google-api-core==1.26.3

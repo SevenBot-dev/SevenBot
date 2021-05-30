@@ -20,7 +20,7 @@ import bs4
 import discord
 from async_google_trans_new import AsyncTranslator
 from discord import CategoryChannel, Forbidden, NotFound
-from discord.ext import commands
+from discord.ext import commands, syntaxer
 from discord.ext.commands import (BadArgument, CommandNotFound, Context,
                                   MissingRequiredArgument, bot)
 from sembed import SAuthor, SEmbed, SField
@@ -811,7 +811,7 @@ class MainCog(commands.Cog):
             tad.append([ad.content, ad.attachments[0].url, str(ad.author)])
         self.bot.consts["ads"] = tad
 
-    @commands.command(aliases=["h"])
+    @commands.command(aliases=["h", "?"])
     async def help(self, ctx, *, datail=None):
         if not self.bot.consts.get("ads"):
             await self.on_message_ad(await self.bot.get_channel(800628621010141224).fetch_message(800634459178663946))
@@ -868,21 +868,9 @@ class MainCog(commands.Cog):
                     title=get_txt(ctx.guild.id, "help_title") + " - " + str(c), color=Bot_info, url="https://sevenbot.jp/commands#" + str(c).replace(" ", "-"))
                 if (not isinstance(c, commands.Group)) or (get_txt(ctx.guild.id, "help_datail").get(str(c)) and len(inspect.signature(c.callback).parameters) > 2) or (get_txt(ctx.guild.id, "help_datail").get(str(c), "").count("\n") > 1):
                     if desc_txt != get_txt(ctx.guild.id, "help_datail_none"):
-                        name_ary = []
-                        for l in desc_txt.split("\n"):
-                            if ": " not in l:
-                                continue
-                            name_ary.append(l.split(": ", 2)[0])
-                        txt = str(c)
-                        for pi, (pn, pv) in enumerate(inspect.signature(c.callback).parameters.items(), -2):
-                            if pi < 0:
-                                continue
-                            if pv.default == inspect.Signature.empty:
-                                txt += f" <{name_ary[pi]}>"
-                            else:
-                                txt += f" [{name_ary[pi]}]"
+                        txt = syntaxer.Syntax(c, desc_txt)
                         e.add_field(name=get_txt(
-                            ctx.guild.id, "help_datail_syntax_name"), value=txt)
+                            ctx.guild.id, "help_datail_syntax_name"), value="```apache\n{}\n```".format(str(txt)))
                     e.description = desc_txt
                 if isinstance(c, commands.Group):
                     sct = ""
@@ -2815,29 +2803,19 @@ class MainCog(commands.Cog):
                     c), get_txt(ctx.guild.id, "help_datail_none")).lstrip("\n ")
                 if (not isinstance(c, commands.Group)) or (get_txt(ctx.guild.id, "help_datail").get(str(c)) and len(inspect.signature(c.callback).parameters) > 2):
                     if desc_txt != get_txt(ctx.guild.id, "help_datail_none"):
-                        name_ary = []
-                        for l in desc_txt.split("\n"):
-                            if ": " not in l:
-                                continue
-                            name_ary.append(l.split(": ", 2))
-                        syntax = []
-                        for pi, (_, pv) in enumerate(inspect.signature(c.callback).parameters.items(), -2):
-                            if pi < 0:
-                                continue
-                            if pv.default == inspect.Signature.empty:
-                                syntax.append({"name": name_ary[pi][0],
-                                               "optional": False, "datail": name_ary[pi][1]})
-                            else:
-                                syntax.append({"name": name_ary[pi][0],
-                                               "optional": True, "datail": name_ary[pi][1]})
+                        synt = syntaxer.Syntax(c, desc_txt)
+                        syntaxes = []
+                        for s in synt.args:
+                            syntaxes.append({"name": s.name,
+                                             "optional": s.optional, "datail": s.description, "extra": (s.flag & 0b1100) >> 2})
                 else:
-                    syntax = None
+                    syntaxes = None
                 li.append({
                     "name": str(c),
                     "desc": Texts["ja"]["help_datail"].get(str(c)),
                     "parents": c.full_parent_name, "category": ca[0],
                     "index": ca[1].index(str((c.parents or [c])[-1])),
-                    "aliases": c.aliases, "syntax": syntax
+                    "aliases": c.aliases, "syntax": syntaxes
                 })
                 if isinstance(c, commands.Group):
                     for sc in c.commands:
