@@ -2807,7 +2807,10 @@ class MainCog(commands.Cog):
                         syntaxes = []
                         for s in synt.args:
                             syntaxes.append({"name": s.name,
-                                             "optional": s.optional, "datail": s.description, "extra": (s.flag & 0b1100) >> 2})
+                                             "optional": s.optional,
+                                             "variable": bool(s.flag & syntaxer.ArgumentType.variable),
+                                             "kwarg": bool(s.flag & syntaxer.ArgumentType.kwarg),
+                                             "datail": s.description})
                 else:
                     syntaxes = None
                 li.append({
