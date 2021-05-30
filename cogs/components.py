@@ -7,12 +7,20 @@ class ComponentResponse():
     def __init__(self, bot, data, state):
         self.bot = bot
         self.state = state
+        self.data = data
+
+    async def _fetch(self):
+        bot = self.bot
+        data = self.data
         self.id = int(data["id"])
         self.application_id = int(data["application_id"])
         self.guild = bot.get_guild(int(data["guild_id"]))
-        self.channel = bot.get_channel(int(data["message"]["channel_id"]))
-        self.message = discord.Message(state=bot._get_state(), channel=self.channel, data=data["message"])
+        self.channel = bot.get_channel(int(data["channel_id"]))
         self.member = discord.Member(state=bot._get_state(), guild=self.guild, data=data["member"])
+        if data["message"]["flags"] == 64:
+            self.message = await self.channel.fetch_message(int(data["message"]["id"]))
+        else:
+            self.message = discord.Message(state=bot._get_state(), channel=self.channel, data=data["message"])
         self.token = data["token"]
         self.custom_id = data["data"]["custom_id"]
         self.defered = False
@@ -100,7 +108,9 @@ class ComponentCog(commands.Cog):
         data = pl["d"]
         if data["type"] != 3:
             return
-        self.bot.dispatch("component_click", ComponentResponse(self.bot, data, self.bot._get_state()))
+        resp = ComponentResponse(self.bot, data, self.bot._get_state())
+        await resp._fetch()
+        self.bot.dispatch("component_click", resp)
 
 
 def setup(_bot):
