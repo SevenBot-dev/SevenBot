@@ -21,7 +21,7 @@ Gc_last_users = {}
 Image_exts = ["gif", "jpg", "jpeg", "jpe", "jfif", "png", "bmp", "ico"]
 Cant_image = "https://i.imgur.com/UuhmAUG.png"
 INVITE_PATTERN = re.compile(
-    r"(https?://)?((ptb|canary)\.)?(discord.(gg|io)|discord(app)?.com/invite)/[0-9a-zA-Z]+")
+    r"(https?://)?((ptb|canary)\.)?(discord\.(gg|io)|discord(app)?.com/invite)/[0-9a-zA-Z]+")
 Private_chat_info = {}
 
 
