@@ -32,7 +32,6 @@ from common_resources.consts import (Activate_aliases, Alert, Chat,
                                      Official_discord_id, Success,
                                      Widget, Bot_info, Owner_ID, Event_dict, Stat_dict)
 from common_resources.tools import flatten, remove_emoji, convert_timedelta
-from common_resources.component import send_with_components, edit_with_components, Button
 
 
 Categories = {
@@ -367,61 +366,6 @@ class MainCog(commands.Cog):
                           .replace("!mention", member.mention)
                           .replace("!count", str(len(g.members)))
                           .replace("\\n", "\n"))
-
-    @commands.Cog.listener("on_message")
-    async def on_message_ar(self, message):
-        global last_announce
-        global Guild_settings
-        global Bump_alerts, Dissoku_alerts
-        global Afks
-        if message.author.id in GBan.keys() or message.channel.id in self.bot.global_chats:
-            return
-        if not self.bot.is_ready():
-            return
-        if message.author.bot or message.channel.id in Guild_settings[message.guild.id]["lainan_talk"]:
-            return
-        if message.author.id in SB_Bans.keys() and is_command(message):
-            if SB_Bans[message.author.id] > time.time():
-                return
-        arp = Guild_settings[message.guild.id].get("autoreply")
-        random_tmp = []
-
-        async def ar_send(ch, msg_content):
-            try:
-                m = re.match(r"^([^:]+):([\s\S]*)", msg_content)
-                if m:
-                    cmd = m[1].lower()
-                    cnt = m[2]
-                    if cmd == "noreply":
-                        await ch.send(cnt)
-                    elif cmd == "pingreply":
-                        await message.reply(cnt, mention_author=True)
-                    elif cmd == "react":
-                        try:
-                            await message.add_reaction(cnt)
-                        except discord.errors.BadRequest:
-                            await message.add_reaction(Official_emojis["check2"])
-                    elif cmd == "random":
-                        random_tmp.append(cnt)
-                else:
-                    await message.reply(msg_content)
-            except asyncio.TimeoutError:
-                pass
-        ga = []
-        if arp is not None:
-            for ar in arp.values():
-                m = re.match(r"^([^:]+):([\s\S]*)", ar[0])
-                if m:
-                    cmd = m[1].lower()
-                    cnt = m[2]
-                    if cmd == "re":
-                        if re.search(cnt, message.content):
-                            ga.append(ar_send(message.channel, ar[1]))
-                elif ar[0].lower() in message.content.lower() and not is_command(message):
-                    ga.append(ar_send(message.channel, ar[1]))
-        await asyncio.gather(*ga)
-        if random_tmp:
-            await ar_send(message.channel, random.choice(random_tmp))
 
     @commands.Cog.listener("on_message")
     async def on_message_cmd(self, message):
@@ -1171,123 +1115,6 @@ class MainCog(commands.Cog):
             e = discord.Embed(
                 title="自動公開が無効になりました。", color=Success)
             return await ctx.reply(embed=e)
-
-    @commands.group(aliases=["ar"])
-    async def autoreply(self, ctx):
-        if ctx.invoked_subcommand is None:
-            await self.bot.send_subcommands(ctx)
-
-    @autoreply.command(name="add", aliases=["set"])
-    @commands.has_guild_permissions(manage_messages=True)
-    async def ar_add(self, ctx, base, *, reply):
-        global Guild_settings
-        dat = base + reply
-        rid = hashlib.md5(dat.encode()).hexdigest()[0:8]
-        if ctx.guild.id not in Guild_settings:
-            await self.reset(ctx)
-        if "autoreply" not in Guild_settings[ctx.guild.id]:
-            Guild_settings[ctx.guild.id]["autoreply"] = {}
-        Guild_settings[ctx.guild.id]["autoreply"][rid] = [base, reply]
-        e = discord.Embed(title=f"自動返信に`{base}`を追加しました。",
-                          description=f"戻すには`sb#autoreply remove {base}`または`sb#autoreply remove {rid}`を使用してください", color=Success)
-        await ctx.reply(embed=e)
-        if reply.startswith("!"):
-            e = discord.Embed(title="注意！",
-                              description="コマンドは`!コマンド名 内容`から`コマンド名:内容`へ移行しました。", color=Alert)
-            await ctx.reply(embed=e)
-
-    @autoreply.command(name="remove", aliases=["del", "delete", "rem"])
-    @commands.has_guild_permissions(manage_messages=True)
-    async def ar_remove(self, ctx, *, txt):
-        global Guild_settings
-        res = ""
-        count = 0
-        new = {}
-        if txt in Guild_settings[ctx.guild.id]["autoreply"].keys():
-            res += "`" + \
-                Guild_settings[ctx.guild.id]["autoreply"][txt][1] + "`\n"
-            for ark, ar in Guild_settings[ctx.guild.id]["autoreply"].items():
-                if ark != txt:
-                    new[ark] = ar
-            count = 1
-        else:
-            for ark, ar in Guild_settings[ctx.guild.id]["autoreply"].items():
-                if ar[0] == txt:
-                    count += 1
-                    res += "`" + ar[1] + "`\n"
-                else:
-                    new[ark] = ar
-        if count == 0:
-            e = discord.Embed(
-                title=f"自動返信に`{txt}`は含まれていません。", description="`sb#autoreply list`で確認してください。", color=Error)
-        else:
-            e = discord.Embed(
-                title=f"{count}個の自動返信を削除しました。", description=res, color=Success)
-            Guild_settings[ctx.guild.id]["autoreply"] = new
-        return await ctx.reply(embed=e)
-
-    @autoreply.command(name="list")
-    async def ar_list(self, ctx):
-        g = ctx.guild.id
-        if g not in Guild_settings:
-            await self.reset(ctx)
-        gs = Guild_settings[g]
-        if gs["autoreply"] == {}:
-            e = discord.Embed(
-                title=get_txt(ctx.guild.id, "ar_list_no"), description=get_txt(ctx.guild.id, "ar_list_no_desc"), color=Error)
-            return await ctx.reply(embed=e)
-        else:
-            def make_new():
-                table = Texttable(max_width=80)
-                table.set_deco(Texttable.HEADER)
-                table.set_cols_dtype(['t', 't', 't'])
-                table.set_cols_align(["l", "l", "l"])
-                table.set_cols_width([8, 19, 20])
-                table.add_row(get_txt(ctx.guild.id, "ar_list_row"))
-                return table
-            table = make_new()
-            res = []
-            for k, v in gs["autoreply"].items():
-                b = table.draw()
-                table.add_row([k, v[0].replace("\n", get_txt(ctx.guild.id, "ar_list_br")),
-                               v[1].replace("\n", get_txt(ctx.guild.id, "ar_list_br"))])
-                if len(b) > 2000:
-                    res.append(b)
-                    table = make_new()
-                    table.add_row([k, v[0].replace("\n", get_txt(ctx.guild.id, "ar_list_br")),
-                                   v[1].replace("\n", get_txt(ctx.guild.id, "ar_list_br"))])
-            res.append(table.draw())
-            e = discord.Embed(title=get_txt(ctx.guild.id, "ar_list")
-                              + f" - {1}/{len(res)}", description=f"```asciidoc\n{res[0]}```", color=Info)
-            buttons = [
-                Button("前のページ", "left", 2, enabled=False),
-                Button("次のページ", "right", 2, enabled=len(res) > 1),
-                Button("終了", "exit", 4),
-            ]
-            msg = await send_with_components(ctx, embed=e, reference=ctx.message.to_reference(), components=buttons)
-            page = 0
-            while True:
-                try:
-                    cmp = await self.bot.wait_for("component_click", check=lambda cmp: cmp.message == msg and cmp.member == ctx.author, timeout=60)
-                    await cmp.defer_update()
-                    if cmp.custom_id == "left":
-                        if page > 0:
-                            page -= 1
-                        buttons[0].enabled = page != 0
-                    elif cmp.custom_id == "right":
-                        if page < (len(res) - 1):
-                            page += 1
-                        buttons[1].enabled = page != (len(res) - 1)
-                    elif cmp.custom_id == "exit":
-                        break
-                    e = discord.Embed(title=get_txt(
-                        ctx.guild.id, "ar_list") + f" - {page+1}/{len(res)}", description=f"```asciidoc\n{res[page]}```", color=Info)
-                    await msg.edit(embed=e)
-                except asyncio.TimeoutError:
-                    break
-            for c in buttons:
-                c.enabled = False
-            await edit_with_components(msg, components=buttons)
 
     @commands.command()
     @commands.has_guild_permissions(manage_guild=True)
