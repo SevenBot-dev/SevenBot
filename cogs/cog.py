@@ -388,9 +388,10 @@ class MainCog(commands.Cog):
 
         async def ar_send(ch, msg_content):
             try:
-                if msg_content.startswith("!"):
-                    cmd = msg_content.split(" ", 1)[0][1:].lower()
-                    cnt = msg_content.split(" ", 1)[1]
+                m = re.match(r"^([^:]+):([\s\S]*)", ar[0])
+                if m:
+                    cmd = m[0].lower()
+                    cnt = m[1]
                     if cmd == "noreply":
                         await ch.send(cnt)
                     elif cmd == "pingreply":
@@ -409,9 +410,10 @@ class MainCog(commands.Cog):
         ga = []
         if arp is not None:
             for ar in arp.values():
-                if ar[0].startswith("!") and len(ar[0].split(" ", 1)) > 1:
-                    cmd = ar[0].split(" ", 1)[0][1:].lower()
-                    cnt = ar[0].split(" ", 1)[1]
+                m = re.match(r"^([^:]+):([\s\S]*)", ar[0])
+                if m:
+                    cmd = m[1].lower()
+                    cnt = m[2]
                     if cmd == "re":
                         if re.search(cnt, message.content):
                             ga.append(ar_send(message.channel, ar[1]))
@@ -1188,7 +1190,11 @@ class MainCog(commands.Cog):
         Guild_settings[ctx.guild.id]["autoreply"][rid] = [base, reply]
         e = discord.Embed(title=f"自動返信に`{base}`を追加しました。",
                           description=f"戻すには`sb#autoreply remove {base}`または`sb#autoreply remove {rid}`を使用してください", color=Success)
-        return await ctx.reply(embed=e)
+        await ctx.reply(embed=e)
+        if reply.startswith("!"):
+            e = discord.Embed(title="注意！",
+                              description="コマンドは`!コマンド名 内容`から`コマンド名:内容`へ移行しました。", color=Alert)
+            await ctx.reply(embed=e)
 
     @autoreply.command(name="remove", aliases=["del", "delete", "rem"])
     @commands.has_guild_permissions(manage_messages=True)
