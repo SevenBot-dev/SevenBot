@@ -267,7 +267,7 @@ class AdminCog(commands.Cog):
                 return await commands.MessageConverter().convert(ctx, url)
 
             def _print(*txt):
-                ret[ctx.message.id] += " ".join(map(str, txt))
+                ret[ctx.message.id] += " ".join(map(str, txt)) + "\n"
             exec(
                 'async def __ex(self,_bot,_ctx,ctx,session,print,get_msg): '
                 + '\n'.join(f'    {l}' for l in script.split('\n'))
