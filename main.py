@@ -83,7 +83,7 @@ print("Loading saves from db...", end="")
 gs = {}
 tmp_client = pymongo.MongoClient(cstr)
 for g in tmp_client.sevenbot.guild_settings.find({}, {"_id": False}):
-    for ik in ["levels", "level_counts", "warns", "warn_settings.punishments", "ticket_time", "ticket_subject", "level_boosts"]:
+    for ik in ["levels", "level_counts", "warns", "warn_settings.punishments", "ticket_time", "ticket_subject", "level_boosts", "level_roles"]:
         t = g
         for ikc in ik.split("."):
             t = t[ikc]
