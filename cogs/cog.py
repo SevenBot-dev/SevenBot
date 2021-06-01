@@ -608,6 +608,15 @@ class MainCog(commands.Cog):
                                    files=message.attachments,
                                    embeds=message.embeds)
                 await message.delete()
+
+    @commands.Cog.listener("on_message")
+    async def on_message_message_expand(self, message):
+        if message.author.id in GBan.keys():
+            return
+        if not self.bot.is_ready():
+            return
+        if message.guild.id not in Guild_settings.keys():
+            return
         if re.match(Message_url_re, message.content) is not None and Guild_settings[message.guild.id]["expand_message"]:
             rids = re.match(Message_url_re, message.content)
             ids = [int(i) for i in [rids[1], rids[2], rids[3]]]
@@ -627,7 +636,7 @@ class MainCog(commands.Cog):
                 try:
                     m = await c.fetch_message(ids[2])
                     mc = m.content
-                    if m.author.id != message.author.id:
+                    if not (m.guild == message.guild or m.author == message.author):
                         return
                     if len(mc.splitlines()) > 10:
                         mc = "\n".join(mc.splitlines()[:10]) + "\n..."
@@ -653,9 +662,9 @@ class MainCog(commands.Cog):
                     else:
                         em.set_footer(text=footer + Texts[Guild_settings[message.guild.id]["lang"]]
                                       ["expand_message_footer2"].format(len(m.embeds)), icon_url=self.bot.get_guild(ids[0]).icon_url_as(static_format="png"))
-                        bm = await message.reply(embed=em)
+                        await message.reply(embed=em)
                         for e in m.embeds:
-                            await bm.reply(embed=e)
+                            await message.channel.send(embed=e)
                 except Exception as er:
                     e = discord.Embed(title=get_txt(message.guild.id, "expand_message_fail"),
                                       description="", color=Error)
