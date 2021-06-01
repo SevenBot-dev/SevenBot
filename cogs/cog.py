@@ -388,7 +388,7 @@ class MainCog(commands.Cog):
 
         async def ar_send(ch, msg_content):
             try:
-                m = re.match(r"^([^:]+):([\s\S]*)", ar[0])
+                m = re.match(r"^([^:]+):([\s\S]*)", msg_content)
                 if m:
                     cmd = m[0].lower()
                     cnt = m[1]
