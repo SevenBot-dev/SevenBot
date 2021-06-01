@@ -390,8 +390,8 @@ class MainCog(commands.Cog):
             try:
                 m = re.match(r"^([^:]+):([\s\S]*)", msg_content)
                 if m:
-                    cmd = m[0].lower()
-                    cnt = m[1]
+                    cmd = m[1].lower()
+                    cnt = m[2]
                     if cmd == "noreply":
                         await ch.send(cnt)
                     elif cmd == "pingreply":
