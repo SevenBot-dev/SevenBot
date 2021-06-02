@@ -57,8 +57,8 @@ JA_TEXTS = {  # noqa
     "dpy_classes": "クラス",
     "dpy_props": "プロパティ",
     "dpy_methods": "メソッド",
-    "clear_format": "引数は`引数=値`の形式で入力して下さい。",
-    "clear_keys": "不明な引数({})です。",
+    "clear_format": "パラメータは`パラメータ=値`の形式で入力して下さい。",
+    "clear_keys": "不明なパラメータ({})です。",
     "ot_title": "オセロ",
     "ot_desc": "`11`のように左から、上から何マス目に置くか入力して下さい。",
     "ot_range": "1..8で指定して下さい。",
@@ -249,7 +249,7 @@ JA_TEXTS = {  # noqa
     "rc_title": "ロールの人数一覧",
     "rc_people": "人",
     "see_help": "`sb#help`で確認してください。",
-    "bad_arg": "引数が不正です。",
+    "bad_arg": "パラメータが不正です。",
     "error": "エラーが発生しました。",
     "permission_title": "{}の権限一覧",
     "permission_title_channel": "{}の`{}`での権限一覧",
@@ -422,16 +422,16 @@ JA_TEXTS = {  # noqa
     "help_ad": ["`{}`の広告", "この広告にアクセス"],
     "delta_txt": ["日", "時間", "分", "秒", "間"],
     "help_hidden": "このコマンドは非公開です。",
-    "help_datail_aliases": "エイリアス",
-    "help_datail_count": ["使用回数", "{}回（セーブデータの容量を減らすため、サブコマンドの場合は親コマンドの回数が表示されます。）"],
-    "help_datail_subcommands": "サブコマンド",
-    "help_datail_aliases_none": "なし",
-    "help_datail_subcommands_none": "なし",
+    "help_detail_aliases": "エイリアス",
+    "help_detail_count": ["使用回数", "{}回（セーブデータの容量を減らすため、サブコマンドの場合は親コマンドの回数が表示されます。）"],
+    "help_detail_subcommands": "サブコマンド",
+    "help_detail_aliases_none": "なし",
+    "help_detail_subcommands_none": "なし",
     "help_none": "コマンドが見付かりませんでした。",
-    "help_datail_none": "説明が見付かりませんでした。",
-    "help_datail_syntax_name": "構文",
-    "help_datail_category": "カテゴリー",
-    "help_datail": {
+    "help_detail_none": "説明が見付かりませんでした。",
+    "help_detail_syntax_name": "構文",
+    "help_detail_category": "カテゴリー",
+    "help_detail": {
         "afk": "AFKになります。\nAFK中は、メンション時にAFKであることを伝えます。（もし理由が指定されていれば、理由も伝えます。）\n理由: AFKの理由（文字列、省略で理由なし）",
         "afk key": "AFKのAPIキーを取得します。",
         "afk twitter": "AFKのTwitter連携を設定します。",
@@ -753,7 +753,7 @@ JA_TEXTS = {  # noqa
     #                ],
     #     "help_first": """
     # `/`はサブコマンドあり
-    # `sb#help <コマンド名>`でサブコマンド、引数を表示
+    # `sb#help <コマンド名>`でサブコマンド、パラメータを表示
     #  """,
     "page_footer": r"ページ (\d+)/\d+",
     "lang_name": {'en': '英語',
@@ -970,7 +970,7 @@ JA_TEXTS = {  # noqa
 公式サーバーをチェック！（`sb#about`）
 """,
         "tips_arg": """
-Tipsコマンドには引数を設定出来るよ。
+Tipsコマンドにはパラメータを設定出来るよ。
 フッターに出てくるID（これは`tips_arg`）を入力すれば好きなTipsを表示できるよ。
 """,
         "topgg": """

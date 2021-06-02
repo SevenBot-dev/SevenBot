@@ -98,7 +98,7 @@ def chrsize_len(text):
 async def send_subcommands(ctx):
     desc = ""
     for c in ctx.command.commands:
-        desc += f"**`{c.name}`** " + (ctx.bot.get_txt(ctx.guild.id, "help_datail").get(str(c), "_" + ctx.bot.get_txt(ctx.guild.id, "help_datail_none") + "_")).split("\n")[0] + "\n"
+        desc += f"**`{c.name}`** " + (ctx.bot.get_txt(ctx.guild.id, "help_detail").get(str(c), "_" + ctx.bot.get_txt(ctx.guild.id, "help_detail_none") + "_")).split("\n")[0] + "\n"
     e = discord.Embed(title=ctx.bot.get_txt(ctx.guild.id, "subcommand").format(ctx.command.name),
                       description=desc, color=0x00ccff)
     await ctx.send(embed=e)

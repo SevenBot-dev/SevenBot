@@ -767,10 +767,10 @@ class MainCog(commands.Cog):
         self.bot.consts["ads"] = tad
 
     @commands.command(aliases=["h", "?"])
-    async def help(self, ctx, *, datail=None):
+    async def help(self, ctx, *, detail=None):
         if not self.bot.consts.get("ads"):
             await self.on_message_ad(await self.bot.get_channel(800628621010141224).fetch_message(800634459178663946))
-        if datail is None:
+        if detail is None:
             desc = get_txt(ctx.guild.id, "help_categories")[1] + "\n**`uses`** - " + \
                 get_txt(ctx.guild.id, "help_category_helps")["uses"] + "\n"
             for ck, cv in Categories.items():
@@ -781,13 +781,13 @@ class MainCog(commands.Cog):
             e.set_author(
                 name=f"{ctx.author.display_name}(ID:{ctx.author.id})", icon_url=ctx.author.avatar_url)
             return await ctx.reply(embed=e)
-        elif datail == "uses":
+        elif detail == "uses":
             desc = ""
             for cni, (cnk, cnv) in enumerate(sorted(Command_counter.items(), key=lambda x: x[1], reverse=True)[0:10]):
                 c = self.bot.get_command(cnk)
                 if c:
-                    desc += f"#{cni+1}: **`{c.name}`**({cnv}) " + (get_txt(ctx.guild.id, "help_datail").get(
-                        str(c), "_" + get_txt(ctx.guild.id, "help_datail_none") + "_")).split("\n")[0] + "\n"
+                    desc += f"#{cni+1}: **`{c.name}`**({cnv}) " + (get_txt(ctx.guild.id, "help_detail").get(
+                        str(c), "_" + get_txt(ctx.guild.id, "help_detail_none") + "_")).split("\n")[0] + "\n"
             e = discord.Embed(title=get_txt(ctx.guild.id, "help_ranking"),
                               description=desc, color=Bot_info)
             e.set_author(
@@ -795,60 +795,60 @@ class MainCog(commands.Cog):
             e.set_footer(
                 text=get_txt(ctx.guild.id, "help_categories")[3])
             return await ctx.reply(embed=e)
-        elif datail in Categories.keys():
+        elif detail in Categories.keys():
             desc = ""
-            for cn in Categories[datail]:
+            for cn in Categories[detail]:
                 c = self.bot.get_command(cn)
                 if c:
-                    desc += f"**`{c.name}`** " + (get_txt(ctx.guild.id, "help_datail").get(str(
-                        c), "_" + get_txt(ctx.guild.id, "help_datail_none") + "_")).split("\n")[0] + "\n"
-            e = discord.Embed(title=get_txt(ctx.guild.id, "help_categories")[2].format(datail),
-                              description=desc, color=Bot_info, url="https://sevenbot.jp/commands#category-" + datail)
+                    desc += f"**`{c.name}`** " + (get_txt(ctx.guild.id, "help_detail").get(str(
+                        c), "_" + get_txt(ctx.guild.id, "help_detail_none") + "_")).split("\n")[0] + "\n"
+            e = discord.Embed(title=get_txt(ctx.guild.id, "help_categories")[2].format(detail),
+                              description=desc, color=Bot_info, url="https://sevenbot.jp/commands#category-" + detail)
             e.set_author(
                 name=f"{ctx.author.display_name}(ID:{ctx.author.id})", icon_url=ctx.author.avatar_url)
             e.set_footer(
                 text=get_txt(ctx.guild.id, "help_categories")[3])
             return await ctx.reply(embed=e)
         else:
-            datail = datail.lower()
-            if self.bot.get_command(datail):
-                c = self.bot.get_command(datail)
+            detail = detail.lower()
+            if self.bot.get_command(detail):
+                c = self.bot.get_command(detail)
                 if c.hidden:
                     e = SEmbed(title=get_txt(ctx.guild.id, "help_title") + " - " + str(c), description=get_txt(ctx.guild.id, "help_hidden"),
                                color=Bot_info, author=SAuthor(name=f"{ctx.author.display_name}(ID:{ctx.author.id})", icon_url=ctx.author.avatar_url))
                     return await ctx.reply(embed=e)
-                desc_txt = get_txt(ctx.guild.id, "help_datail").get(str(
-                    c), get_txt(ctx.guild.id, "help_datail_none")).lstrip("\n ")
+                desc_txt = get_txt(ctx.guild.id, "help_detail").get(str(
+                    c), get_txt(ctx.guild.id, "help_detail_none")).lstrip("\n ")
                 e = discord.Embed(
                     title=get_txt(ctx.guild.id, "help_title") + " - " + str(c), color=Bot_info, url="https://sevenbot.jp/commands#" + str(c).replace(" ", "-"))
-                if (not isinstance(c, commands.Group)) or (get_txt(ctx.guild.id, "help_datail").get(str(c)) and len(inspect.signature(c.callback).parameters) > 2) or (get_txt(ctx.guild.id, "help_datail").get(str(c), "").count("\n") > 1):
-                    if desc_txt != get_txt(ctx.guild.id, "help_datail_none"):
+                if (not isinstance(c, commands.Group)) or (get_txt(ctx.guild.id, "help_detail").get(str(c)) and len(inspect.signature(c.callback).parameters) > 2) or (get_txt(ctx.guild.id, "help_detail").get(str(c), "").count("\n") > 1):
+                    if desc_txt != get_txt(ctx.guild.id, "help_detail_none"):
                         txt = syntaxer.Syntax(c, desc_txt)
                         e.add_field(name=get_txt(
-                            ctx.guild.id, "help_datail_syntax_name"), value="```apache\n{}\n```".format(str(txt)))
+                            ctx.guild.id, "help_detail_syntax_name"), value="```apache\n{}\n```".format(str(txt)))
                     e.description = desc_txt
                 if isinstance(c, commands.Group):
                     sct = ""
                     for c2 in c.commands:
-                        sct += f"**`{c2.name}`** " + (get_txt(ctx.guild.id, "help_datail").get(str(
-                            c2), "_" + get_txt(ctx.guild.id, "help_datail_none") + "_")).split("\n")[0] + "\n"
+                        sct += f"**`{c2.name}`** " + (get_txt(ctx.guild.id, "help_detail").get(str(
+                            c2), "_" + get_txt(ctx.guild.id, "help_detail_none") + "_")).split("\n")[0] + "\n"
                     e.add_field(name=get_txt(
-                        ctx.guild.id, "help_datail_subcommands"), value=sct, inline=False)
+                        ctx.guild.id, "help_detail_subcommands"), value=sct, inline=False)
                 at = "`,`".join(c.aliases)
                 if at == "":
                     at = Texts[Guild_settings[ctx.guild.id]
-                               ["lang"]]["help_datail_aliases_none"]
+                               ["lang"]]["help_detail_aliases_none"]
                 else:
                     at = "`" + at + "`"
                 e.add_field(name=get_txt(
-                    ctx.guild.id, "help_datail_aliases"), value=at, inline=False)
-                e.add_field(name=get_txt(ctx.guild.id, "help_datail_count")[0],
-                            value=get_txt(ctx.guild.id, "help_datail_count")[1].format(Command_counter.get(str(c).split()[0], 0)), inline=False)
+                    ctx.guild.id, "help_detail_aliases"), value=at, inline=False)
+                e.add_field(name=get_txt(ctx.guild.id, "help_detail_count")[0],
+                            value=get_txt(ctx.guild.id, "help_detail_count")[1].format(Command_counter.get(str(c).split()[0], 0)), inline=False)
                 e.set_author(
                     name=f"{ctx.author.display_name}(ID:{ctx.author.id})", icon_url=ctx.author.avatar_url)
                 return await ctx.reply(embed=e)
             else:
-                e = discord.Embed(title=get_txt(ctx.guild.id, "help_title") + " - " + datail,
+                e = discord.Embed(title=get_txt(ctx.guild.id, "help_title") + " - " + detail,
                                   description=get_txt(ctx.guild.id, "help_none"), color=Bot_info)
                 return await ctx.reply(embed=e)
 
@@ -2532,8 +2532,8 @@ class MainCog(commands.Cog):
         part_res = ""
         if perf_match:
             for pm in perf_match:
-                tmp_txt = f"**`{pm}`** " + (get_txt(ctx.guild.id, "help_datail").get(
-                    pm, "_" + get_txt(ctx.guild.id, "help_datail_none") + "_")).split("\n")[0] + "\n"
+                tmp_txt = f"**`{pm}`** " + (get_txt(ctx.guild.id, "help_detail").get(
+                    pm, "_" + get_txt(ctx.guild.id, "help_detail_none") + "_")).split("\n")[0] + "\n"
                 if len(perf_res + tmp_txt) < 1024:
                     perf_res += tmp_txt
                 else:
@@ -2542,8 +2542,8 @@ class MainCog(commands.Cog):
             perf_res = get_txt(ctx.guild.id, "getid_search")[3]
         if part_match:
             for pm in part_match:
-                tmp_txt = f"**`{pm}`** " + (get_txt(ctx.guild.id, "help_datail").get(
-                    pm, "_" + get_txt(ctx.guild.id, "help_datail_none") + "_")).split("\n")[0] + "\n"
+                tmp_txt = f"**`{pm}`** " + (get_txt(ctx.guild.id, "help_detail").get(
+                    pm, "_" + get_txt(ctx.guild.id, "help_detail_none") + "_")).split("\n")[0] + "\n"
                 if len(part_res + tmp_txt) < 1024:
                     part_res += tmp_txt
                 else:
@@ -2640,17 +2640,17 @@ class MainCog(commands.Cog):
         start = time.time()
 
         async def add_l(c):
-            if Texts["ja"]["help_datail"].get(str(c)):
+            if Texts["ja"]["help_detail"].get(str(c)):
                 await self.bot.db.commands.delete_many({"name": str(c)})
                 ca = [(ck, cv) for ck, cv in Categories.items()
                       if str((c.parents or [c])[-1]) in cv]
                 if not ca:
                     return
                 ca = ca[0]
-                desc_txt = get_txt(ctx.guild.id, "help_datail").get(str(
-                    c), get_txt(ctx.guild.id, "help_datail_none")).lstrip("\n ")
-                if (not isinstance(c, commands.Group)) or (get_txt(ctx.guild.id, "help_datail").get(str(c)) and len(inspect.signature(c.callback).parameters) > 2):
-                    if desc_txt != get_txt(ctx.guild.id, "help_datail_none"):
+                desc_txt = get_txt(ctx.guild.id, "help_detail").get(str(
+                    c), get_txt(ctx.guild.id, "help_detail_none")).lstrip("\n ")
+                if (not isinstance(c, commands.Group)) or (get_txt(ctx.guild.id, "help_detail").get(str(c)) and len(inspect.signature(c.callback).parameters) > 2):
+                    if desc_txt != get_txt(ctx.guild.id, "help_detail_none"):
                         synt = syntaxer.Syntax(c, desc_txt)
                         syntaxes = []
                         for s in synt.args:
@@ -2658,12 +2658,12 @@ class MainCog(commands.Cog):
                                              "optional": s.optional,
                                              "variable": bool(s.flag & syntaxer.ArgumentType.variable),
                                              "kwarg": bool(s.flag & syntaxer.ArgumentType.kwarg),
-                                             "datail": s.description})
+                                             "detail": s.description})
                 else:
                     syntaxes = None
                 li.append({
                     "name": str(c),
-                    "desc": Texts["ja"]["help_datail"].get(str(c)),
+                    "desc": Texts["ja"]["help_detail"].get(str(c)),
                     "parents": c.full_parent_name, "category": ca[0],
                     "index": ca[1].index(str((c.parents or [c])[-1])),
                     "aliases": c.aliases, "syntax": syntaxes
