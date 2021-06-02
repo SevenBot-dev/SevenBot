@@ -1254,9 +1254,11 @@ class MainCog(commands.Cog):
             return await ctx.reply(embed=e)
 
     @commands.command(aliases=["poll"])
-    async def vote(self, ctx, title, time: convert_timedelta, multi: Optional[bool], *select):
+    async def vote(self, ctx, title, time: Optional[convert_timedelta], multi: Optional[bool], *select):
         if multi is None:
             multi = True
+        if time is None:
+            time = datetime.timedelta(hours=1)
         if len(select) > 10:
             g = ctx.guild
             e = discord.Embed(title=get_txt(g.id, "vote_error")[0],
@@ -1693,7 +1695,9 @@ class MainCog(commands.Cog):
         return await ctx.reply(embed=e)
 
     @commands.command(aliases=["recruit", "apply"])
-    async def party(self, ctx, title, time: convert_timedelta, max: int):
+    async def party(self, ctx, title, time: Optional[convert_timedelta], max: int):
+        if time is None:
+            time = datetime.timedelta(hours=1)
         dt = datetime.datetime.utcnow()
         dt += time
         e = discord.Embed(title="募集", color=Widget, timestamp=dt)
