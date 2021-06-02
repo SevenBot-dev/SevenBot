@@ -1254,7 +1254,9 @@ class MainCog(commands.Cog):
             return await ctx.reply(embed=e)
 
     @commands.command(aliases=["poll"])
-    async def vote(self, ctx, title, time: convert_timedelta, multi: bool, *select):
+    async def vote(self, ctx, title, time: convert_timedelta, multi: Optional[bool], *select):
+        if multi is None:
+            multi = True
         if len(select) > 10:
             g = ctx.guild
             e = discord.Embed(title=get_txt(g.id, "vote_error")[0],
