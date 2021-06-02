@@ -269,7 +269,7 @@ class AdminCog(commands.Cog):
             def _print(*txt):
                 ret[ctx.message.id] += " ".join(map(str, txt)) + "\n"
             exec(
-                'import io;async def __ex(self,_bot,_ctx,ctx,session,print,get_msg): '
+                'async def __ex(self,_bot,_ctx,ctx,session,print,get_msg): '
                 + '\n'.join(f'    {l}' for l in script.split('\n'))
             )
             r = await locals()['__ex'](self, self.bot, ctx, ctx, session, _print, get_msg)
