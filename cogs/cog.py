@@ -21,8 +21,7 @@ import discord
 from async_google_trans_new import AsyncTranslator
 from discord import CategoryChannel, Forbidden, NotFound
 from discord.ext import commands, syntaxer
-from discord.ext.commands import (BadArgument, CommandNotFound, Context,
-                                  MissingRequiredArgument, bot)
+from discord.ext.commands import (BadArgument, CommandNotFound, Context, bot)
 from sembed import SAuthor, SEmbed, SField
 from texttable import Texttable
 
@@ -1182,7 +1181,11 @@ class MainCog(commands.Cog):
         print(error)
         if isinstance(error, CommandNotFound):
             return
-        elif isinstance(error, MissingRequiredArgument) or isinstance(error, BadArgument):
+        elif isinstance(error, commands.errors.MissingRequiredArgument):
+            synt = syntaxer.Syntax(ctx.command, get_txt(ctx.guild.id, "help_detail")[str(ctx.command)])
+            e = discord.Embed(title=get_txt(ctx.guild.id, "missing_argument").format(discord.utils.get(synt.args, param=error.param).name), description=get_txt(ctx.guild.id, "missing_argument_desc").format(synt), color=Error)
+            return await ctx.reply(embed=e)
+        elif isinstance(error, BadArgument):
             e = discord.Embed(title=get_txt(ctx.guild.id, "bad_arg"),
                               description=get_txt(ctx.guild.id, "see_help") + f"\n```\n{error}```", color=Error)
             return await ctx.reply(embed=e)
