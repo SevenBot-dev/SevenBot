@@ -20,7 +20,7 @@ import bs4
 import discord
 from async_google_trans_new import AsyncTranslator
 from discord import CategoryChannel, Forbidden, NotFound
-from discord.ext import commands, syntaxer
+from discord.ext import commands, syntaxer, components
 from discord.ext.commands import (BadArgument, CommandNotFound, Context, bot)
 from sembed import SAuthor, SEmbed, SField
 from texttable import Texttable
@@ -1184,7 +1184,7 @@ class MainCog(commands.Cog):
         elif isinstance(error, commands.errors.MissingRequiredArgument):
             synt = syntaxer.Syntax(ctx.command, get_txt(ctx.guild.id, "help_detail")[str(ctx.command)])
             e = discord.Embed(title=get_txt(ctx.guild.id, "missing_argument").format(discord.utils.get(synt.args, param=error.param).name), description=get_txt(ctx.guild.id, "missing_argument_desc").format(synt), color=Error)
-            return await ctx.reply(embed=e)
+            return await components.reply(ctx.message, embed=e, components=[components.Button(get_txt(ctx.guild.id, "online_help"), style=5, url="https://sevenbot.jp/commands#" + str(ctx.command).replace(" ", "-"))])
         elif isinstance(error, BadArgument):
             e = discord.Embed(title=get_txt(ctx.guild.id, "bad_arg"),
                               description=get_txt(ctx.guild.id, "see_help") + f"\n```\n{error}```", color=Error)

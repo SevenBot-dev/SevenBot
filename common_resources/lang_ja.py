@@ -418,6 +418,7 @@ JA_TEXTS = {  # noqa
     "not_nsfw": "このコマンドはNSFWチャンネル限定です。",
     "missing_argument": "パラメータ`{}`が不足しています。",
     "missing_argument_desc": "```apache\n{}\n```",
+    "online_help": "ヘルプを表示",
     "subcommand": "`{}`のサブコマンド",
     "vote_rank": ["順位", "ユーザー名", "Upvote数"],
     "vote_rank_title": "今月のUpvote数ランキング",
