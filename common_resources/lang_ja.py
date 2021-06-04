@@ -520,7 +520,7 @@ JA_TEXTS = {  # noqa
 メッセージ: 送信するメッセージ（文字列）
 **イベント名:**
 {en}
-メッセージ: 送信するメッセージ
+メッセージ: 送信するメッセージ（文字列）
 **置き換え一覧:**
 `!name`: 参加したメンバーの名前
 `!mention`: 参加したメンバーのメンション
@@ -586,12 +586,12 @@ JA_TEXTS = {  # noqa
         "role_link remove": "ロールリンクを削除します。\nロール: このサーバーの削除したいリンクロールのロール（ロール）\nロール2: 他サーバーの削除したいリンクロールのロール（ID-ロール）",
         "role_link list": "ロールリンクのリストを表示します。",
         "level_settings roles": """報酬ロールを管理します。""",
-        "level_settings roles add": "報酬ロールを設定します。\nレベル: 報酬ロールを与えるレベル\nロール: 与えるロール",
-        "level_settings roles remove": "報酬ロールを削除します。\nレベル: 削除したい報酬ロールが与えられるレベル",
+        "level_settings roles add": "報酬ロールを設定します。\nレベル: 報酬ロールを与えるレベル（数値）\nロール: 与えるロール（ロール）",
+        "level_settings roles remove": "報酬ロールを削除します。\nレベル: 削除したい報酬ロールが与えられるレベル（数値）",
         "level_settings roles list": "報酬ロールのリストを表示します。",
         "level_settings boost": """レベルブーストを管理します。""",
         "level_settings boost add": "レベルブーストを設定します。\nロール: レベルブーストを設定する対象（ロール/メンバー）\n倍率: レベルブーストの倍率（小数）",
-        "level_settings boost remove": "レベルブーストを削除します。\nロール: 削除したいレベルブーストが設定されているロール",
+        "level_settings boost remove": "レベルブーストを削除します。\nロール: 削除したいレベルブーストが設定されているロール（ロール）",
         "level_settings boost list": "レベルブーストのリストを表示します。",
         "level_settings activate": "レベルシステムを有効にします。",
         "level_settings deactivate": "レベルシステムを無効にします。",
@@ -627,7 +627,7 @@ JA_TEXTS = {  # noqa
         "fatal role dm": "ロールを持っている人に一括でDMを送信します。\nロール: DMを送信する対象（ロール）\nメッセージ: メッセージ内容（文字列）",
         "emoji_list": "サーバーの絵文字を表示し、リアクションします。",
         "loop_trans": "メッセージを五カ国語で再翻訳します。\nテキスト: 翻訳するテキスト（文字列/メッセージURL）",
-        "ticket": "チケット作成メッセージを送信します。\nタイトル: チケットのタイトル\n説明: チケットの説明",
+        "ticket": "チケット作成メッセージを送信します。\nタイトル: チケットのタイトル（文字列）\n説明: チケットの説明（文字列）",
         "serverinfo": "サーバーの情報を表示します。\nID: 表示するサーバーのID（ID-サーバー、省略で実行したサーバー）",
         "check_permissions": "SevenBotに必要な権限があるかチェックします。",
         "lockdown": "チャンネルを封鎖します。\n再実行で解放します。",
@@ -645,10 +645,10 @@ JA_TEXTS = {  # noqa
         "role": "ロールパネルを作成します。\n複数選択: 複数選択を許可するか（Y/N）\nロール: ロールのメンション（リスト-ロール、最大10個）",
         "ww_role": "人狼の生存/死亡ロールを設定します。\nロールタイプ: 設定するロールの種類（alive/dead）\nロール: 設定するロール（ロール、省略で未設定化）",
         "image 5000": "[5000choyen-api](https://github.com/CyberRex0/5000choyen-api)を使って5000兆円欲しい！を生成します。\n上部: 上に入るテキスト（文字列）\n下部: 下に入るテキスト（文字列）",
-        "develop_tool chr_info": "文字の情報を表示します。\nテキスト: 情報を表示するテキスト",
+        "develop_tool chr_info": "文字の情報を表示します。\nテキスト: 情報を表示するテキスト（文字列）",
         "develop_tool rtfm": "リファレンスを検索します。",
-        "develop_tool rtfm dpy": "[discord.py](https://discordpy.readthedocs.io/ja/stable/)のリファレンスを検索します。\nキーワード: 検索するキーワード。",
-        "develop_tool rtfm djs": "[discord.js](https://discord.js.org/#/docs/main)のリファレンスを検索します。\nキーワード: 検索するキーワード。",
+        "develop_tool rtfm dpy": "[discord.py](https://discordpy.readthedocs.io/ja/stable/)のリファレンスを検索します。\nキーワード: 検索するキーワード。（文字列）",
+        "develop_tool rtfm djs": "[discord.js](https://discord.js.org/#/docs/main)のリファレンスを検索します。\nキーワード: 検索するキーワード。（文字列）",
         "snowflake": "Snowflake（DiscordのID）の情報を表示します。\nSnowflake: 情報を表示するSnowflake（数値）"
     },
     "help_categories": ["ヘルプ - カテゴリー一覧", "sb#help <カテゴリー名> でそのカテゴリーのコマンドを表示します。", "`{}`のコマンド一覧", "sb#help <コマンド名> でコマンドのヘルプを表示します。"],
