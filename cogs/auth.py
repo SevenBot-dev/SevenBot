@@ -7,7 +7,7 @@ import time
 
 import aiohttp
 import discord
-from discord.ext import commands
+from discord.ext import commands, components
 from discord.errors import NotFound, Forbidden
 from PIL import Image, ImageDraw, ImageFont
 from sembed import SEmbed
@@ -15,7 +15,6 @@ from sembed import SEmbed
 import _pathmagic  # type: ignore # noqa
 from common_resources.consts import (Process, Success, Error, Widget)
 from common_resources.tokens import web_pass
-from common_resources.component import send_with_components, Button
 
 
 class AuthCog(commands.Cog):
@@ -94,7 +93,8 @@ class AuthCog(commands.Cog):
                     await msg.delete(delay=60)
 
     @commands.Cog.listener()
-    async def on_component_click(self, cmp):
+    async def on_button_click(self, cmp):
+        print(1)
         if cmp.message.embeds == []:
             return
         m0 = cmp.message.embeds[0]
@@ -167,7 +167,7 @@ class AuthCog(commands.Cog):
             Guild_settings[ctx.guild.id]["auth_role"] = role.id
         e = discord.Embed(
             title="認証ボタン - ワンクリック", description=f'下のボタンを押して認証\nロール: {ctx.guild.get_role(Guild_settings[ctx.guild.id]["auth_role"]).mention}', color=Widget)
-        await send_with_components(ctx, embed=e, components=[Button("認証", "auth")])
+        await components.send(ctx, embed=e, components=[components.Button("認証", "auth")])
         try:
             await ctx.message.delete()
         except discord.errors.Forbidden:
@@ -227,7 +227,7 @@ class AuthCog(commands.Cog):
             Guild_settings[ctx.guild.id]["auth_role"] = role.id
         e = discord.Embed(
             title="認証ボタン - 画像認証", description=f'下の{Official_emojis["check5"]}を押して認証\nロール: {ctx.guild.get_role(Guild_settings[ctx.guild.id]["auth_role"]).mention}', color=Widget)
-        await send_with_components(ctx, embed=e, components=[Button("認証", "auth")])
+        await components.send(ctx, embed=e, components=[components.Button("認証", "auth")])
         try:
             await ctx.message.delete()
         except discord.errors.Forbidden:
@@ -307,7 +307,7 @@ class AuthCog(commands.Cog):
             Guild_settings[ctx.guild.id]["auth_role"] = role.id
         e = discord.Embed(
             title="認証ボタン - Web認証", description=f'下のボタンを押して認証\nロール: {ctx.guild.get_role(Guild_settings[ctx.guild.id]["auth_role"]).mention}', color=Widget)
-        await send_with_components(ctx, embed=e, components=[Button("認証", "auth")])
+        await components.send(ctx, embed=e, components=[components.Button("認証", "auth")])
         try:
             await ctx.message.delete()
         except discord.errors.Forbidden:

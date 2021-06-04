@@ -5,12 +5,11 @@ import re
 import time
 
 import discord
-from discord.ext import commands
+from discord.ext import commands, components
 from texttable import Texttable
 
 import _pathmagic  # type: ignore # noqa
 from common_resources.consts import (Info, Success, Error, Alert)
-from common_resources.component import send_with_components, edit_with_components, Button
 
 
 class TemplateCog(commands.Cog):
@@ -166,15 +165,15 @@ class TemplateCog(commands.Cog):
             e = discord.Embed(title=get_txt(ctx.guild.id, "ar_list")
                               + f" - {1}/{len(res)}", description=f"```asciidoc\n{res[0]}```", color=Info)
             buttons = [
-                Button("前のページ", "left", 2, enabled=False),
-                Button("次のページ", "right", 2, enabled=len(res) > 1),
-                Button("終了", "exit", 4),
+                components.Button("前のページ", "left", 2, enabled=False),
+                components.Button("次のページ", "right", 2, enabled=len(res) > 1),
+                components.Button("終了", "exit", 4),
             ]
-            msg = await send_with_components(ctx, embed=e, reference=ctx.message.to_reference(), components=buttons)
+            msg = await components.send(ctx, embed=e, reference=ctx.message.to_reference(), components=buttons)
             page = 0
             while True:
                 try:
-                    cmp = await self.bot.wait_for("component_click", check=lambda cmp: cmp.message == msg and cmp.member == ctx.author, timeout=60)
+                    cmp = await self.bot.wait_for("button_click", check=lambda cmp: cmp.message == msg and cmp.member == ctx.author, timeout=60)
                     await cmp.defer_update()
                     if cmp.custom_id == "left":
                         if page > 0:
@@ -193,7 +192,7 @@ class TemplateCog(commands.Cog):
                     break
             for c in buttons:
                 c.enabled = False
-            await edit_with_components(msg, components=buttons)
+            await components.edit(msg, components=buttons)
 
 
 def setup(_bot):
