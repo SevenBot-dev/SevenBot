@@ -6,7 +6,6 @@ import re
 import sys
 import urllib.error
 import urllib.parse
-import urllib.request
 from functools import partial
 from html import unescape
 
