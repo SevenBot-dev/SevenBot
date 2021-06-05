@@ -7,11 +7,9 @@ import traceback
 import aiohttp
 import discord
 import psutil
-from discord import Forbidden, NotFound
 from discord.ext import commands, tasks
 
 import _pathmagic  # type: ignore # noqa
-from common_resources.lang_ja import Stat_dict
 from common_resources.tools import recr_items
 from common_resources.tokens import botdd_token
 
@@ -41,11 +39,7 @@ class BatchCog(commands.Cog):
         Batchs.append(self.bot.loop.create_task(self.sync_db()))
         time.sleep(0.1)
         Batchs.append(self.batch_save.start())
-        time.sleep(0.1)
-        Batchs.append(self.batch_update_stat_channel.start())
         if not self.bot.debug:
-            time.sleep(0.1)
-            Batchs.append(self.batch_bump_alert.start())
             time.sleep(0.1)
             Batchs.append(self.botdd_post.start())
             time.sleep(0.1)
@@ -87,101 +81,6 @@ class BatchCog(commands.Cog):
     @batch_send_status.before_loop
     async def batch_send_status_before(self):
         await asyncio.sleep((10 - datetime.datetime.now().minute % 10) * 60)
-
-    @tasks.loop(seconds=10)
-    async def batch_bump_alert(self):
-
-        for rg in self.bot.guilds:
-            gi = rg.id
-            if gi not in Bump_alerts.keys():
-                continue
-            try:
-                bt = datetime.datetime.strptime(
-                    Bump_alerts[gi][0], Time_format)
-                nt = datetime.datetime.utcnow()
-                if bt < nt:
-                    e = discord.Embed(title=get_txt(gi, "bump_alert"),
-                                      description=get_txt(gi, "bump_alert_desc"), color=Bump_color)
-                    c = self.bot.get_channel(Bump_alerts[gi][1])
-                    m = ""
-                    if Guild_settings[c.guild.id]["bump_role"]:
-                        r = c.guild.get_role(
-                            Guild_settings[c.guild.id]["bump_role"])
-                        if r:
-                            m = r.mention
-                    await c.send(content=m, embed=e)
-                    del Bump_alerts[gi]
-
-            except BaseException:
-                pass
-        for gi, gs in Guild_settings.items():
-            if gi not in Dissoku_alerts.keys():
-                continue
-            try:
-                bt = datetime.datetime.strptime(
-                    Dissoku_alerts[gi][0], Time_format)
-                nt = datetime.datetime.utcnow()
-                if bt < nt:
-                    e = discord.Embed(title=get_txt(gi, "dissoku_alert"),
-                                      description=get_txt(gi, "dissoku_alert_desc"), color=Dissoku_color)
-                    c = self.bot.get_channel(Dissoku_alerts[gi][1])
-                    m = ""
-                    if Guild_settings[c.guild.id]["dissoku_role"]:
-                        r = c.guild.get_role(
-                            Guild_settings[c.guild.id]["dissoku_role"])
-                        if r:
-                            m = r.mention
-                    await c.send(content=m, embed=e)
-                    del Dissoku_alerts[gi]
-
-            except Exception:
-                pass
-
-    @tasks.loop(minutes=5, seconds=10)
-    async def batch_update_stat_channel(self):
-        try:
-            for g in self.bot.guilds:
-                if Guild_settings[g.id]["do_stat_channels"]:
-                    for sck, scv in Guild_settings[g.id]["stat_channels"].items():
-                        if sck == "category":
-                            continue
-                        s = self.bot.get_channel(scv)
-                        if s is None:
-                            continue
-
-                        val = "--"
-                        if sck == "members":
-                            val = g.member_count
-                        elif sck == "humans":
-                            val = len(
-                                list(filter(lambda m: not m.bot, g.members)))
-                        elif sck == "bots":
-                            val = len(list(filter(lambda m: m.bot, g.members)))
-                        elif sck == "channels":
-                            val = len(g.text_channels) + len(g.voice_channels) - \
-                                len(Guild_settings[g.id]
-                                    ["stat_channels"].keys()) + 1
-                        elif sck == "text_channels":
-                            val = len(g.text_channels)
-                        elif sck == "voice_channels":
-                            val = len(
-                                g.voice_channels) - len(Guild_settings[g.id]["stat_channels"].keys()) + 1
-                        elif sck == "roles":
-                            val = len(g.roles)
-                        else:
-                            try:
-                                await s.delete()
-                            except (NotFound, Forbidden):
-                                pass
-
-                            continue
-                        try:
-                            await s.edit(name=f"{Stat_dict[sck]}: {val}")
-                        except (NotFound, Forbidden):
-                            pass
-            await asyncio.sleep(5)
-        except Exception:
-            pass
 
     @tasks.loop(minutes=5)
     async def batch_save(self):

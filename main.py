@@ -97,7 +97,7 @@ print("Done")
 class SevenBot(commands.Bot):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.consts = {"qu": {}, "ch": {}, "oe": {}, "ne": [], "tc": {}}
+        self.consts = {"qu": {}, "ch": {}, "oe": {}, "ne": [], "tc": {}, "pci": {}}
         self.raw_config = ast.literal_eval(raw_save)
         self.guild_settings = gs
         self.dbclient = motor.AsyncIOMotorClient(cstr)

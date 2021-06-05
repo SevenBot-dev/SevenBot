@@ -19,7 +19,7 @@ import aiohttp
 import bs4
 import discord
 from async_google_trans_new import AsyncTranslator
-from discord import CategoryChannel, Forbidden, NotFound
+from discord import Forbidden, NotFound
 from discord.ext import commands, syntaxer, components
 from discord.ext.commands import (BadArgument, CommandNotFound, Context, bot)
 from sembed import SAuthor, SEmbed, SField
@@ -29,8 +29,8 @@ import _pathmagic  # type: ignore # noqa: F401
 from common_resources.consts import (Activate_aliases, Alert, Chat,
                                      Deactivate_aliases, Error, Info,
                                      Official_discord_id, Success,
-                                     Widget, Bot_info, Owner_ID, Event_dict, Stat_dict)
-from common_resources.tools import flatten, remove_emoji, convert_timedelta
+                                     Widget, Bot_info, Owner_ID, Event_dict)
+from common_resources.tools import flatten, remove_emoji
 
 
 Categories = {
@@ -180,8 +180,6 @@ Image_exts = ["gif", "jpg", "jpeg", "jpe", "jfif", "png", "bmp", "ico"]
 Link_2ch_re = re.compile(r">>[0-9]+")
 Sevennet_footer_re = re.compile(
     r"Server: (.+?) | ID: (.{8}) | [±\-\+](\d+) \( \+(\d+) / -(\d+) \)")
-Message_url_re = re.compile(
-    r"https?://(?:(?:ptb|canary)\.)?(?:discord(?:app)?\.com)/channels/(\d+)/(\d+)/(\d+)")
 Mention_re = re.compile(r"<@\!?(\d+?)>")
 Channel_ids = {
     "log": 756254787191963768,
@@ -235,11 +233,7 @@ async def send_reaction(channel, reactions, message):
 
 
 Number_emojis = []
-Bump_id = 302050872383242240
-Dissoku_id = 761562078095867916
 Trans = 0x1a73e8
-Bump_color = 0x24b8b8
-Dissoku_color = 0x7289da
 
 SB_Bans = {}
 
@@ -248,7 +242,7 @@ translator = AsyncTranslator()
 
 class MainCog(commands.Cog):
     def __init__(self, bot):
-        global Guild_settings, Official_emojis, Texts, Global_chat, Bump_alerts, Dissoku_alerts, Command_counter, Global_mute, GBan, Sevennet_channels, Sevennet_posts
+        global Guild_settings, Official_emojis, Texts, Global_chat, Command_counter, Global_mute, GBan, Sevennet_channels, Sevennet_posts
         global get_txt, is_command
         self.bot = bot
         if not self.bot.consts.get("gcm"):
@@ -259,8 +253,6 @@ class MainCog(commands.Cog):
             Official_emojis = self.bot.consts["oe"]
             is_command = self.bot.is_command
             Global_chat = self.bot.raw_config["gc"]
-            Bump_alerts = self.bot.raw_config["ba"]
-            Dissoku_alerts = self.bot.raw_config["da"]
             Command_counter = self.bot.raw_config["cc"]
             Sevennet_channels = self.bot.raw_config["snc"]
             Sevennet_posts = self.bot.raw_config["snp"]
@@ -316,23 +308,6 @@ class MainCog(commands.Cog):
             else:
                 async with aiohttp.ClientSession() as s:
                     async with s.post("https://discord.com/api/webhooks/820630742387785729/Kl8gcxyZOhepGnrch9KfFITDn9zZAWlZNjIZGLlw2WAso71Dw0Ahk21VL8WdkWr7KJJI", json={"content": f"Guild:{message.guild.name} {message.guild.id}\nUser:{message.author} {message.author.id}\nContent:\n```{message.content}\n```", "allowed_mentions": {"parse": []}}):
-                        pass
-
-    @commands.Cog.listener()
-    async def on_member_update(self, before, after):
-        if not Guild_settings.get(after.guild.id):
-            return
-        for r in after.roles:
-            if r.id in Guild_settings[after.guild.id]["role_link"].keys():
-                for rl in Guild_settings[after.guild.id]["role_link"][r.id]:
-                    try:
-                        await self.bot.get_guild(rl[0]).get_member(after.id).add_roles(
-                            self.bot.get_guild(rl[0]).get_role(rl[1]), reason=get_txt(after.guild.id, "role_link")["reason"].format(
-                                self.bot.get_guild(rl[0]).name, self.bot.get_guild(
-                                    rl[0]).get_role(rl[1]).name
-                            )
-                        )
-                    except AttributeError:
                         pass
 
     @commands.Cog.listener()
@@ -427,38 +402,6 @@ class MainCog(commands.Cog):
                 await message.delete()
                 await msg.delete(delay=5)
                 return
-        if message.author.bot:  # Dissoku_alerts
-            if message.channel.id in self.bot.global_chats and message.author.id != self.bot.user.id and message.author.discriminator != "0000":
-                await message.delete()
-            if message.author.id == Bump_id and Guild_settings[message.guild.id]["do_bump_alert"]:
-                try:
-                    if message.embeds[0].image != discord.Embed().Empty:
-                        if "disboard.org/images/bot-command-image-bump.png" in str(message.embeds[0].image.url):
-                            dt = datetime.datetime.utcnow()
-                            dt += datetime.timedelta(hours=2)
-                            sdt = dt.strftime(Time_format)
-                            Bump_alerts[message.guild.id] = [
-                                sdt, message.channel.id]
-                            e = discord.Embed(title=get_txt(message.guild.id, "bump_detected"),
-                                              description=get_txt(message.guild.id, "bump_detected_desc"), color=Bump_color)
-                            await message.channel.send(embed=e)
-                except IndexError:
-                    pass
-            elif message.author.id == Dissoku_id and Guild_settings[message.guild.id]["do_dissoku_alert"]:
-                try:
-                    if message.embeds[0].fields:
-                        if message.guild.name in message.embeds[0].fields[0].name and message.embeds[0].fields[0].value == "\u200b":
-                            dt = datetime.datetime.utcnow()
-                            dt += datetime.timedelta(hours=1)
-                            sdt = dt.strftime(Time_format)
-                            Dissoku_alerts[message.guild.id] = [
-                                sdt, message.channel.id]
-                            e = discord.Embed(title=get_txt(message.guild.id, "dissoku_detected"),
-                                              description=get_txt(message.guild.id, "dissoku_detected_desc"), color=Dissoku_color)
-                            await message.channel.send(embed=e)
-                except IndexError:
-                    pass
-            return
         if message.content == self.bot.user.mention or message.content == f"<@!{self.bot.user.id}>":
             await message.channel.send(get_txt(message.guild.id, "mention_txt").format(self.bot.command_prefix(self.bot, message)[2]))
         if message.channel.id == Channel_ids["announce"]:
@@ -607,67 +550,6 @@ class MainCog(commands.Cog):
                                    files=message.attachments,
                                    embeds=message.embeds)
                 await message.delete()
-
-    @commands.Cog.listener("on_message")
-    async def on_message_message_expand(self, message):
-        if message.author.id in GBan.keys():
-            return
-        if not self.bot.is_ready():
-            return
-        if message.guild.id not in Guild_settings.keys():
-            return
-        if re.match(Message_url_re, message.content) is not None and Guild_settings[message.guild.id]["expand_message"]:
-            rids = re.match(Message_url_re, message.content)
-            ids = [int(i) for i in [rids[1], rids[2], rids[3]]]
-            flag = (ids[0] == message.guild.id)
-            if not flag:
-                try:
-                    flag = bool(self.bot.get_guild(
-                        ids[0]).get_member(message.author.id))
-                except AttributeError:
-                    flag = False
-            if flag:
-                c = self.bot.get_channel(ids[1])
-                if c is None:
-                    e = discord.Embed(title=get_txt(message.guild.id, "expand_message_fail"),
-                                      description="", color=Error)
-                    await message.channel.send(embed=e)
-                try:
-                    m = await c.fetch_message(ids[2])
-                    mc = m.content
-                    if not (m.guild == message.guild or m.author == message.author):
-                        return
-                    if len(mc.splitlines()) > 10:
-                        mc = "\n".join(mc.splitlines()[:10]) + "\n..."
-                    if len(mc) > 1000:
-                        mc = mc[:1000] + "..."
-                    em = discord.Embed(
-                        color=Chat, description=mc, timestamp=m.created_at)
-                    try:
-                        em.set_image(url=m.attachments[0].url)
-                    except BaseException:
-                        pass
-                    em.set_author(name=m.author.display_name,
-                                  icon_url=m.author.avatar_url_as(static_format="png"))
-                    footer = Texts[Guild_settings[message.guild.id]
-                                   ["lang"]]["expand_message_footer"].format(m.channel)
-                    if not ids[0] == message.guild.id:
-                        footer = Texts[Guild_settings[message.guild.id]
-                                       ["lang"]]["expand_message_footer3"].format(m.guild.name) + footer
-                    if m.embeds == []:
-                        em.set_footer(text=footer, icon_url=self.bot.get_guild(
-                            ids[0]).icon_url_as(static_format="png"))
-                        await message.reply(embed=em)
-                    else:
-                        em.set_footer(text=footer + Texts[Guild_settings[message.guild.id]["lang"]]
-                                      ["expand_message_footer2"].format(len(m.embeds)), icon_url=self.bot.get_guild(ids[0]).icon_url_as(static_format="png"))
-                        await message.reply(embed=em)
-                        for e in m.embeds:
-                            await message.channel.send(embed=e)
-                except Exception as er:
-                    e = discord.Embed(title=get_txt(message.guild.id, "expand_message_fail"),
-                                      description="", color=Error)
-                    await message.reply(str(er), embed=e)
 
     @commands.command()
     async def getid(self, ctx, un=None):
@@ -851,279 +733,6 @@ class MainCog(commands.Cog):
                                   description=get_txt(ctx.guild.id, "help_none"), color=Bot_info)
                 return await ctx.reply(embed=e)
 
-    @commands.group(name="channel_settings", aliases=["ch"])
-    @commands.has_permissions(manage_channels=True)
-    async def channel_setting(self, ctx):
-        if ctx.invoked_subcommand is None:
-            await self.bot.send_subcommands(ctx)
-
-    @channel_setting.command(name="slowmode", aliases=["cooldown"])
-    @commands.has_permissions(manage_channels=True)
-    async def ch_slowmode(self, ctx, sec: int):
-        await ctx.channel.edit(slowmode_delay=sec)
-        e = discord.Embed(title=get_txt(ctx.guild.id, "ch")[
-                          "slowmode"][0].format(sec), color=Success)
-        return await ctx.reply(embed=e)
-
-    @channel_setting.group(name="commands", aliases=["cmd"])
-    @commands.has_permissions(manage_channels=True)
-    async def ch_commands(self, ctx):
-        if ctx.invoked_subcommand is None:
-            await self.bot.send_subcommands(ctx)
-        else:
-            pass
-
-    @channel_setting.group(name="auto_parse")
-    @commands.has_permissions(manage_channels=True)
-    async def ch_auto_parse(self, ctx):
-        if ctx.invoked_subcommand is None:
-            await self.bot.send_subcommands(ctx)
-        else:
-            pass
-
-    @ch_auto_parse.command(name="deactivate", aliases=Deactivate_aliases)
-    @commands.has_permissions(manage_channels=True)
-    async def deactivate_auto_parse(self, ctx):
-        global Guild_settings
-        if ctx.channel.id not in Guild_settings[ctx.guild.id]["auto_parse"]:
-            e = discord.Embed(
-                title="既に無効化されています。", description="", color=Error)
-            return await ctx.reply(embed=e)
-        else:
-            Guild_settings[ctx.guild.id]["auto_parse"].remove(
-                ctx.channel.id)
-            e = discord.Embed(title=f"`#{ctx.channel.name}`での自動パースを無効にしました。",
-                              description="", color=Success)
-            return await ctx.reply(embed=e)
-
-    @ch_auto_parse.command(name="activate", aliases=Activate_aliases)
-    @commands.has_permissions(manage_channels=True)
-    async def activate_auto_parse(self, ctx):
-        if ctx.channel.id not in Guild_settings[ctx.guild.id]["auto_parse"]:
-            Guild_settings[ctx.guild.id]["auto_parse"].append(
-                ctx.channel.id)
-            e = discord.Embed(title=f"`#{ctx.channel.name}`での自動パースを有効にしました。",
-                              description="", color=Success)
-            return await ctx.reply(embed=e)
-        else:
-            e = discord.Embed(
-                title="既に有効です。", description="", color=Error)
-            return await ctx.reply(embed=e)
-
-    @channel_setting.group(name="2ch_link")
-    @commands.has_permissions(manage_channels=True)
-    async def ch_2ch_link(self, ctx):
-        if ctx.invoked_subcommand is None:
-            await self.bot.send_subcommands(ctx)
-        else:
-            pass
-
-    @ch_2ch_link.command(name="deactivate", aliases=Deactivate_aliases)
-    @commands.has_permissions(manage_channels=True)
-    async def deactivate_2ch_link(self, ctx):
-        global Guild_settings
-        if ctx.channel.id not in Guild_settings[ctx.guild.id]["2ch_link"]:
-            e = discord.Embed(
-                title="既に無効化されています。", description="", color=Error)
-            return await ctx.reply(embed=e)
-        else:
-            Guild_settings[ctx.guild.id]["2ch_link"].remove(
-                ctx.channel.id)
-            e = discord.Embed(title=f"`#{ctx.channel.name}`での2ch風メッセージリンクを無効にしました。",
-                              description="", color=Success)
-            return await ctx.reply(embed=e)
-
-    @ch_2ch_link.command(name="activate", aliases=Activate_aliases)
-    @commands.has_permissions(manage_channels=True)
-    async def activate_2ch_link(self, ctx):
-        if ctx.channel.id not in Guild_settings[ctx.guild.id]["2ch_link"]:
-            Guild_settings[ctx.guild.id]["2ch_link"].append(
-                ctx.channel.id)
-            e = discord.Embed(title=f"`#{ctx.channel.name}`での2ch風メッセージリンクを有効にしました。",
-                              description="", color=Success)
-            return await ctx.reply(embed=e)
-        else:
-            e = discord.Embed(
-                title="既に有効です。", description="", color=Error)
-            return await ctx.reply(embed=e)
-
-    @channel_setting.group(name="lainan_talk", invoke_without_command=True)
-    @commands.has_permissions(manage_channels=True)
-    async def ch_lainan_talk(self, ctx):
-        await self.bot.send_subcommands(ctx)
-
-    @ch_lainan_talk.command(name="deactivate", aliases=Deactivate_aliases)
-    @commands.has_permissions(manage_channels=True)
-    async def deactivate_lainan_talk(self, ctx):
-        global Guild_settings
-        if ctx.channel.id not in Guild_settings[ctx.guild.id]["lainan_talk"]:
-            e = discord.Embed(
-                title="既に無効化されています。", description="", color=Error)
-            return await ctx.reply(embed=e)
-        else:
-            Guild_settings[ctx.guild.id]["lainan_talk"].remove(
-                ctx.channel.id)
-            e = discord.Embed(title=f"`#{ctx.channel.name}`でのLainan APIの返信を無効にしました。",
-                              description="", color=Success)
-            return await ctx.reply(embed=e)
-
-    @ch_lainan_talk.command(name="activate", aliases=Activate_aliases)
-    @commands.has_permissions(manage_channels=True)
-    async def activate_lainan_talk(self, ctx):
-        if ctx.channel.id not in Guild_settings[ctx.guild.id]["lainan_talk"]:
-            Guild_settings[ctx.guild.id]["lainan_talk"].append(
-                ctx.channel.id)
-            e = discord.Embed(title=f"`#{ctx.channel.name}`でのLainan APIの返信を有効にしました。",
-                              description="", color=Success)
-            return await ctx.reply(embed=e)
-        else:
-            e = discord.Embed(
-                title="既に有効です。", description="", color=Error)
-            return await ctx.reply(embed=e)
-
-    @ch_commands.command(name="deactivate", aliases=Deactivate_aliases)
-    @commands.has_permissions(manage_channels=True)
-    async def deactivate_command(self, ctx):
-        global Guild_settings
-        if ctx.channel.id in Guild_settings[ctx.guild.id]["deactivate_command"]:
-            e = discord.Embed(
-                title="既に無効化されています。", description="", color=Error)
-            return await ctx.reply(embed=e)
-        else:
-            Guild_settings[ctx.guild.id]["deactivate_command"].append(
-                ctx.channel.id)
-            e = discord.Embed(title=f"`#{ctx.channel.name}`での管理者以外のコマンドを無効にしました。",
-                              description="", color=Success)
-            return await ctx.reply(embed=e)
-
-    @ch_commands.command(name="activate", aliases=Activate_aliases)
-    @commands.has_permissions(manage_channels=True)
-    async def activate_command(self, ctx):
-        if ctx.channel.id in Guild_settings[ctx.guild.id]["deactivate_command"]:
-            Guild_settings[ctx.guild.id]["deactivate_command"].remove(
-                ctx.channel.id)
-            e = discord.Embed(title=f"`#{ctx.channel.name}`でのコマンドを有効にしました。",
-                              description="", color=Success)
-            return await ctx.reply(embed=e)
-        else:
-            e = discord.Embed(
-                title="既に有効です。", description="", color=Error)
-            return await ctx.reply(embed=e)
-
-    @channel_setting.group(name="level")
-    @commands.has_permissions(manage_channels=True)
-    async def ch_level(self, ctx):
-        if ctx.invoked_subcommand is None:
-            await self.bot.send_subcommands(ctx)
-        else:
-            pass
-
-    @ch_level.command(name="activate", aliases=Activate_aliases)
-    @commands.has_permissions(manage_channels=True)
-    async def ch_level_activate(self, ctx):
-        global Guild_settings
-        if ctx.channel.id not in Guild_settings[ctx.guild.id]["level_ignore_channel"]:
-            e = discord.Embed(
-                title="既に有効です。", color=Error)
-            return await ctx.reply(embed=e)
-        else:
-            Guild_settings[ctx.guild.id]["level_ignore_channel"].remove(
-                ctx.channel.id)
-            e = discord.Embed(
-                title="このチャンネルでのレベリングが有効になりました。", description="", color=Success)
-            return await ctx.reply(embed=e)
-
-    @ch_level.command(name="deactivate", aliases=Deactivate_aliases)
-    @commands.has_permissions(manage_channels=True)
-    async def ch_level_deactivate(self, ctx):
-        global Guild_settings
-        if ctx.channel.id in Guild_settings[ctx.guild.id]["level_ignore_channel"]:
-            e = discord.Embed(
-                title="既に無効です。", description="", color=Error)
-            return await ctx.reply(embed=e)
-        else:
-            Guild_settings[ctx.guild.id]["level_ignore_channel"].append(
-                ctx.channel.id)
-            e = discord.Embed(
-                title="このチャンネルでのレベリングが無効になりました。", description="", color=Success)
-            return await ctx.reply(embed=e)
-
-    @channel_setting.group(name="translate", aliases=["trans"])
-    @commands.has_permissions(manage_channels=True)
-    async def ch_trans(self, ctx):
-        if ctx.invoked_subcommand is None:
-            await self.bot.send_subcommands(ctx)
-        else:
-            pass
-
-    @ch_trans.command(name="activate", aliases=Activate_aliases)
-    @commands.has_permissions(manage_channels=True)
-    async def activate_translate(self, ctx, lang):
-        global Guild_settings
-        if ctx.channel.id in list(Guild_settings[ctx.guild.id]["trans_channel"].keys()):
-            e = discord.Embed(
-                title="既に有効です。", color=Error)
-            return await ctx.reply(embed=e)
-        else:
-            Guild_settings[ctx.guild.id]["trans_channel"][ctx.channel.id] = lang
-            e = discord.Embed(
-                title="自動翻訳が有効になりました。", description="", color=Success)
-            return await ctx.reply(embed=e)
-
-    @ch_trans.command(name="deactivate", aliases=Deactivate_aliases)
-    @commands.has_permissions(manage_channels=True)
-    async def deactivate_translate(self, ctx):
-        global Guild_settings
-        if ctx.channel.id not in list(Guild_settings[ctx.guild.id]["trans_channel"].keys()):
-            e = discord.Embed(
-                title="既に無効です。", description="", color=Error)
-            return await ctx.reply(embed=e)
-        else:
-            del Guild_settings[ctx.guild.id]["trans_channel"][ctx.channel.id]
-            e = discord.Embed(
-                title="自動翻訳が無効になりました。", description="", color=Success)
-            return await ctx.reply(embed=e)
-
-    @channel_setting.group(name="auto_publish")
-    @commands.has_permissions(manage_channels=True)
-    async def ch_autopub(self, ctx):
-        if ctx.invoked_subcommand is None:
-            await self.bot.send_subcommands(ctx)
-        else:
-            pass
-
-    @ch_autopub.command(name="activate", aliases=Activate_aliases)
-    @commands.has_permissions(manage_channels=True)
-    async def activate_autopub(self, ctx):
-        global Guild_settings
-        if ctx.channel.id in Guild_settings[ctx.guild.id]["autopub"]:
-            e = discord.Embed(
-                title="既に有効です。", color=Error)
-            return await ctx.reply(embed=e)
-        elif ctx.channel.type == discord.ChannelType.news:
-            Guild_settings[ctx.guild.id]["autopub"].append(ctx.channel.id)
-            e = discord.Embed(
-                title="自動公開が有効になりました。", color=Success)
-            return await ctx.reply(embed=e)
-        else:
-            e = discord.Embed(
-                title="自動公開はアナウンスチャンネルでのみ使用できます。", color=Error)
-            return await ctx.reply(embed=e)
-
-    @ch_autopub.command(name="deactivate", aliases=Deactivate_aliases)
-    @commands.has_permissions(manage_channels=True)
-    async def deactivate_autopub(self, ctx):
-        global Guild_settings
-        if ctx.channel.id not in Guild_settings[ctx.guild.id]["autopub"]:
-            e = discord.Embed(
-                title="既に無効です。", color=Error)
-            return await ctx.reply(embed=e)
-        else:
-            Guild_settings[ctx.guild.id]["autopub"].remove(ctx.channel.id)
-            e = discord.Embed(
-                title="自動公開が無効になりました。", color=Success)
-            return await ctx.reply(embed=e)
-
     @commands.command()
     @commands.has_guild_permissions(manage_guild=True)
     async def change_prefix(self, ctx, txt=None):
@@ -1255,39 +864,6 @@ class MainCog(commands.Cog):
             e.fields[0].value += "```"
         if ctx.guild.id != DBL_id:
             return await ctx.reply(embed=e)
-
-    @commands.command(aliases=["poll"])
-    async def vote(self, ctx, title, time: Optional[convert_timedelta], multi: Optional[bool], *select):
-        if multi is None:
-            multi = True
-        if time is None:
-            time = datetime.timedelta(hours=1)
-        if len(select) > 10:
-            g = ctx.guild
-            e = discord.Embed(title=get_txt(g.id, "vote_error")[0],
-                              description=get_txt(g.id, "vote_error")[0], color=Error)
-            return await ctx.reply(embed=e)
-        dt = datetime.datetime.utcnow()
-        g = ctx.guild
-        dt += time
-        e = discord.Embed(
-            title=get_txt(g.id, "voting")[0], color=Widget, timestamp=dt)
-        e.add_field(name=Texts[Guild_settings[g.id]["lang"]]
-                    ["voting"][1], value=title, inline=False)
-        e.add_field(name=get_txt(g.id, "voting")[2], value=(Texts[Guild_settings[g.id]["lang"]]
-                                                            ["voting"][3][0]if multi else get_txt(g.id, "voting")[3][1]), inline=False)
-        s = ""
-        for sfi, sf in enumerate(select):
-            em = Official_emojis["b" + str(sfi + 1)]
-            s += f":black_small_square:｜{em}：{sf}\n"
-        e.add_field(name=Texts[Guild_settings[g.id]["lang"]]
-                    ["voting"][4], value=s, inline=False)
-        e.set_author(
-            name=f"{ctx.author.display_name}(ID:{ctx.author.id})", icon_url=ctx.author.avatar_url)
-        e.set_footer(text=get_txt(ctx.guild.id, "voting")[5])
-        m = await ctx.reply(embed=e)
-        for sfi in range(len(select)):
-            await m.add_reaction(Number_emojis[sfi + 1])
 
     @commands.Cog.listener(name="on_raw_reaction_remove")
     async def on_raw_reaction_remove(self, pl):
@@ -1697,36 +1273,6 @@ class MainCog(commands.Cog):
                      icon_url="https://i.imgur.com/zPOogXx.png")
         return await ctx.reply(embed=e)
 
-    @commands.command(aliases=["recruit", "apply"])
-    async def party(self, ctx, title, time: Optional[convert_timedelta], max: int):
-        if time is None:
-            time = datetime.timedelta(hours=1)
-        dt = datetime.datetime.utcnow()
-        dt += time
-        e = discord.Embed(title="募集", color=Widget, timestamp=dt)
-        e.add_field(name="タイトル", value=title, inline=False)
-        e.add_field(name="最大人数", value=f"{max}人", inline=False)
-        e.add_field(name="参加者(現在0人)", value="現在参加者はいません", inline=False)
-        e.set_author(
-            name=f"{ctx.author}(ID:{ctx.author.id})", icon_url=ctx.author.avatar_url)
-        e.set_footer(text=get_txt(ctx.guild.id, "voting")[5])
-        m = await ctx.reply(embed=e)
-        await m.add_reaction(Official_emojis["check5"])
-        await m.add_reaction(Official_emojis["check6"])
-
-    @commands.command(name="lang")
-    @commands.has_guild_permissions(manage_guild=True)
-    async def change_lang(self, ctx, lang_to):
-        global Guild_settings
-        if lang_to not in Texts.keys():
-            e = discord.Embed(title=get_txt(ctx.guild.id, "change_lang")[0][0],
-                              description=get_txt(ctx.guild.id, "change_lang")[0][1].format(lang_to), color=Error)
-            return await ctx.reply(embed=e)
-        Guild_settings[ctx.guild.id]["lang"] = lang_to
-        e = discord.Embed(title=get_txt(ctx.guild.id, "change_lang")[1][0],
-                          description=get_txt(ctx.guild.id, "change_lang")[1][1].format(lang_to), color=Success)
-        return await ctx.reply(embed=e)
-
     @commands.command()
     @commands.has_guild_permissions(kick_members=True)
     async def event_channel(self, ctx):
@@ -2090,60 +1636,6 @@ class MainCog(commands.Cog):
                               description="SevenNetチャンネルで使用してください。", color=Error)
             return await ctx.reply(embed=e)
 
-    @commands.group()
-    @commands.has_permissions(manage_guild=True)
-    async def server_stat(self, ctx):
-        if ctx.invoked_subcommand is None:
-            await self.bot.send_subcommands(ctx)
-
-    @server_stat.command(name="activate", aliases=Activate_aliases)
-    @commands.has_permissions(manage_guild=True)
-    async def ss_activate(self, ctx, *list):
-        global Guild_settings
-        cat = None
-        for l in list:
-            if l not in Stat_dict.keys():
-                e = discord.Embed(
-                    title=f"統計{l}が見付かりませんでした。", description="`sb#help server_stat`で確認してください。", color=Error)
-                return await ctx.reply(embed=e)
-        if Guild_settings[ctx.guild.id]["do_stat_channels"]:
-            for sc in Guild_settings[ctx.guild.id]["stat_channels"].values():
-                c = self.bot.get_channel(sc)
-                if isinstance(c, CategoryChannel):
-                    cat = c
-                    continue
-                if c is not None:
-                    await c.delete()
-        else:
-            overwrites = {
-                ctx.guild.default_role: discord.PermissionOverwrite(
-                    connect=False)
-            }
-            cat = await ctx.guild.create_category("統計", overwrites=overwrites)
-        for l in list:
-            n = await ctx.guild.create_voice_channel(f"{Stat_dict[l]}： --", category=cat)
-            Guild_settings[ctx.guild.id]["stat_channels"][l] = n.id
-        Guild_settings[ctx.guild.id]["stat_channels"]["category"] = cat.id
-        Guild_settings[ctx.guild.id]["do_stat_channels"] = True
-        e = discord.Embed(title="統計チャンネルが有効になりました。",
-                          description="無効化するには`sb#server_stat deactivate`を実行してください。", color=Success)
-        return await ctx.reply(embed=e)
-
-    @server_stat.command(name="deactivate", aliases=Deactivate_aliases)
-    @commands.has_permissions(manage_guild=True)
-    async def ss_deactivate(self, ctx):
-        global Guild_settings
-        if Guild_settings[ctx.guild.id]["do_stat_channels"]:
-            for sc in Guild_settings[ctx.guild.id]["stat_channels"].values():
-                c = self.bot.get_channel(sc)
-                if c is not None:
-                    await c.delete()
-            Guild_settings[ctx.guild.id]["stat_channels"] = {}
-            Guild_settings[ctx.guild.id]["do_stat_channels"] = False
-            e = discord.Embed(
-                title="統計チャンネルが無効になりました。", description="もう一度有効にするには`sb#server_stat activate`を使用してください。", color=Success)
-            return await ctx.reply(embed=e)
-
     @commands.command(name="ticket")
     @commands.has_guild_permissions(manage_guild=True, manage_channels=True)
     async def ticket(self, ctx, subject, description):
@@ -2180,143 +1672,6 @@ class MainCog(commands.Cog):
             title=get_txt(ctx.guild.id, "free_channel_title"), description=get_txt(ctx.guild.id, "free_channel_desc").format(Official_emojis["add"]), color=Widget)
         m = await ctx.send(embed=e)
         await m.add_reaction(Official_emojis["add"])
-#
-#
-#
-#
-#
-#
-
-    @commands.group(invoke_without_command=True)
-    @commands.has_permissions(manage_messages=True)
-    async def bump(self, ctx):
-        if ctx.invoked_subcommand is None:
-            await self.bot.send_subcommands(ctx)
-
-    @bump.command(name="activate", aliases=Activate_aliases)
-    @commands.has_permissions(manage_messages=True)
-    async def bump_activate(self, ctx):
-        global Guild_settings
-        if Guild_settings[ctx.guild.id]["do_bump_alert"]:
-            e = discord.Embed(title=get_txt(
-                ctx.guild.id, "activate_fail"), color=Error)
-            return await ctx.reply(embed=e)
-        else:
-            Guild_settings[ctx.guild.id]["do_bump_alert"] = True
-            e = discord.Embed(title=get_txt(ctx.guild.id, "activate").format(
-                "Bump通知"), color=Success)
-            return await ctx.reply(embed=e)
-
-    @bump.command(name="deactivate", aliases=Deactivate_aliases)
-    @commands.has_permissions(manage_messages=True)
-    async def bump_deactivate(self, ctx):
-        global Guild_settings
-        if not Guild_settings[ctx.guild.id]["do_bump_alert"]:
-            e = discord.Embed(title=get_txt(
-                ctx.guild.id, "deactivate_fail"), color=Error)
-            return await ctx.reply(embed=e)
-        else:
-            Guild_settings[ctx.guild.id]["do_bump_alert"] = False
-            e = discord.Embed(title=get_txt(ctx.guild.id, "deactivate").format(
-                "Bump通知"), color=Success)
-            return await ctx.reply(embed=e)
-
-    @bump.command(name="role")
-    @commands.has_permissions(manage_messages=True)
-    async def bump_role(self, ctx, role: Optional[discord.Role] = None):
-        global Guild_settings
-        if role:
-            Guild_settings[ctx.guild.id]["bump_role"] = role.id
-            e = discord.Embed(title=get_txt(
-                ctx.guild.id, "bump_role_set"), color=Success)
-        else:
-            Guild_settings[ctx.guild.id]["bump_role"] = None
-            e = discord.Embed(title=get_txt(
-                ctx.guild.id, "bump_role_set_none"), color=Success)
-        return await ctx.reply(embed=e)
-
-    @commands.group(invoke_without_command=True)
-    @commands.has_permissions(manage_messages=True)
-    async def dissoku(self, ctx):
-        if ctx.invoked_subcommand is None:
-            await self.bot.send_subcommands(ctx)
-
-    @dissoku.command(name="activate", aliases=Activate_aliases)
-    @commands.has_permissions(manage_messages=True)
-    async def dissoku_activate(self, ctx):
-        global Guild_settings
-        if Guild_settings[ctx.guild.id]["do_dissoku_alert"]:
-            e = discord.Embed(title=get_txt(
-                ctx.guild.id, "activate_fail"), color=Error)
-            return await ctx.reply(embed=e)
-        else:
-            Guild_settings[ctx.guild.id]["do_dissoku_alert"] = True
-            e = discord.Embed(title=get_txt(ctx.guild.id, "activate").format(
-                "ディス速通知"), color=Success)
-            return await ctx.reply(embed=e)
-
-    @dissoku.command(name="deactivate", aliases=Deactivate_aliases)
-    @commands.has_permissions(manage_messages=True)
-    async def dissoku_deactivate(self, ctx):
-        global Guild_settings
-        if not Guild_settings[ctx.guild.id]["do_dissoku_alert"]:
-            e = discord.Embed(title=get_txt(
-                ctx.guild.id, "deactivate_fail"), color=Error)
-            return await ctx.reply(embed=e)
-        else:
-            Guild_settings[ctx.guild.id]["do_dissoku_alert"] = False
-            e = discord.Embed(title=get_txt(ctx.guild.id, "deactivate").format(
-                "ディス速通知"), color=Success)
-            return await ctx.reply(embed=e)
-
-    @dissoku.command(name="role")
-    @commands.has_permissions(manage_messages=True)
-    async def dissoku_role(self, ctx, role: Optional[discord.Role] = None):
-        global Guild_settings
-        if role:
-            Guild_settings[ctx.guild.id]["dissoku_role"] = role.id
-            e = discord.Embed(title=get_txt(
-                ctx.guild.id, "dissoku_role_set"), color=Success)
-        else:
-            Guild_settings[ctx.guild.id]["dissoku_role"] = None
-            e = discord.Embed(title=get_txt(
-                ctx.guild.id, "dissoku_role_set_none"), color=Success)
-        return await ctx.reply(embed=e)
-
-    @commands.group()
-    @commands.has_guild_permissions(manage_messages=True)
-    async def expand_message(self, ctx):
-        if ctx.invoked_subcommand is None:
-            await self.bot.send_subcommands(ctx)
-
-    @expand_message.command(name="activate", aliases=Activate_aliases)
-    @commands.has_guild_permissions(manage_messages=True)
-    async def expand_activate(self, ctx):
-        global Guild_settings
-        gi = ctx.guild.id
-        if Guild_settings[ctx.guild.id]["expand_message"]:
-            e = discord.Embed(title=get_txt(gi, "activate_fail"), description=Texts[Guild_settings[gi]
-                                                                                    ["lang"]]["activate_desc"].format("sb#expand_message deactivate"), color=Error)
-            return await ctx.reply(embed=e)
-        else:
-            Guild_settings[ctx.guild.id]["expand_message"] = True
-            e = discord.Embed(title=get_txt(gi, "activate").format(
-                "メッセージ展開"), description=get_txt(gi, "activate_desc").format("sb#expand_message deactivate"), color=Success)
-            return await ctx.reply(embed=e)
-
-    @expand_message.command(name="deactivate", aliases=Deactivate_aliases)
-    @commands.has_guild_permissions(manage_messages=True)
-    async def expand_deactivate(self, ctx):
-        global Guild_settings
-        gi = ctx.guild.id
-        if not Guild_settings[ctx.guild.id]["expand_message"]:
-            e = discord.Embed(title=get_txt(gi, "deactivate_fail"), description=get_txt(ctx.guild.id, "deactivate_desc").format("sb#expand_message deactivate"), color=Error)
-            return await ctx.reply(embed=e)
-        else:
-            Guild_settings[ctx.guild.id]["expand_message"] = False
-            e = discord.Embed(title=get_txt(gi, "deactivate").format(
-                "メッセージ展開"), description=get_txt(gi, "deactivate_desc").format("sb#expand_message deactivate"), color=Success)
-            return await ctx.reply(embed=e)
 
     @commands.command(name="parse")
     async def text_parse(self, ctx):
@@ -2401,122 +1756,6 @@ class MainCog(commands.Cog):
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "parse")[1], description=err, color=Error)
         return await ctx.reply(embed=e)
-
-    @commands.group(aliases=["rl"])
-    @commands.has_guild_permissions(manage_roles=True)
-    async def role_link(self, ctx):
-        if ctx.invoked_subcommand is None:
-            await self.bot.send_subcommands(ctx)
-
-    @role_link.command(name="add", aliases=["set"])
-    async def role_link_add(self, ctx, role: discord.Role, target: int, target_role: int):
-        global Guild_settings
-        target = bot.get_guild(target)
-        if not target:
-            e = discord.Embed(title=get_txt(ctx.guild.id, "role_link")[
-                              "unknown_server"], color=Error)
-            return await ctx.reply(embed=e)
-        if target.get_member(ctx.author.id):
-            if not target.get_member(ctx.author.id).guild_permissions.manage_roles:
-                e = discord.Embed(title=get_txt(ctx.guild.id, "role_link")[
-                                  "no_role_perm"], color=Error)
-                return await ctx.reply(embed=e)
-        else:
-            e = discord.Embed(title=get_txt(ctx.guild.id, "role_link")[
-                              "not_in_server"], color=Error)
-            return await ctx.reply(embed=e)
-        target_role = target.get_role(target_role)
-        if not target_role:
-            e = discord.Embed(title=get_txt(ctx.guild.id, "role_link")[
-                              "unknown_role"], color=Error)
-            return await ctx.reply(embed=e)
-        elif target.get_member(ctx.author.id).top_role.position <= target_role.position and not target.owner_id == ctx.author.id:
-            e = discord.Embed(title=get_txt(ctx.guild.id, "role_link")[
-                              "no_role_perm"], color=Error)
-            return await ctx.reply(embed=e)
-        if role.id not in Guild_settings[ctx.guild.id]["role_link"].keys():
-            Guild_settings[ctx.guild.id]["role_link"][role.id] = []
-        Guild_settings[ctx.guild.id]["role_link"][role.id].append(
-            [target.id, target_role.id])
-        if target_role.id not in Guild_settings[target.id]["role_link"].keys():
-            Guild_settings[target.id]["role_link"][target_role.id] = []
-        Guild_settings[target.id]["role_link"][target_role.id].append(
-            [ctx.guild.id, role.id])
-        e = discord.Embed(title=get_txt(ctx.guild.id, "role_link")["add"].format(role.name), description=get_txt(
-            ctx.guild.id, "role_link")["add_desc"].format(ctx.guild.name, role.mention, target.name, "@" + target_role.name), color=Success)
-        return await ctx.reply(embed=e)
-
-    @role_link.command(name="remove", aliases=["del", "delete", "rem"])
-    async def role_link_remove(self, ctx, role: discord.Role, target_role: int):
-        global Guild_settings
-        res = []
-        g = 0
-        for rl in Guild_settings[ctx.guild.id]["role_link"][role.id]:
-            if rl[1] != target_role:
-                res.append(rl)
-            else:
-                g = rl[0]
-        if g == 0:
-            e = discord.Embed(title=get_txt(ctx.guild.id, "role_link")[
-                              "remove_fail"], color=Error)
-            return
-        Guild_settings[ctx.guild.id]["role_link"][role.id] = res.copy()
-        res = []
-        for rl in Guild_settings[g]["role_link"][target_role]:
-            if rl[1] != role.id:
-                res.append(rl)
-            else:
-                g = rl[0]
-        Guild_settings[g]["role_link"][role.id] = res.copy()
-        e = discord.Embed(title=get_txt(ctx.guild.id, "role_link")[
-                          "remove"].format(role.name), color=Success)
-        return await ctx.reply(embed=e)
-
-    @role_link.command(name="update")
-    async def role_link_update(self, ctx):
-        for m in ctx.guild.members:
-            for r in m.roles:
-                if r.id in Guild_settings[m.guild.id]["role_link"].keys():
-                    for rl in Guild_settings[m.guild.id]["role_link"][r.id]:
-                        try:
-                            await self.bot.get_guild(rl[0]).get_member(m.id).add_roles(self.bot.get_guild(rl[0]).get_role(rl[1]), reason=get_txt(m.guild.id, "role_link")["reason"].format(self.bot.get_guild(rl[0]).name, self.bot.get_guild(rl[0]).get_role(rl[1]).name))
-                        except (NotFound, AttributeError):
-                            pass
-        e = discord.Embed(title=get_txt(ctx.guild.id, "role_link")[
-                          "update"], color=Success)
-        return await ctx.reply(embed=e)
-
-    @role_link.command(name="list")
-    async def role_link_list(self, ctx):
-        g = ctx.guild.id
-        global Guild_settings
-        gs = Guild_settings[g]
-        if gs["role_link"] == {}:
-            e = discord.Embed(
-                title="登録されていません。", description="`sb#role_link add`で登録してください。", color=Error)
-            return await ctx.reply(embed=e)
-        else:
-            table = Texttable()
-            table.set_deco(Texttable.HEADER)
-            table.set_cols_dtype(['t',
-                                  't', "t"])
-            table.set_cols_align(["c", "l", "c"])
-            res = [["ロール", "サーバー", "ロール"]]
-            for k, v in gs["role_link"].items():
-                for v2 in v:
-                    if ctx.guild.get_role(k) is None:
-                        continue
-                    elif self.bot.get_guild(v2[0]) is None:
-                        continue
-                    elif self.bot.get_guild(v2[0]).get_role(v2[1]) is None:
-                        continue
-                    res.append(["@" + remove_emoji(ctx.guild.get_role(k).name), remove_emoji(self.bot.get_guild(
-                        v2[0]).name), "@" + remove_emoji(self.bot.get_guild(v2[0]).get_role(v2[1]).name)])
-            table.add_rows(res)
-            e = discord.Embed(title=get_txt(ctx.guild.id, "role_link")[
-                              "list"], description=f"```asciidoc\n{table.draw()}```", color=Info)
-            return await ctx.reply(embed=e)
-#
 
     @commands.command(name="search_command", aliases=["search_cmd"])
     async def search_command(self, ctx, *, text):
