@@ -10,7 +10,6 @@ import re
 import time
 import urllib.error
 import urllib.parse
-import urllib.request
 
 import aiohttp
 from async_timeout import timeout
@@ -25,9 +24,6 @@ import _pathmagic  # type: ignore # noqa: F401
 from common_resources.consts import Official_discord_id, Gaming, Info, Error, Success
 from common_resources.tools import chrsize_len
 
-Activate_aliases = ["on", "active", "true"]
-Deactivate_aliases = ["off", "disable", "false"]
-
 
 def flatten(l):
     for el in l:
@@ -35,9 +31,6 @@ def flatten(l):
             yield from flatten(el)
         else:
             yield el
-
-
-Bot_info = 0x00ccff
 
 
 Bignum_join = {}
@@ -57,8 +50,6 @@ def to_lts(s):
     return res
 
 
-Time_format = '%Y-%m-%d %H:%M:%S'
-
 Channel_ids = {
     "log": 756254787191963768,
     "announce": 756254915441197206,
@@ -67,7 +58,6 @@ Channel_ids = {
     "boot_log": 747764100922343554
 }
 
-DBL_id = 264445053596991498
 #
 
 
@@ -142,8 +132,6 @@ def rgb_tuple(i):
 
 
 Number_emojis = []
-Bump_id = 302050872383242240
-Dissoku_id = 761562078095867916
 Trans = 0x1a73e8
 
 Mention_re = re.compile(r"<@\!?(\d+?)>")
