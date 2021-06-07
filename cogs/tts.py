@@ -200,7 +200,7 @@ class TtsCog(commands.Cog):
             return
         if not Tts_settings.get(ctx.author.id):
             Tts_settings[ctx.author.id] = {}
-        Tts_settings[ctx.author.id]["speaker"] = "abcdefgh".index(
+        Tts_settings[ctx.author.id]["speaker"] = "abcde".index(
             voice.lower())
         e = discord.Embed(title=get_txt(ctx.guild.id, "tts_voice_changed").format(
             voice.upper()), color=Success)
@@ -341,82 +341,6 @@ class TtsCog(commands.Cog):
             bio.seek(0)
             msg = (await (self.bot.get_channel(765528694500360212)).send(file=discord.File(bio, filename="tmp.wav")))
             bio.close()
-        elif ts.get("speaker") in (5, 6, 7):
-            form = {
-                "speaker_id": "55" + str(ts.get("speaker") - 4),
-                "text": txt[:100],
-                "ext": "ogg",
-                "volume": "1.0",
-                "speed": "1.0",
-                "pitch": "1.0",
-                "range": "1.0",
-                "anger": "0",
-                "sadness": "0",
-                "joy": "0",
-                "callback": "callback"
-            }
-            # await message.reply(str(form))
-            if message:
-                loop.create_task(message.add_reaction(
-                    Official_emojis["network"]))
-            async with aiohttp.ClientSession() as session:
-                async with session.post("https://cloud.ai-j.jp/demo/aitalk2webapi_nop.php", data=form) as r:
-                    async with session.get("https:" + (await r.text()).split('"')[3].replace("\\", "")) as r2:
-                        bio = io.BytesIO(await r2.read())
-                        bio.seek(0)
-                        url = (await (self.bot.get_channel(765528694500360212)).send(file=discord.File(bio, filename="tmp.ogg"))).attachments[0].url
-                        bio.close()
-            cmd = f"ffmpeg -ss {DEMO_SHIFTS[ts.get('speaker')]} -i {url} -f ogg pipe:1"
-            c = await asyncio.create_subprocess_shell(cmd, stdin=asyncio.subprocess.PIPE, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
-            stdout, stderr = await c.communicate()
-            # await c.wait()
-            # await message.reply((await c.stderr.read()).decode())
-            # await message.reply(f"stdout: ```{stdout[:100]}```\nstderr: ```{stderr[-1000:]}```")
-            bio = io.BytesIO(stdout)
-            bio.seek(0)
-            msg = (await (self.bot.get_channel(765528694500360212)).send(file=discord.File(bio, filename="tmp.ogg")))
-            bio.close()
-            if message:
-                loop.create_task(message.remove_reaction(
-                    Official_emojis["network"], self.bot.user))
-        # else:
-        #     if not ts:
-        #         si = user.id % 4
-        #         sp = 100
-        #     else:
-        #         si = ts.get("speaker", user.id % 4)
-        #         sp = ts.get("speed", 100)
-
-        #     params = {"text": txt[:49], "speaker": Speakers[si],
-        #               "format": "mp3", "speed": sp}
-        #     if emoji.demojize(message.clean_content).startswith(tuple(flatten(Emotions.values()))):
-        #         if self.bot.is_premium(user):
-        #             if si > 0:
-        #                 for k, v in Emotions.items():
-        #                     for v2 in v:
-        #                         if emoji.demojize(message.clean_content).startswith(v2):
-        #                             params["text"] = emoji.demojize(
-        #                                 message.clean_content).replace(v2, "", 1)[:49]
-        #                             params["emotion"] = k
-        #                             params["emotion_level"] = 4
-        #                             break
-        #             else:
-        #                 if message:
-        #                     loop.create_task(message.add_reaction(
-        #                         Official_emojis["check4"]))
-        #                     loop.create_task(message.add_reaction(
-        #                         Official_emojis["voice_info"]))
-        #         else:
-        #             if message:
-        #                 loop.create_task(message.add_reaction(
-        #                     Official_emojis["check4"]))
-        #                 loop.create_task(message.add_reaction(
-        #                     Official_emojis["premium"]))
-        #     async with self.session.post('https://api.voicetext.jp/v1/tts', params=params) as response:
-        #         bio = io.BytesIO(await response.read())
-        #         bio.seek(0)
-        #         msg = (await (self.bot.get_channel(765528694500360212)).send(file=discord.File(bio, filename="tmp.mp3")))
-        #         bio.close()
         Tts_channels[guild.voice_client.channel.id]["qu"].append(
             (message, msg))
         if not Tts_channels[guild.voice_client.channel.id]["playing"]:
