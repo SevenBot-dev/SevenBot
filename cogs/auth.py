@@ -151,7 +151,7 @@ class AuthCog(commands.Cog):
                               description="初回はロールを登録する必要があります", color=Error)
             await ctx.reply(embed=e)
             return
-        if role != 0:
+        if role == 0:
             role = ctx.guild.get_role(Guild_settings[ctx.guild.id]["auth_role"])
         if role.position > ctx.author.top_role.position and not ctx.guild.owner_id == ctx.author.id:
             e = discord.Embed(
@@ -182,7 +182,7 @@ class AuthCog(commands.Cog):
                               description="初回はロールを登録する必要があります", color=Error)
             m = await ctx.reply(embed=e)
             return
-        if role != 0:
+        if role == 0:
             role = ctx.guild.get_role(Guild_settings[ctx.guild.id]["auth_role"])
         if role.position > ctx.author.top_role.position and not ctx.guild.owner_id == ctx.author.id:
             e = discord.Embed(
@@ -211,7 +211,7 @@ class AuthCog(commands.Cog):
                               description="初回はロールを登録する必要があります", color=Error)
             await ctx.reply(embed=e)
             return
-        if role != 0:
+        if role == 0:
             role = ctx.guild.get_role(Guild_settings[ctx.guild.id]["auth_role"])
         if role.position > ctx.author.top_role.position and not ctx.guild.owner_id == ctx.author.id:
             e = discord.Embed(
@@ -242,7 +242,7 @@ class AuthCog(commands.Cog):
                               description="初回はロールを登録する必要があります", color=Error)
             m = await ctx.reply(embed=e)
             return
-        if role != 0:
+        if role == 0:
             role = ctx.guild.get_role(Guild_settings[ctx.guild.id]["auth_role"])
         if role.position > ctx.author.top_role.position and not ctx.guild.owner_id == ctx.author.id:
             e = discord.Embed(
@@ -269,7 +269,7 @@ class AuthCog(commands.Cog):
         if role == 0:
             role = ctx.guild.get_role(
                 Guild_settings[ctx.guild.id]["auth_role"])
-        if role != 0:
+        if role == 0:
             role = ctx.guild.get_role(Guild_settings[ctx.guild.id]["auth_role"])
         if role.position > ctx.author.top_role.position and not ctx.guild.owner_id == ctx.author.id:
             e = discord.Embed(
