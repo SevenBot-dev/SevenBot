@@ -363,7 +363,7 @@ class GlobalCog(commands.Cog):
 
     @commands.Cog.listener("on_message")
     async def on_message_global(self, message):
-        if message.channel.id in self.bot.global_chats and message.author.id != self.bot.user.id and message.author.discriminator != "0000":
+        if message.channel.id in self.bot.global_chats and message.author.id != self.bot.user.id and not message.webhook_id:
             await message.delete()
         if (message.channel.id in self.bot.global_chats) and (not message.author.bot and not message.webhook_id):
             if is_command(message):
