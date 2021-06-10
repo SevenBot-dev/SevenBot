@@ -96,7 +96,7 @@ class TimedRoleCog(commands.Cog):
                 else:
                     continue
                 table.add_row([f"@{remove_emoji(rn)}", to_lts(v)])
-                if len(b) > 2000:
+                if len(table.draw()) > 2000:
                     res.append(b)
                     table = make_new()
                     table.add_row([k, v[0].replace("\n", get_txt(ctx.guild.id, "tr_list_br")),

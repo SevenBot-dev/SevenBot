@@ -156,7 +156,7 @@ class AutoreplyCog(commands.Cog):
                 b = table.draw()
                 table.add_row([k, v[0].replace("\n", get_txt(ctx.guild.id, "ar_list_br")),
                                v[1].replace("\n", get_txt(ctx.guild.id, "ar_list_br"))])
-                if len(b) > 2000:
+                if len(table.draw()) > 2000:
                     res.append(b)
                     table = make_new()
                     table.add_row([k, v[0].replace("\n", get_txt(ctx.guild.id, "ar_list_br")),
