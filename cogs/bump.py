@@ -80,7 +80,7 @@ class BumpCog(commands.Cog):
                             Guild_settings[c.guild.id]["bump_role"])
                         if r:
                             m = r.mention
-                    await c.send(content=m, embed=e)
+                    await c.send(content=m, embed=e, allowed_mentions=discord.AllowedMentions(roles=True))
                     del Bump_alerts[gi]
 
             except BaseException:
@@ -102,7 +102,7 @@ class BumpCog(commands.Cog):
                             Guild_settings[c.guild.id]["dissoku_role"])
                         if r:
                             m = r.mention
-                    await c.send(content=m, embed=e)
+                    await c.send(content=m, embed=e, allowed_mentions=discord.AllowedMentions(roles=True))
                     del Dissoku_alerts[gi]
 
             except Exception:
