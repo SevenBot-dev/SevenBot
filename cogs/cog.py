@@ -388,6 +388,8 @@ class MainCog(commands.Cog):
             return
         if message.guild.id not in Guild_settings.keys():
             return
+        if message.author.bot:
+            return
         ls = list(Guild_settings[message.guild.id]["muted"].keys())
         if message.author.id in ls:
             dt = datetime.datetime.utcnow()
