@@ -275,9 +275,9 @@ class AdminCog(commands.Cog):
             r = await locals()['__ex'](self, self.bot, ctx, ctx, session, _print, get_msg)
         try:
             if ret[ctx.message.id]:
-                await ctx.send(f"stdout:```py\n{str(ret[ctx.message.id])[:1980]}\n```")
+                await ctx.send(f"stdout:```py\n{str(ret[ctx.message.id])[:1980]}\n```".replace(self.bot.http.token, "[Token]"))
             if r:
-                await ctx.send(f"return:```py\n{str(r)[:1980]}\n```")
+                await ctx.send(f"return:```py\n{str(r)[:1980]}\n```".replace(self.bot.http.token, "[Token]"))
         except BaseException:
             pass
         await ctx.message.add_reaction(Official_emojis["check8"])
