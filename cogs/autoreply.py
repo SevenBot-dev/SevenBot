@@ -1,11 +1,11 @@
 import asyncio
 import hashlib
 import random
-import re
 import time
 
 import discord
 from discord.ext import commands, components
+import re2 as re
 from texttable import Texttable
 
 import _pathmagic  # type: ignore # noqa
