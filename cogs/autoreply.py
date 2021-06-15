@@ -73,7 +73,7 @@ class AutoreplyCog(commands.Cog):
                     if cmd == "re":
                         if re.search(cnt, message.content):
                             ga.append(ar_send(message.channel, ar[1]))
-                    else:
+                    elif ar[0].lower() in message.content.lower() and not is_command(message):
                         ga.append(ar_send(message.channel, ar[1]))
                 elif ar[0].lower() in message.content.lower() and not is_command(message):
                     ga.append(ar_send(message.channel, ar[1]))
