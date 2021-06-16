@@ -57,6 +57,7 @@ pylint==2.8.2
 pymongo==3.11.3
 PyNaCl==1.4.0
 pyparsing==2.4.7
+pyre2==0.3.6
 python-Levenshtein==0.12.2
 pytz==2021.1
 requests==2.25.1

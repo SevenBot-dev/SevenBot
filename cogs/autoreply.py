@@ -1,11 +1,11 @@
 import asyncio
 import hashlib
 import random
-import re
 import time
 
 import discord
 from discord.ext import commands, components
+import re2 as re
 from texttable import Texttable
 
 import _pathmagic  # type: ignore # noqa
@@ -57,6 +57,8 @@ class AutoreplyCog(commands.Cog):
                             await message.add_reaction(Official_emojis["check2"])
                     elif cmd == "random":
                         random_tmp.append(cnt)
+                    else:
+                        await message.reply(msg_content)
                 else:
                     await message.reply(msg_content)
             except asyncio.TimeoutError:
@@ -71,6 +73,8 @@ class AutoreplyCog(commands.Cog):
                     if cmd == "re":
                         if re.search(cnt, message.content):
                             ga.append(ar_send(message.channel, ar[1]))
+                    elif ar[0].lower() in message.content.lower() and not is_command(message):
+                        ga.append(ar_send(message.channel, ar[1]))
                 elif ar[0].lower() in message.content.lower() and not is_command(message):
                     ga.append(ar_send(message.channel, ar[1]))
         await asyncio.gather(*ga)

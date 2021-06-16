@@ -290,10 +290,7 @@ class MainCog(commands.Cog):
         if g.owner_id == self.bot.user.id:
             return
         await self.bot.get_channel(756254787191963768).send(f"<サーバー参加>\n名前：{g.name}\nID：{g.id}\n現在の個数：{len(self.bot.guilds)}")
-        if g.region == discord.VoiceRegion.japan:
-            lang = "ja"
-        else:
-            lang = "en"
+        lang = "ja"
         await self.bot.save()
         Guild_settings[g.id]["lang"] = lang
 
@@ -387,6 +384,8 @@ class MainCog(commands.Cog):
         if not self.bot.is_ready():
             return
         if message.guild.id not in Guild_settings.keys():
+            return
+        if message.author.bot:
             return
         ls = list(Guild_settings[message.guild.id]["muted"].keys())
         if message.author.id in ls:
