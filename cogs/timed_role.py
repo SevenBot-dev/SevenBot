@@ -105,8 +105,8 @@ class TimedRoleCog(commands.Cog):
             e = discord.Embed(title=get_txt(ctx.guild.id, "tr_list")
                               + f" - {1}/{len(res)}", description=f"```asciidoc\n{res[0]}```", color=Info)
             buttons = [
-                components.Button("前のページ", "left", style=2, enabled=False),
-                components.Button("次のページ", "right", style=2, enabled=len(res) > 1),
+                components.Button("前のページ", "left", style=2),
+                components.Button("次のページ", "right", style=2),
                 components.Button("終了", "exit", style=4),
             ]
             msg = await components.send(ctx, embed=e, reference=ctx.message.to_reference(), components=buttons)
