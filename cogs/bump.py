@@ -46,7 +46,7 @@ class BumpCog(commands.Cog):
         elif message.author.id == Dissoku_id and Guild_settings[message.guild.id]["do_dissoku_alert"]:
             try:
                 if message.embeds[0].fields:
-                    if message.guild.name in message.embeds[0].fields[0].name and message.embeds[0].fields[0].value == "\u200b":
+                    if message.guild.name in message.embeds[0].fields[0].name:
                         dt = datetime.datetime.utcnow()
                         dt += datetime.timedelta(hours=1)
                         sdt = dt.strftime(Time_format)
