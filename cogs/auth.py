@@ -94,7 +94,6 @@ class AuthCog(commands.Cog):
 
     @commands.Cog.listener()
     async def on_button_click(self, com):
-        print(1)
         if com.message.embeds == []:
             return
         m0 = com.message.embeds[0]
