@@ -21,7 +21,7 @@ class AuthCog(commands.Cog):
     def __init__(self, bot):
         global Guild_settings, Texts, Official_emojis
         global get_txt
-        self.bot = bot
+        self.bot: commands.Bot = bot
         Official_emojis = self.bot.consts["oe"]
         Guild_settings = bot.guild_settings
         Texts = bot.texts

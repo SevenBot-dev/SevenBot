@@ -244,7 +244,7 @@ class MainCog(commands.Cog):
     def __init__(self, bot):
         global Guild_settings, Official_emojis, Texts, Global_chat, Command_counter, Global_mute, GBan, Sevennet_channels, Sevennet_posts
         global get_txt, is_command
-        self.bot = bot
+        self.bot: commands.Bot = bot
         if not self.bot.consts.get("gcm"):
             self.bot.consts["gcm"] = collections.defaultdict(dict)
         try:

@@ -14,7 +14,7 @@ class TimedRoleCog(commands.Cog):
     def __init__(self, bot):
         global Guild_settings, Texts, Official_emojis, Timed_roles
         global get_txt
-        self.bot = bot
+        self.bot: commands.Bot = bot
         Timed_roles = self.bot.raw_config["tr"]
         Guild_settings = bot.guild_settings
         Official_emojis = bot.consts["oe"]

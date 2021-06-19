@@ -9,7 +9,7 @@ class TopGG(commands.Cog):
     """
 
     def __init__(self, bot):
-        self.bot = bot
+        self.bot: commands.Bot = bot
         # Autopost will post your guild count every 30 minutes
         if not self.bot.debug:
             self.dblpy = self.bot.DBL_client

@@ -10,7 +10,7 @@ class TemplateCog(commands.Cog):
     def __init__(self, bot):
         global Guild_settings, Texts, Official_emojis
         global get_txt
-        self.bot = bot
+        self.bot: commands.Bot = bot
         Guild_settings = bot.guild_settings
         Official_emojis = bot.consts["oe"]
         Texts = bot.texts

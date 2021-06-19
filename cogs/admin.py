@@ -18,7 +18,7 @@ class AdminCog(commands.Cog):
     def __init__(self, bot):
         global Guild_settings, Official_emojis, Global_chat, Global_mute, Private_chats, Sevennet_channels, GBan, Blacklists
         global get_txt
-        self.bot = bot
+        self.bot: commands.Bot = bot
         Guild_settings = bot.guild_settings
         Global_chat = bot.raw_config["gc"]
         GBan = bot.raw_config["gb"]

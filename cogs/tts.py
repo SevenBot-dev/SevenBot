@@ -54,7 +54,7 @@ class TtsCog(commands.Cog):
     def __init__(self, bot):
         global Guild_settings, Official_emojis, Tts_channels, Tts_settings
         global get_txt
-        self.bot = bot
+        self.bot: commands.Bot = bot
         Guild_settings = bot.guild_settings
         get_txt = bot.get_txt
         Official_emojis = bot.consts["oe"]

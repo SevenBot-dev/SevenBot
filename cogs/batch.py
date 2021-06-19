@@ -29,7 +29,7 @@ class BatchCog(commands.Cog):
     def __init__(self, bot):
         global Guild_settings, Bump_alerts, Dissoku_alerts
         global get_txt
-        self.bot = bot
+        self.bot: commands.Bot = bot
         Guild_settings = self.bot.guild_settings
         Bump_alerts = self.bot.raw_config["ba"]
         Dissoku_alerts = self.bot.raw_config["da"]

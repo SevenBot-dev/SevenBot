@@ -16,7 +16,7 @@ class AutoreplyCog(commands.Cog):
     def __init__(self, bot):
         global Guild_settings, Texts, Official_emojis, GBan, SB_Bans
         global get_txt, is_command
-        self.bot = bot
+        self.bot: commands.Bot = bot
         is_command = self.bot.is_command
         Guild_settings = bot.guild_settings
         Official_emojis = bot.consts["oe"]

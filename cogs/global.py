@@ -29,7 +29,7 @@ class GlobalCog(commands.Cog):
     def __init__(self, bot):
         global Guild_settings, Official_emojis, Global_chat, Global_mute, Private_chat_info
         global get_txt, is_command
-        self.bot = bot
+        self.bot: commands.Bot = bot
         Guild_settings = bot.guild_settings
         Global_chat = bot.raw_config["gc"]
         Official_emojis = bot.consts["oe"]

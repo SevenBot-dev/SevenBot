@@ -17,7 +17,7 @@ class LevelCog(commands.Cog):
     def __init__(self, bot):
         global Guild_settings, Texts, GBan, SB_Bans, Official_emojis
         global get_txt, is_command
-        self.bot = bot
+        self.bot: commands.Bot = bot
         Guild_settings = bot.guild_settings
         Texts = bot.texts
         get_txt = bot.get_txt

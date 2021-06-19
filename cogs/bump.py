@@ -17,7 +17,7 @@ class BumpCog(commands.Cog):
     def __init__(self, bot):
         global Guild_settings, Texts, Official_emojis, Dissoku_alerts, Bump_alerts
         global get_txt
-        self.bot = bot
+        self.bot: commands.Bot = bot
         Guild_settings = bot.guild_settings
         Official_emojis = bot.consts["oe"]
         Dissoku_alerts = bot.raw_config["da"]
