@@ -38,10 +38,7 @@ class LevelCog(commands.Cog):
             if message.content == "level":
                 us = await self.bot.db.user_settings.find_one({"uid": message.author.id})
                 if us is None:
-                    await self.bot.db.user_settings.insert_one({
-                        "uid": message.author.id,
-                        "level_dm": False
-                    })
+                    await self.bot.init_user_settings(message.author.id)
                     res = False
                 elif us["level_dm"]:
                     await self.bot.db.user_settings.update_one({

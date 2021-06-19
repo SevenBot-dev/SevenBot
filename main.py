@@ -1,5 +1,6 @@
 
 import ast
+import copy
 import datetime
 import importlib
 import io
@@ -107,6 +108,10 @@ class SevenBot(commands.Bot):
         self.web_pass = web_pass
         self.debug = len(sys.argv) != 1 and sys.argv[1] == "debug"
         self.texts = common_resources.Texts
+        self.bot.default_user_settings = {
+            "level_dm": False,
+            "favorite_musics": []
+        }
         print("Debug mode: " + str(self.debug))
         self.check(commands.cooldown(2, 2))
 
@@ -189,6 +194,11 @@ class SevenBot(commands.Bot):
         e = discord.Embed(title=self.get_txt(ctx.guild.id, "subcommand").format(ctx.command.name),
                           description=desc, color=0x00ccff)
         await ctx.send(embed=e)
+
+    async def init_user_settings(self, uid):
+        nd = copy.deepcopy(self.bot.default_user_settings)
+        nd["uid"] = uid
+        await self.bot.db.user_settings.insert_one(nd)
 
     @property
     def global_chats(self):
