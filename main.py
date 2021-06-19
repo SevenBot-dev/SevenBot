@@ -31,11 +31,6 @@ handler = logging.StreamHandler()
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
-print('*********************')
-print("      SevenBot       ")
-print("  Created by 名無し。  ")
-print("*********************")
-
 
 Channel_ids = {
     "log": 756254787191963768,
@@ -108,7 +103,7 @@ class SevenBot(commands.Bot):
         self.web_pass = web_pass
         self.debug = len(sys.argv) != 1 and sys.argv[1] == "debug"
         self.texts = common_resources.Texts
-        self.bot.default_user_settings = {
+        self.default_user_settings = {
             "level_dm": False,
             "favorite_musics": []
         }
@@ -222,7 +217,12 @@ async def on_message(msg):
     pass
 
 
-print("ログイン中…")
-
 Texts = common_resources.Texts
-bot.run(TOKEN)
+
+if __name__ == "__main__":
+    print('*********************')
+    print("      SevenBot       ")
+    print("  Created by 名無し。  ")
+    print("*********************")
+    print("ログイン中…")
+    bot.run(TOKEN)
