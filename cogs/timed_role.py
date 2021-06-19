@@ -113,17 +113,17 @@ class TimedRoleCog(commands.Cog):
             page = 0
             while True:
                 try:
-                    cmp = await self.bot.wait_for("button_click", check=lambda cmp: cmp.message == msg and cmp.member == ctx.author, timeout=60)
-                    await cmp.defer_update()
-                    if cmp.custom_id == "left":
+                    com = await self.bot.wait_for("button_click", check=lambda com: com.message == msg and com.member == ctx.author, timeout=60)
+                    await com.defer_update()
+                    if com.custom_id == "left":
                         if page > 0:
                             page -= 1
                         buttons[0].enabled = page != 0
-                    elif cmp.custom_id == "right":
+                    elif com.custom_id == "right":
                         if page < (len(res) - 1):
                             page += 1
                         buttons[1].enabled = page != (len(res) - 1)
-                    elif cmp.custom_id == "exit":
+                    elif com.custom_id == "exit":
                         break
                     e = discord.Embed(title=get_txt(
                         ctx.guild.id, "tr_list") + f" - {page+1}/{len(res)}", description=f"```asciidoc\n{res[page]}```", color=Info)

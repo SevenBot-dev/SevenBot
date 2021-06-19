@@ -93,48 +93,48 @@ class AuthCog(commands.Cog):
                     await msg.delete(delay=60)
 
     @commands.Cog.listener()
-    async def on_button_click(self, cmp):
+    async def on_button_click(self, com):
         print(1)
-        if cmp.message.embeds == []:
+        if com.message.embeds == []:
             return
-        m0 = cmp.message.embeds[0]
+        m0 = com.message.embeds[0]
         if m0.title.startswith("認証ボタン - "):
-            await cmp.defer_source(hidden=True)
-            guild = cmp.guild
-            user = cmp.member
+            await com.defer_source(hidden=True)
+            guild = com.guild
+            user = com.member
             try:
                 r = guild.get_role(
                     int(m0.description.splitlines()[1].split(": ")[1][3:-1]))
             except IndexError:
                 r = guild.get_role(
-                    Guild_settings[cmp.guild.id]["auth_role"])
+                    Guild_settings[com.guild.id]["auth_role"])
             if m0.title.endswith("ワンクリック"):
                 if r not in user.roles:
                     await user.add_roles(r)
-                    await cmp.send(f"{guild.name} での認証が完了しました。", hidden=True)
+                    await com.send(f"{guild.name} での認証が完了しました。", hidden=True)
                 else:
-                    await cmp.send("すでに認証済みです。", hidden=True)
+                    await com.send("すでに認証済みです。", hidden=True)
             elif m0.title.endswith("画像認証"):
                 if r not in user.roles:
-                    url, auth_text = await self.make_image_auth_url(cmp.message)
-                    await cmp.send(embed=SEmbed(description=get_txt(cmp.guild.id, "img_auth_desc2") + "\n" + get_txt(cmp.guild.id, "img_auth_warn"), image_url=url, color=Process))
+                    url, auth_text = await self.make_image_auth_url(com.message)
+                    await com.send(embed=SEmbed(description=get_txt(com.guild.id, "img_auth_desc2") + "\n" + get_txt(com.guild.id, "img_auth_warn"), image_url=url, color=Process))
                     try:
                         await self.bot.wait_for("message", check=lambda message: message.content.lower() == auth_text and message.channel == message.author.dm_channel and message.author == user, timeout=30)
-                        await user.send(get_txt(guild.id, "img_auth_ok").format(cmp.channel.id))
+                        await user.send(get_txt(guild.id, "img_auth_ok").format(com.channel.id))
                         await user.add_roles(r)
                     except asyncio.TimeoutError:
-                        await cmp.send(get_txt(guild.id, "timeout"), hidden=True)
+                        await com.send(get_txt(guild.id, "timeout"), hidden=True)
                 else:
-                    await cmp.send("すでに認証済みです。", hidden=True)
+                    await com.send("すでに認証済みです。", hidden=True)
             elif m0.title.endswith("Web認証"):
                 if r not in user.roles:
                     async with aiohttp.ClientSession() as session:
-                        async with session.post('https://captcha.sevenbot.jp/session', json={"password": web_pass, "uid": user.id, "gid": guild.id, "rid": r.id, "appid": cmp.application_id, "token": cmp.token}) as r:
+                        async with session.post('https://captcha.sevenbot.jp/session', json={"password": web_pass, "uid": user.id, "gid": guild.id, "rid": r.id, "appid": com.application_id, "token": com.token}) as r:
                             r.raise_for_status()
                             session_id = (await r.json())["message"]
-                    await cmp.send(get_txt(guild.id, "web_auth") + "\nhttps://captcha.sevenbot.jp/verify?id=" + session_id, hidden=True)
+                    await com.send(get_txt(guild.id, "web_auth") + "\nhttps://captcha.sevenbot.jp/verify?id=" + session_id, hidden=True)
                 else:
-                    await cmp.send("すでに認証済みです。")
+                    await com.send("すでに認証済みです。")
 
     @commands.group()
     @commands.has_guild_permissions(manage_roles=True)
