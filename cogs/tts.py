@@ -313,34 +313,33 @@ class TtsCog(commands.Cog):
         if last_request - time.time() < 2:
             await asyncio.sleep(last_request - time.time())
         last_request = time.time()
-        if ts.get("speaker", user.id % 4) in (0, 1, 2, 3, 4):
-            if sys.platform == "win32":
-                open_jtalk = [r'E:\open_jtalk-1.11\bin\open_jtalk.exe']
-                mech = ['-x', r'E:\open_jtalk-1.11\bin\dic']
-                outwav = ['-ow', 'CON']
-            else:
-                open_jtalk = [r'~/bin/open-jtalk/bin/open_jtalk']
-                mech = ['-x', r'~/bin/open-jtalk/dic']
-                outwav = ['-ow', '/dev/stdout']
-            htsvoice = [
-                '-m', f'./htsvoices/{ts.get("speaker", user.id % 4)}.htsvoice']
-            speed = ['-r', str(ts.get("speed", 100) / 100.0)]
-            cmd = open_jtalk + mech + htsvoice + speed + outwav
-            # await message.channel.send(" ".join(cmd))
-            loop.create_task(message.add_reaction(
-                Official_emojis["network"]))
-            c = await asyncio.create_subprocess_shell((" ".join(cmd)).encode(), stdin=asyncio.subprocess.PIPE, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.STDOUT)
-            try:
-                stdout, _ = await c.communicate((txt.replace("\n", " ")[:30] + "\n").encode("utf8"))
-            except asyncio.TimeoutError:
-                c.terminate()
-            loop.create_task(message.remove_reaction(Official_emojis["network"], message.guild.me))
-            # await c.wait()
-            # await message.reply((await c.stderr.read()).decode())
-            bio = io.BytesIO(stdout)
-            bio.seek(0)
-            msg = (await (self.bot.get_channel(765528694500360212)).send(file=discord.File(bio, filename="tmp.wav")))
-            bio.close()
+        if sys.platform == "win32":
+            open_jtalk = [r'E:\open_jtalk-1.11\bin\open_jtalk.exe']
+            mech = ['-x', r'E:\open_jtalk-1.11\bin\dic']
+            outwav = ['-ow', 'CON']
+        else:
+            open_jtalk = [r'~/bin/open-jtalk/bin/open_jtalk']
+            mech = ['-x', r'~/bin/open-jtalk/dic']
+            outwav = ['-ow', '/dev/stdout']
+        htsvoice = [
+            '-m', f'./htsvoices/{ts.get("speaker", user.id % 4)}.htsvoice']
+        speed = ['-r', str(ts.get("speed", 100) / 100.0)]
+        cmd = open_jtalk + mech + htsvoice + speed + outwav
+        # await message.channel.send(" ".join(cmd))
+        loop.create_task(message.add_reaction(
+            Official_emojis["network"]))
+        c = await asyncio.create_subprocess_shell((" ".join(cmd)).encode(), stdin=asyncio.subprocess.PIPE, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.STDOUT)
+        try:
+            stdout, _ = await c.communicate((txt.replace("\n", " ")[:30] + "\n").encode("utf8"))
+        except asyncio.TimeoutError:
+            c.terminate()
+        loop.create_task(message.remove_reaction(Official_emojis["network"], message.guild.me))
+        # await c.wait()
+        # await message.reply((await c.stderr.read()).decode())
+        bio = io.BytesIO(stdout)
+        bio.seek(0)
+        msg = (await (self.bot.get_channel(765528694500360212)).send(file=discord.File(bio, filename="tmp.wav")))
+        bio.close()
         Tts_channels[guild.voice_client.channel.id]["qu"].append(
             (message, msg))
         if not Tts_channels[guild.voice_client.channel.id]["playing"]:
