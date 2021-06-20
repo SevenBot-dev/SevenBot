@@ -285,14 +285,9 @@ class MusicCog(commands.Cog):
     async def get_music_info(self, url):
         loop = asyncio.get_event_loop()
         try:
-            cache = await self.bot.db.music_info_caches.find_one({"url": url, "time": {"$lt": time.time()}})
-            if cache is not None:
-                return cache
             info = await loop.run_in_executor(None, partial(ytdl.extract_info, url, download=False, process=False))
             info["url"] = url
             info["time"] = time.time() + 60 * 60 * 24 * 7
-            await self.bot.db.music_info_caches.insert_one(info)
-            await self.bot.db.music_info_caches.delete_one({"url": url, "time": {"$lt": time.time()}})
             return info
         except youtube_dl.DownloadError as e:
             raise e
