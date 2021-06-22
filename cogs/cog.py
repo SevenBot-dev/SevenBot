@@ -296,6 +296,8 @@ class MainCog(commands.Cog):
 
     @commands.Cog.listener("on_message")
     async def on_message_spam(self, message):
+        if message.guild is None:
+            return
         if is_command(message):
             try:
                 await self.bot.wait_for("message", check=lambda m: m.guild == message.guild and is_command(m), timeout=5)
@@ -382,6 +384,8 @@ class MainCog(commands.Cog):
         if message.author.id in GBan.keys():
             return
         if not self.bot.is_ready():
+            return
+        if message.guild is None:
             return
         if message.guild.id not in Guild_settings.keys():
             return
