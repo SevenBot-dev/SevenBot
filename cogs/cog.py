@@ -298,8 +298,8 @@ class MainCog(commands.Cog):
     async def on_message_spam(self, message):
         if is_command(message):
             try:
-                await self.bot.wait_for("message", check=lambda m: m.guild.id == message.guild.id and is_command(m), timeout=5)
-                await self.bot.wait_for("message", check=lambda m: m.guild.id == message.guild.id and is_command(m), timeout=5)
+                await self.bot.wait_for("message", check=lambda m: m.guild == message.guild and is_command(m), timeout=5)
+                await self.bot.wait_for("message", check=lambda m: m.guild == message.guild and is_command(m), timeout=5)
             except asyncio.TimeoutError:
                 pass
             else:

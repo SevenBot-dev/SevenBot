@@ -27,6 +27,8 @@ class MessageExpandCog(commands.Cog):
             return
         if not self.bot.is_ready():
             return
+        if message.guild is None:
+            return
         if message.guild.id not in Guild_settings.keys():
             return
         if re.match(Message_url_re, message.content) is not None and Guild_settings[message.guild.id]["expand_message"]:
