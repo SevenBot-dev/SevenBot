@@ -484,6 +484,12 @@ class GlobalCog(commands.Cog):
                     url=ctx.guild.icon_url_as(static_format='png'))
                 e2.set_footer(text=f"現在のチャンネル数：{len(Global_chat)+1}")
                 loop = asyncio.get_event_loop()
+
+                async def send_webhook(webhook, *args, **kwargs):
+                    try:
+                        await webhook.send(*args, **kwargs)
+                    except discord.errors.InvalidArgument:
+                        pass
                 for c in Global_chat:
                     cn = self.bot.get_channel(c)
                     if cn is None:
@@ -502,7 +508,8 @@ class GlobalCog(commands.Cog):
                             webhook = await cn.create_webhook(name="sevenbot-global-webhook", avatar=await a.read())
                         fl = []
                         un = "SevenBot Global"
-                        loop.create_task(webhook.send(embed=e2,  # content.replace("@", "@​")
+                        loop.create_task(send_webhook(webhook,
+                                                      embed=e2,  # content.replace("@", "@​")
                                                       username=un,
                                                       avatar_url="https://i.imgur.com/eaXHbTe.png",
                                                       files=fl))
