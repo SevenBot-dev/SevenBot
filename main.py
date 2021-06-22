@@ -48,7 +48,7 @@ Save_channel_id = 765489262123548673
 def prefix(bot, message):
     if Guild_settings[message.guild.id]["prefix"] is None:
         if bot.debug:
-            return ['sbb#', "sbb. ", 'sbb.']
+            return ['sb/']
         else:
             return ['sb#', "sb. ", 'sb.']
     else:
