@@ -8,7 +8,7 @@ import time
 import urllib.parse
 import aiohttp
 import discord
-from discord.ext import commands, tasks
+from discord.ext import commands, tasks, components
 from discord.errors import Forbidden, NotFound
 from sembed import SEmbed, SField, SAuthor  # , SField, SAuthor, SFooter
 import _pathmagic  # type: ignore # noqa
@@ -610,17 +610,39 @@ class GlobalCog(commands.Cog):
                         title=f"個人グローバルチャット作成 - `{channel}`", description="DMを確認してください。", color=Process)
                     fm = await ctx.reply(embed=e2)
                     e3 = discord.Embed(
-                        title=f"個人グローバルチャット作成 - `{channel}`", description="30秒以内にパスワードを送信して下さい。\n`none`と送信するとパスワードが無効になります。", color=Process)
+                        title=f"個人グローバルチャット作成 - `{channel}`", description="30秒以内にパスワードを送信して下さい。", color=Process)
                     e3.set_footer(text=f"チャンネルID: {ctx.channel.id}")
-                    m = await ctx.author.send(embed=e3)
+                    buttons = [components.Button("パスワード無し", "no_pass", components.ButtonType.secondary), components.Button("キャンセル", "cancel", components.ButtonType.danger)]
+                    msg = await components.send(ctx.author, embed=e3, components=buttons)
                     try:
-                        msg = await self.bot.wait_for("message", check=check, timeout=30)
+                        loop = asyncio.get_event_loop()
+                        wait_msg = loop.create_task(self.bot.wait_for("message", check=lambda m: m.channel == msg.channel and not m.author.bot, timeout=30), name="wait_pass")
+                        wait_button = loop.create_task(self.bot.wait_for("button_click", check=lambda c: c.channel == msg.channel and c.message == msg, timeout=30), name="wait_button")
+                        done_tasks, pending_tasks = await asyncio.wait({wait_msg, wait_button}, return_when=asyncio.FIRST_COMPLETED)
+                        done_task = done_tasks.pop()
+                        for task in pending_tasks:
+                            task.cancel()
+                        if done_task.get_name() == "wait_pass":
+                            password = hashlib.sha256(done_task.result().content.encode()).hexdigest()
+                        elif done_task.get_name() == "wait_button":
+                            await done_task.result().defer_update()
+                            if done_task.result().custom_id == "cancel":
+                                e4 = discord.Embed(
+                                    title=f"個人グローバルチャット作成 - `{channel}`", description="キャンセルされました。", color=Error)
+                                e4.set_footer(text=f"チャンネルID: {ctx.channel.id}")
+                                for b in buttons:
+                                    b.enabled = False
+                                await components.edit(msg, embed=e4, components=buttons)
+                                await fm.edit(embed=e4)
+                                return
+                            else:
+                                password = ""
                         Private_chat_info[channel] = {
                             "channels": [
                                 ctx.channel.id
                             ],
                             "owner": ctx.author.id,
-                            "pass": ("" if msg.content.lower() == "none" else hashlib.sha256(msg.content.encode()).hexdigest()),
+                            "pass": password,
                             "mute": [],
                             "rule": {},
                             "slow": 5
@@ -628,13 +650,18 @@ class GlobalCog(commands.Cog):
                         e4 = discord.Embed(
                             title=f"個人グローバルチャット作成 - `{channel}`", description="パスワードを確認しました。", color=Success)
                         e4.set_footer(text=f"チャンネルID: {ctx.channel.id}")
-                        await m.edit(embed=e4)
+                        for b in buttons:
+                            b.enabled = False
+                        await components.edit(msg, embed=e4, components=buttons)
                         await fm.edit(embed=e4)
                     except asyncio.TimeoutError:
                         e4 = discord.Embed(
                             title=f"個人グローバルチャット作成 - `{channel}`", description="タイムアウトしました。", color=Error)
                         e4.set_footer(text=f"チャンネルID: {ctx.channel.id}")
-                        await m.edit(embed=e4)
+                        for b in buttons:
+                            b.enabled = False
+                        await components.edit(msg, embed=e4, components=buttons)
+                        await fm.edit(embed=e4)
 
     @gchat.command(name="deactivate", aliases=Deactivate_aliases + ["leave", "disconnect"])
     @commands.has_permissions(manage_channels=True)
@@ -740,27 +767,44 @@ class GlobalCog(commands.Cog):
         e3 = discord.Embed(
             title=f"パスワード編集 - `{channel}`", description="30秒以内にパスワードを送信して下さい。\n`none`と送信するとパスワードが無効になります。", color=Process)
         e3.set_footer(text=f"チャンネルID: {ctx.channel.id}")
-        m = await ctx.author.send(embed=e3)
 
-        def check(c):
-            return (c.channel.id == ctx.author.dm_channel.id and not c.author.bot)
+        buttons = [components.Button("パスワード無し", "no_pass", components.ButtonType.secondary), components.Button("キャンセル", "cancel", components.ButtonType.danger)]
+        msg = await components.send(ctx.author, embed=e3, components=buttons)
         try:
-            msg = await self.bot.wait_for("message", check=check, timeout=30)
-            # Private_chats[channel] = [ctx.channel.id]
-            if msg.content.lower() == "none":
-                Private_chat_info[channel]["pass"] = ""
-            else:
+            loop = asyncio.get_event_loop()
+            wait_msg = loop.create_task(self.bot.wait_for("message", check=lambda m: m.channel == msg.channel and not m.author.bot, timeout=30), name="wait_pass")
+            wait_button = loop.create_task(self.bot.wait_for("button_click", check=lambda c: c.channel == msg.channel and c.message == msg, timeout=30), name="wait_button")
+            done_tasks, pending_tasks = await asyncio.wait({wait_msg, wait_button}, return_when=asyncio.FIRST_COMPLETED)
+            done_task = done_tasks.pop()
+            for task in pending_tasks:
+                task.cancel()
+            if done_task.get_name() == "wait_pass":
                 Private_chat_info[channel]["pass"] = hashlib.sha256(msg.content.encode()).hexdigest()
+            elif done_task.get_name() == "wait_button":
+                await done_task.result().defer_update()
+                if done_task.result().custom_id == "no_pass":
+                    Private_chat_info[channel]["pass"] = ""
+                else:
+                    e4 = discord.Embed(title=f"パスワード編集 - `{channel}`", description="キャンセルされました。", color=Error)
+                    e4.set_footer(text=f"チャンネルID: {ctx.channel.id}")
+                    for b in buttons:
+                        b.enabled = False
+                    await components.edit(msg, embed=e4, components=buttons)
+                    await fm.edit(embed=e4)
+                    return
             e4 = discord.Embed(
                 title=f"パスワード編集 - `{channel}`", description="パスワードを確認しました。", color=Success)
             e4.set_footer(text=f"チャンネルID: {ctx.channel.id}")
-            await m.edit(embed=e4)
+            for b in buttons:
+                b.enabled = False
+            await components.edit(msg, embed=e4, components=buttons)
             await fm.edit(embed=e4)
         except asyncio.TimeoutError:
             e4 = discord.Embed(
                 title=f"パスワード編集 - `{channel}`", description="タイムアウトしました。", color=Error)
             e4.set_footer(text=f"チャンネルID: {ctx.channel.id}")
-            await m.edit(embed=e4)
+            await components.edit(msg, embed=e4, components=buttons)
+            await fm.edit(embed=e4)
 
     @private_global.command(name="slowmode", aliases=["slow"])
     async def changeslow_private_global(self, ctx, channel, seconds: int):
