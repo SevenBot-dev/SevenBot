@@ -16,7 +16,6 @@ import urllib.parse
 from typing import Optional, Union
 
 import aiohttp
-import bs4
 import discord
 from async_google_trans_new import AsyncTranslator
 from discord import Forbidden, NotFound
@@ -1452,29 +1451,29 @@ class MainCog(commands.Cog):
             title=get_txt(ctx.guild.id, "rc_title"), description=r, color=Info)
         return await ctx.reply(embed=e)
 
-    @commands.command(aliases=["cu"])
-    @commands.cooldown(10, 10)
-    async def check_url(self, ctx, *, url):
-        if not (url.startswith("http://") or url.startswith("https://")):
-            url = "http://" + url
-        async with aiohttp.ClientSession() as session:
-            async with session.get(f'https://safeweb.norton.com/report/show?url={url}') as r:
-                if r.status == 200:
-                    get_url_info = await r.text()
-        b4o = bs4.BeautifulSoup(get_url_info, 'lxml')
-        if b4o.select(".icoUntested") != []:
-            ind = 0
-        elif b4o.select('.icoSafe') != []:
-            ind = 1
-        elif b4o.select(".icoCaution") != []:
-            ind = 2
-        elif b4o.select(".icoWarning") != []:
-            ind = 3
-        e = discord.Embed(title=get_txt(ctx.guild.id, "norton_res").format(get_txt(ctx.guild.id, "norton_desc")[ind][0]),
-                          description=get_txt(ctx.guild.id, "norton_desc")[ind][1].format(url), color=0xffcd00)
-        e.set_footer(text="Powered by Norton Safeweb",
-                     icon_url="https://i.imgur.com/QUkiSHQ.png")
-        return await ctx.reply(embed=e)
+    # @commands.command(aliases=["cu"])
+    # @commands.cooldown(10, 10)
+    # async def check_url(self, ctx, *, url):
+    #     if not (url.startswith("http://") or url.startswith("https://")):
+    #         url = "http://" + url
+    #     async with aiohttp.ClientSession() as session:
+    #         async with session.get(f'https://safeweb.norton.com/report/show?url={url}') as r:
+    #             if r.status == 200:
+    #                 get_url_info = await r.text()
+    #     b4o = bs4.BeautifulSoup(get_url_info, 'lxml')
+    #     if b4o.select(".icoUntested") != []:
+    #         ind = 0
+    #     elif b4o.select('.icoSafe') != []:
+    #         ind = 1
+    #     elif b4o.select(".icoCaution") != []:
+    #         ind = 2
+    #     elif b4o.select(".icoWarning") != []:
+    #         ind = 3
+    #     e = discord.Embed(title=get_txt(ctx.guild.id, "norton_res").format(get_txt(ctx.guild.id, "norton_desc")[ind][0]),
+    #                       description=get_txt(ctx.guild.id, "norton_desc")[ind][1].format(url), color=0xffcd00)
+    #     e.set_footer(text="Powered by Norton Safeweb",
+    #                  icon_url="https://i.imgur.com/QUkiSHQ.png")
+    #     return await ctx.reply(embed=e)
 
     @commands.command(aliases=["user", "ui", "userinfo"])
     async def lookup(self, ctx, u: Union[discord.User, int] = None):
