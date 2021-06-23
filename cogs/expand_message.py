@@ -1,7 +1,7 @@
 import re
 
 import discord
-from discord.ext import commands
+from discord.ext import commands, components
 
 import _pathmagic  # type: ignore # noqa
 from common_resources.consts import (Activate_aliases, Deactivate_aliases,
@@ -76,9 +76,7 @@ class MessageExpandCog(commands.Cog):
                     else:
                         em.set_footer(text=footer + Texts[Guild_settings[message.guild.id]["lang"]]
                                       ["expand_message_footer2"].format(len(m.embeds)), icon_url=self.bot.get_guild(ids[0]).icon_url_as(static_format="png"))
-                        await message.reply(embed=em)
-                        for e in m.embeds:
-                            await message.channel.send(embed=e)
+                        await components.reply(message, embeds=[em] + m.embeds[:9])
                 except Exception as er:
                     e = discord.Embed(title=get_txt(message.guild.id, "expand_message_fail"),
                                       description="", color=Error)
