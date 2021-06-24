@@ -43,6 +43,7 @@ class GlobalCog(commands.Cog):
             for info in raw_info:
                 Private_chat_info[info["name"]] = info
             self.bot.consts["pci"] = Private_chat_info
+        self.sync_pc_data.start()
 
     def make_rule_embed(self, channel):
         owner = self.bot.get_user(Private_chat_info[channel]["owner"])
