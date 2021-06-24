@@ -44,6 +44,7 @@ class GlobalCog(commands.Cog):
                 Private_chat_info[info["name"]] = info
             self.bot.consts["pci"] = Private_chat_info
         self.sync_pc_data.start()
+        self.bot.loop.create_task(self.get_pc_data())
 
     def make_rule_embed(self, channel):
         owner = self.bot.get_user(Private_chat_info[channel]["owner"])
@@ -982,6 +983,13 @@ class GlobalCog(commands.Cog):
         async for c in self.bot.db.private_chat.find({}, {"_id": False}):
             if c != Private_chat_info[c["name"]]:
                 await self.bot.db.private_chat.replace_one({"name": c["name"]}, Private_chat_info[c["name"]])
+
+    async def get_pc_data(self):
+        async with self.bot.db.private_chat.watch() as change_stream:
+            async for change in change_stream:
+                if change["operationType"] == "update":
+                    pcd = await self.bot.db.guild_settings.find_one(change["documentKey"])
+                    Private_chat_info[pcd["name"]] = pcd
 
     def cog_unload(self):
         self.sync_pc_data.stop()
