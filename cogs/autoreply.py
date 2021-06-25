@@ -25,6 +25,42 @@ class AutoreplyCog(commands.Cog):
         GBan = bot.raw_config["gb"]
         SB_Bans = bot.raw_config["sbb"]
 
+    async def do_reply(self, ar, message, content):
+        m = re.match(r"^([^:]+):([\s\S]*)$", ar[0])
+        if m:
+            cmd = m[1].lower()
+            cnt = m[2]
+            if cmd == "re":
+                if re.search(cnt, content):
+                    return True
+            elif cmd == "fullmatch":
+                if content.lower() == cnt.lower():
+                    return True
+            elif cmd == "channel":
+                m2 = re.match(r"^([^|]*)\|([^|]*)$", cnt)
+                if m2 is not None:
+                    ch = m2.group(1).split(",")
+                    for c in ch:
+                        try:
+                            fake_ctx = await self.bot.get_context(message)
+                            channel = await commands.converter.TextChannelConverter().convert(fake_ctx, c)
+                        except commands.errors.BadArgument:
+                            pass
+                        else:
+                            if message.channel == channel:
+                                ar[0] = m2.group(2)
+                                return await self.do_reply(ar, message, content)
+            elif cmd == "has-image":
+                if message.attachments and [a for a in message.attachments if a.content_type.startswith("image")]:
+                    ar[0] = cnt
+                    return await self.do_reply(ar, message, content)
+            else:
+                return ar[0].lower() in content.lower()
+        elif ar[0].lower() in content.lower():
+            return True
+
+        return False
+
     @commands.Cog.listener("on_message")
     async def on_message_ar(self, message):
         global Guild_settings
@@ -66,16 +102,7 @@ class AutoreplyCog(commands.Cog):
         ga = []
         if arp is not None:
             for ar in arp.values():
-                m = re.match(r"^([^:]+):([\s\S]*)", ar[0])
-                if m:
-                    cmd = m[1].lower()
-                    cnt = m[2]
-                    if cmd == "re":
-                        if re.search(cnt, message.content):
-                            ga.append(ar_send(message.channel, ar[1]))
-                    elif ar[0].lower() in message.content.lower() and not is_command(message):
-                        ga.append(ar_send(message.channel, ar[1]))
-                elif ar[0].lower() in message.content.lower() and not is_command(message):
+                if await self.do_reply(ar, message, message.content) and not is_command(message):
                     ga.append(ar_send(message.channel, ar[1]))
         await asyncio.gather(*ga)
         if random_tmp:
