@@ -22,5 +22,5 @@ for ek, ev in Event_dict.items():
 st = ""
 for ek, ev in Stat_dict.items():
     st += f"{ek} - {ev}\n"
-with open(os.path.dirname(__file__) + "../translations/en/main.json", "r", encoding="utf8") as f:
+with open(os.path.dirname(__file__) + "/../translations/en/main.json", "r", encoding="utf8") as f:
     JA_TEXTS = json.load(f)
