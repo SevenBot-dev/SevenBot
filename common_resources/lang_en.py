@@ -22,4 +22,4 @@ st2 = ""
 for ek, ev in Stat_dict2.items():
     st2 += f"`{ek}`: {ev}\n"
 with open("translations/en/main.json", "r", encoding="utf8") as f:
-    JA_TEXTS = json.load(f)
+    EN_TEXTS = json.load(f)
