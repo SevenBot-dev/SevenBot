@@ -87,18 +87,18 @@
     "expand_message_fail": "Failed to get message.",
     "expand_message_footer": "Channel: {}",
     "expand_message_footer2": "Channel: {}, {} embed(s).",
-    "expand_message_footer3": "サーバー： {} • ",
+    "expand_message_footer3": "Server: {}, ",
     "ar_remove_title": "自動返信をオフにする方法",
     "ar_remove_desc": "1. `sb#autoreply list`で削除したい返信のIDを確認\n2. `sb#autoreply remove <ID>`で削除",
     "ar_remove_footer": "この埋め込みは10秒後に消去されます。",
-    "ar_list": "自動返信一覧",
+    "ar_list": "Registered autoreplies",
     "ar_list_row": [
         "ID",
-        "条件",
-        "返信"
+        "Conditions",
+        "Reply"
     ],
-    "ar_list_no": "登録されていません。",
-    "ar_list_br": "[改行]",
+    "ar_list_no": "Not registered yet.",
+    "ar_list_br": "[New line]",
     "ar_list_no_desc": "`sb#autoreply add`で登録してください。",
     "tr_list": "時間付きロール一覧",
     "tr_list_row": [
