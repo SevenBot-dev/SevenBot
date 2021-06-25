@@ -1,4 +1,5 @@
 import json
+import os
 
 Event_dict2 = {
     "join": "On join",
@@ -21,5 +22,5 @@ for ek, ev in Event_dict2.items():
 st2 = ""
 for ek, ev in Stat_dict2.items():
     st2 += f"`{ek}`: {ev}\n"
-with open("translations/en/main.json", "r", encoding="utf8") as f:
+with open(os.path.dirname(__file__) + "../translations/en/main.json", "r", encoding="utf8") as f:
     EN_TEXTS = json.load(f)
