@@ -190,13 +190,13 @@
     "tts_join": "{}がボイスチャンネルに入室しました。現在、{}人がボイスチャンネルに入っています。",
     "tts_left": "{}がボイスチャンネルから退出しました。現在、{}人がボイスチャンネルに入っています。",
     "activate": "{} has been activated.",
-    "activate_fail": "Already active.",
+    "activate_fail": "It's already active.",
     "activate_desc": "`{}` to deactivate.",
     "deactivate": "{} has been deactivated.",
-    "deactivate_fail": "Already disable.",
+    "deactivate_fail": "It's already disabled.",
     "deactivate_desc": "`{}` to activate.",
     "voting": [
-        "vote",
+        "Poll",
         "Title",
         "Multi-Voting",
         [
@@ -208,7 +208,7 @@
     ],
     "vote_error": [
         "Too many choices.",
-        "You can set 10 choices or less."
+        "You must set 10 choices or less."
     ],
     "getid_self": [
         "Your ID is `{}`.",
