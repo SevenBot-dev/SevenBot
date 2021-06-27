@@ -225,7 +225,7 @@ class AuthCog(commands.Cog):
         if role != 0:
             Guild_settings[ctx.guild.id]["auth_role"] = role.id
         e = discord.Embed(
-            title="認証ボタン - 画像認証", description=f'下の{Official_emojis["check5"]}を押して認証\nロール: {ctx.guild.get_role(Guild_settings[ctx.guild.id]["auth_role"]).mention}', color=Widget)
+            title="認証ボタン - 画像認証", description=f'下のボタンを押して認証\nロール: {ctx.guild.get_role(Guild_settings[ctx.guild.id]["auth_role"]).mention}', color=Widget)
         await components.send(ctx, embed=e, components=[components.Button("認証", "auth")])
         try:
             await ctx.message.delete()
