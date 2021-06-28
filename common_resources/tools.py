@@ -7,7 +7,7 @@ import unicodedata
 
 import discord
 from discord.ext import commands
-import emoji
+from discord_emoji.table import UNICODE_TO_DISCORD
 
 Datetime_re = re.compile(
     r"(\d+[w(週間?)(weeks?)])?(\d+[d(日)(days?)])? ?(\d+[:h(時間)(hours?)])?(\d+[:m(分)(minutes?)])?(\d+[s(秒)seconds?)]?)?")
@@ -35,7 +35,7 @@ def to_lts(s):
 
 
 def remove_emoji(src_str):
-    return ''.join(c if c not in emoji.UNICODE_EMOJI else "?" for c in src_str)
+    return "".join("?" if c in UNICODE_TO_DISCORD.keys() else c for c in src_str)
 
 
 def recr_keys(d):
