@@ -780,7 +780,7 @@ class MainCog(commands.Cog):
                     value=f'{len(Sevennet_channels)}{get_txt(ctx.guild.id,"abouts")[-2]}({round(len(Sevennet_channels)/len(list(Guild_settings.keys()))*100)}%)')
         inf = await self.bot.DBL_client.get_bot_info()
         e.add_field(name=get_txt(ctx.guild.id, "abouts")[8],
-                    value=get_txt(ctx.guild.id, "abouts")[9].format(inf["points"], inf["monthlyPoints"]))
+                    value=get_txt(ctx.guild.id, "abouts")[9].format(inf["points"], inf["monthly_points"]))
         e.add_field(name=get_txt(ctx.guild.id, "abouts")[10],
                     value='[SevenBot-dev/SevenBot](https://github.com/SevenBot-dev/SevenBot)')
         e.add_field(name=get_txt(ctx.guild.id, "abouts")
