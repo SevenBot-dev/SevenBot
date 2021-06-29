@@ -552,7 +552,7 @@ class MusicCog(commands.Cog):
                 e = discord.Embed(title=f"`{info['title']}`" + get_txt(g.id, "yt_queued"), url=get_url(info), description="\n".join(
                     info.get("description", get_txt(g.id, "no_desc")).split("\n")[:8]), color=Success)
                 e.set_author(
-                    name=f"{au.display_name}(ID:{au.id})", icon_url=au.avatar_url)
+                    name=f"{au.display_name}(ID:{au.id})", icon_url=au.avatar.url)
                 e.set_footer(text=get_txt(g.id, "yt_queued_footer").format(
                     len(Queues[voice.channel.id][0])))
                 e.set_thumbnail(url=info["thumbnails"][-1]["url"])

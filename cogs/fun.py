@@ -953,7 +953,7 @@ class FunCog(commands.Cog):
                                         username=message.author.display_name + \
                                         f"({message.author})",
                                         allowed_mentions=discord.AllowedMentions.none(),
-                                        avatar_url=message.author.avatar_url_as(
+                                        avatar_url=message.author.avatar.url_as(
                                             static_format="png"),
                                         files=[await a.to_file() for a in message.attachments],
                                         wait=True)
@@ -1111,7 +1111,7 @@ class FunCog(commands.Cog):
         sendio.seek(0)
         amsg = await self.bot.get_channel(765528694500360212).send(file=discord.File(sendio, filename="result.png"))
         e.set_author(
-            name=f"{ctx.author.display_name}(ID:{ctx.author.id})", icon_url=ctx.author.avatar_url)
+            name=f"{ctx.author.display_name}(ID:{ctx.author.id})", icon_url=ctx.author.avatar.url)
         e.set_image(url=amsg.attachments[0].url)
         sendio.close()
         await ctx.reply(embed=e)
@@ -1162,7 +1162,7 @@ class FunCog(commands.Cog):
         sendio.seek(0)
         amsg = await self.bot.get_channel(765528694500360212).send(file=discord.File(sendio, filename="result.png"))
         e.set_author(
-            name=f"{ctx.author.display_name}(ID:{ctx.author.id})", icon_url=ctx.author.avatar_url)
+            name=f"{ctx.author.display_name}(ID:{ctx.author.id})", icon_url=ctx.author.avatar.url)
         e.set_image(url=amsg.attachments[0].url)
         sendio.close()
         await ctx.reply(embed=e)

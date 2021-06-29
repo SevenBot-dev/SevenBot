@@ -49,7 +49,7 @@ class PanelCog(commands.Cog):
         e.add_field(name=Texts[Guild_settings[g.id]["lang"]]
                     ["voting"][4], value=s, inline=False)
         e.set_author(
-            name=f"{ctx.author.display_name}(ID:{ctx.author.id})", icon_url=ctx.author.avatar_url)
+            name=f"{ctx.author.display_name}(ID:{ctx.author.id})", icon_url=ctx.author.avatar.url)
         e.set_footer(text=get_txt(ctx.guild.id, "voting")[5])
         m = await ctx.reply(embed=e)
         for sfi in range(len(select)):
@@ -66,7 +66,7 @@ class PanelCog(commands.Cog):
         e.add_field(name="最大人数", value=f"{max}人", inline=False)
         e.add_field(name="参加者(現在0人)", value="現在参加者はいません", inline=False)
         e.set_author(
-            name=f"{ctx.author}(ID:{ctx.author.id})", icon_url=ctx.author.avatar_url)
+            name=f"{ctx.author}(ID:{ctx.author.id})", icon_url=ctx.author.avatar.url)
         e.set_footer(text=get_txt(ctx.guild.id, "voting")[5])
         m = await ctx.reply(embed=e)
         await m.add_reaction(Official_emojis["check5"])

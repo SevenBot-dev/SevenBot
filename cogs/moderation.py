@@ -303,7 +303,7 @@ class ModerationCog(commands.Cog):
         em = discord.Embed(title=get_txt(ctx.guild.id, "fatal_role_dm_title").format(
             ctx.guild.name), description=message, color=Chat)
         em.set_author(name=f"{ctx.author}(ID:{ctx.author.id})",
-                      icon_url=ctx.author.avatar_url)
+                      icon_url=ctx.author.avatar.url)
         for m in role.members:
             c += 1
             await asyncio.sleep(5)

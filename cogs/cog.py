@@ -516,7 +516,7 @@ class MainCog(commands.Cog):
                     e = discord.Embed(
                         title=get_txt(message.guild.id, "trans_after"), description=tr, color=Trans)
                     e.set_author(
-                        name=f"{message.author.name}(ID:{message.author.id})", icon_url=message.author.avatar_url)
+                        name=f"{message.author.name}(ID:{message.author.id})", icon_url=message.author.avatar.url)
                     e.set_footer(text="Powered by async_google_trans_new",
                                  icon_url="https://i.imgur.com/zPOogXx.png")
                     await message.reply(embed=e)
@@ -547,7 +547,7 @@ class MainCog(commands.Cog):
                 await webhook.send(content=res,
                                    username=message.author.display_name,
                                    allowed_mentions=discord.AllowedMentions.none(),
-                                   avatar_url=message.author.avatar_url_as(
+                                   avatar_url=message.author.avatar.url_as(
                                        format="png"),
                                    files=message.attachments,
                                    embeds=message.embeds)
@@ -662,7 +662,7 @@ class MainCog(commands.Cog):
             e = discord.Embed(title=get_txt(ctx.guild.id, "help_categories")[0],
                               description=desc, url="https://sevenbot.jp/commands", color=Bot_info)
             e.set_author(
-                name=f"{ctx.author.display_name}(ID:{ctx.author.id})", icon_url=ctx.author.avatar_url)
+                name=f"{ctx.author.display_name}(ID:{ctx.author.id})", icon_url=ctx.author.avatar.url)
             return await ctx.reply(embed=e)
         elif detail == "uses":
             desc = ""
@@ -674,7 +674,7 @@ class MainCog(commands.Cog):
             e = discord.Embed(title=get_txt(ctx.guild.id, "help_ranking"),
                               description=desc, color=Bot_info)
             e.set_author(
-                name=f"{ctx.author.display_name}(ID:{ctx.author.id})", icon_url=ctx.author.avatar_url)
+                name=f"{ctx.author.display_name}(ID:{ctx.author.id})", icon_url=ctx.author.avatar.url)
             e.set_footer(
                 text=get_txt(ctx.guild.id, "help_categories")[3])
             return await ctx.reply(embed=e)
@@ -688,7 +688,7 @@ class MainCog(commands.Cog):
             e = discord.Embed(title=get_txt(ctx.guild.id, "help_categories")[2].format(detail),
                               description=desc, color=Bot_info, url="https://sevenbot.jp/commands#category-" + detail)
             e.set_author(
-                name=f"{ctx.author.display_name}(ID:{ctx.author.id})", icon_url=ctx.author.avatar_url)
+                name=f"{ctx.author.display_name}(ID:{ctx.author.id})", icon_url=ctx.author.avatar.url)
             e.set_footer(
                 text=get_txt(ctx.guild.id, "help_categories")[3])
             return await ctx.reply(embed=e)
@@ -698,7 +698,7 @@ class MainCog(commands.Cog):
                 c = self.bot.get_command(detail)
                 if c.hidden:
                     e = SEmbed(title=get_txt(ctx.guild.id, "help_title") + " - " + str(c), description=get_txt(ctx.guild.id, "help_hidden"),
-                               color=Bot_info, author=SAuthor(name=f"{ctx.author.display_name}(ID:{ctx.author.id})", icon_url=ctx.author.avatar_url))
+                               color=Bot_info, author=SAuthor(name=f"{ctx.author.display_name}(ID:{ctx.author.id})", icon_url=ctx.author.avatar.url))
                     return await ctx.reply(embed=e)
                 desc_txt = get_txt(ctx.guild.id, "help_detail").get(str(
                     c), get_txt(ctx.guild.id, "help_detail_none")).lstrip("\n ")
@@ -728,7 +728,7 @@ class MainCog(commands.Cog):
                 e.add_field(name=get_txt(ctx.guild.id, "help_detail_count")[0],
                             value=get_txt(ctx.guild.id, "help_detail_count")[1].format(Command_counter.get(str(c).split()[0], 0)), inline=False)
                 e.set_author(
-                    name=f"{ctx.author.display_name}(ID:{ctx.author.id})", icon_url=ctx.author.avatar_url)
+                    name=f"{ctx.author.display_name}(ID:{ctx.author.id})", icon_url=ctx.author.avatar.url)
                 return await ctx.reply(embed=e)
             else:
                 e = discord.Embed(title=get_txt(ctx.guild.id, "help_title") + " - " + detail,
@@ -1624,7 +1624,7 @@ class MainCog(commands.Cog):
             await ctx.reply(embed=e)
             e2 = discord.Embed(
                 title="SevenNetの仲間が抜けちゃった…", description=f"{ctx.guild.name}がSevenNetから退出しました。", timestamp=ctx.message.created_at, color=Chat)
-            e2.set_thumbnail(url=ctx.guild.icon_url)
+            e2.set_thumbnail(url=ctx.guild.icon.url)
             e2.set_footer(text=f"現在のチャンネル数：{len(Sevennet_channels)}")
             for c in Sevennet_channels:
                 cn = self.bot.get_channel(c)

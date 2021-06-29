@@ -48,7 +48,7 @@ class GlobalCog(commands.Cog):
 
     def make_rule_embed(self, channel):
         owner = self.bot.get_user(Private_chat_info[channel]["owner"])
-        return SEmbed(f"`{channel}`のルール", fields=[SField(*r, False) for r in Private_chat_info[channel]["rule"].items()], author=SAuthor(str(owner) + f"(ID:{owner.id})", str(owner.avatar_url)), color=Info)
+        return SEmbed(f"`{channel}`のルール", fields=[SField(*r, False) for r in Private_chat_info[channel]["rule"].items()], author=SAuthor(str(owner) + f"(ID:{owner.id})", str(owner.avatar.url)), color=Info)
 
     @commands.Cog.listener("on_message")
     async def on_message_sgc(self, message):
@@ -163,7 +163,7 @@ class GlobalCog(commands.Cog):
                     return await webhook.send(embed=e,  # content.replace("@", "@​")
                                               username=un,
                                               allowed_mentions=discord.AllowedMentions.none(),
-                                              avatar_url=message.author.avatar_url_as(
+                                              avatar_url=message.author.avatar.url_as(
                                                   static_format="png"),
                                               wait=True)
                 for c in each:
@@ -281,7 +281,7 @@ class GlobalCog(commands.Cog):
                             ga.append(webhook.send(content=content,  # content.replace("@", "@​")
                                                    username=un,
                                                    allowed_mentions=discord.AllowedMentions.none(),
-                                                   avatar_url=message.author.avatar_url_as(
+                                                   avatar_url=message.author.avatar.url_as(
                                                        static_format="png"),
                                                    files=fl,
                                                    embed=embed or rem,
@@ -682,7 +682,7 @@ class GlobalCog(commands.Cog):
             await ctx.reply(embed=e)
             e2 = discord.Embed(title="グローバルチャットの仲間が抜けちゃった…",
                                description=f"{ctx.guild.name}がグローバルチャットから退出しました。", timestamp=ctx.message.created_at, color=Chat)
-            e2.set_thumbnail(url=ctx.guild.icon_url)
+            e2.set_thumbnail(url=ctx.guild.icon.url)
             e2.set_footer(text=f"現在のチャンネル数：{len(Global_chat)}")
             loop = asyncio.get_event_loop()
             for c in Global_chat:
@@ -723,7 +723,7 @@ class GlobalCog(commands.Cog):
                 return
             e2 = discord.Embed(title="グローバルチャットの仲間が抜けちゃった…",
                                description=f"{ctx.guild.name}がグローバルチャットから退出しました。", timestamp=ctx.message.created_at, color=Chat)
-            e2.set_thumbnail(url=ctx.guild.icon_url)
+            e2.set_thumbnail(url=ctx.guild.icon.url)
             e2.set_footer(text=f"現在のチャンネル数：{len(Private_chat_info[pk]['channels'])}")
             if pk == "sgc":
                 await self.bot.get_channel(SGC_ID2).send(json.dumps({
