@@ -392,4 +392,4 @@ def setup(_bot):
     global bot
     bot = _bot
 #     logging.info("cog.py reloaded")
-    _bot.add_cog(TtsCog(_bot))
+    _bot.add_cog(TtsCog(_bot), override=True)

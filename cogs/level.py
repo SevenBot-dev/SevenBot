@@ -477,4 +477,4 @@ class LevelCog(commands.Cog):
 def setup(_bot):
     global bot
     bot = _bot
-    _bot.add_cog(LevelCog(_bot))
+    _bot.add_cog(LevelCog(_bot), override=True)

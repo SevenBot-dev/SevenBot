@@ -229,4 +229,4 @@ class AutoreplyCog(commands.Cog):
 def setup(_bot):
     global bot
     bot = _bot
-    _bot.add_cog(AutoreplyCog(_bot))
+    _bot.add_cog(AutoreplyCog(_bot), override=True)

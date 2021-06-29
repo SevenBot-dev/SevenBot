@@ -154,4 +154,4 @@ class RoleLinkCog(commands.Cog):
 def setup(_bot):
     global bot
     bot = _bot
-    _bot.add_cog(RoleLinkCog(_bot))
+    _bot.add_cog(RoleLinkCog(_bot), override=True)

@@ -514,4 +514,4 @@ def setup(_bot):
     global bot
     bot = _bot
 #     logging.info("cog.py reloaded")
-    _bot.add_cog(ToolCog(_bot))
+    _bot.add_cog(ToolCog(_bot), override=True)

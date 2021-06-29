@@ -75,7 +75,7 @@ class GlobalCog(commands.Cog):
                     if webhook is None:
                         g = self.bot.get_guild(
                             Official_discord_id)
-                        a = g.icon_url_as(format="png")
+                        a = g.icon.url
                         webhook = await cn.create_webhook(name=whname, avatar=await a.read())
                     fl = []
                     for at in message.attachments:
@@ -117,7 +117,7 @@ class GlobalCog(commands.Cog):
                         deletes.append(c)
                         continue
                     else:
-                        if cn.guild.me.permissions_in(cn).manage_webhooks:
+                        if cn.permissions_for(self.bot.user).manage_webhooks:
                             if not c == message.channel.id:
                                 ga.append(single_send(cn))
                                 # await
@@ -148,7 +148,7 @@ class GlobalCog(commands.Cog):
                     if webhook is None:
                         g = self.bot.get_guild(
                             Official_discord_id)
-                        a = g.icon_url_as(format="png")
+                        a = g.icon.url
                         webhook = await cn.create_webhook(name=whname, avatar=await a.read())
                     fl = []
                     for at in message.attachments:
@@ -172,7 +172,7 @@ class GlobalCog(commands.Cog):
                         deletes.append(c)
                         continue
                     else:
-                        if cn.guild.me.permissions_in(cn).manage_webhooks:
+                        if cn.permissions_for(self.bot.user).manage_webhooks:
                             if not c == message.channel.id:
                                 ga.append(single_send(cn))
                 loop.create_task(message.add_reaction(
@@ -193,9 +193,9 @@ class GlobalCog(commands.Cog):
                 u = Cant_image
             e.set_image(url=u)
         e.set_author(name=f"{message.author}(ID:{message.author.id})",
-                     icon_url=message.author.avatar_url_as(static_format="png"))
+                     icon_url=message.author.avatar.url)
         e.set_footer(text=f"{message.guild.name}(ID:{message.guild.id})",
-                     icon_url=message.guild.icon_url_as(static_format="png"))
+                     icon_url=message.guild.icon.url)
         # loop = asyncio.get_event_loop()
         ga = []
         if message.channel.id in flatten([c["channels"] for c in Private_chat_info.values()]):
@@ -232,7 +232,7 @@ class GlobalCog(commands.Cog):
             else:
                 # print(cn)
                 try:
-                    if cn.guild.me.permissions_in(cn).manage_webhooks:
+                    if cn.permissions_for(self.bot.user).manage_webhooks:
                         if not c == message.channel.id:
                             ch_webhooks = await cn.webhooks()
                             webhook = discord.utils.get(
@@ -240,7 +240,7 @@ class GlobalCog(commands.Cog):
                             if webhook is None:
                                 g = self.bot.get_guild(
                                     Official_discord_id)
-                                a = g.icon_url_as(format="png")
+                                a = g.icon.url
                                 webhook = await cn.create_webhook(name=whname, avatar=await a.read())
                             fl = []
                             for at in message.attachments:
@@ -275,7 +275,7 @@ class GlobalCog(commands.Cog):
                                     rem = discord.Embed(
                                         description=rmsg.content, color=Chat)
                                     rem.set_author(
-                                        name=rmsg.author.name, icon_url=rmsg.author.avatar_url_as(static_format="png"))
+                                        name=rmsg.author.name, icon_url=rmsg.author.avatar.url)
                                 except discord.errors.NotFound:
                                     rem = None
                             ga.append(webhook.send(content=content,  # content.replace("@", "@​")
@@ -303,7 +303,7 @@ class GlobalCog(commands.Cog):
                             await cn.send(embed=e3)
                 except discord.HTTPException:
                     pass
-        if not message.guild.me.permissions_in(message.channel).manage_webhooks:
+        if not message.channel.permissions_for(self.bot.user).manage_webhooks:
             await message.delete()
         for d in deletes:
             each.remove(d)
@@ -321,7 +321,7 @@ class GlobalCog(commands.Cog):
             "userId": message.author.id,
             "userName": message.author.name,
             "userDiscriminator": message.author.discriminator,
-            "userAvatar": message.author.avatar,
+            "userAvatar": message.author.avatar.key,
             "isBot": message.author.bot,
             "guildId": message.guild.id,
             "guildName": message.guild.name,
@@ -483,7 +483,7 @@ class GlobalCog(commands.Cog):
                 e2 = discord.Embed(
                     title="グローバルチャットに仲間が入ってきた!", description=f"{ctx.guild.name}がグローバルチャットに参加しました！", timestamp=ctx.message.created_at, color=Chat)
                 e2.set_thumbnail(
-                    url=ctx.guild.icon_url_as(static_format='png'))
+                    url=ctx.guild.icon.url)
                 e2.set_footer(text=f"現在のチャンネル数：{len(Global_chat)+1}")
                 loop = asyncio.get_event_loop()
 
@@ -506,7 +506,7 @@ class GlobalCog(commands.Cog):
                         if webhook is None:
                             g = self.bot.get_guild(
                                 Official_discord_id)
-                            a = g.icon_url_as(format="png")
+                            a = g.icon.url
                             webhook = await cn.create_webhook(name="sevenbot-global-webhook", avatar=await a.read())
                         fl = []
                         un = "SevenBot Global"
@@ -584,7 +584,7 @@ class GlobalCog(commands.Cog):
                     e2 = discord.Embed(
                         title="グローバルチャットに仲間が入ってきた!", description=f"{ctx.guild.name}がグローバルチャットに参加しました！", timestamp=ctx.message.created_at, color=Chat)
                     e2.set_thumbnail(
-                        url=ctx.guild.icon_url_as(static_format='png'))
+                        url=ctx.guild.icon.url)
                     e2.set_footer(
                         text=f"現在のチャンネル数：{len(Private_chat_info[channel]['channels'])}")
                     r = await ctx.send(embed=self.make_rule_embed(channel))
@@ -606,7 +606,7 @@ class GlobalCog(commands.Cog):
                             if webhook is None:
                                 g = self.bot.get_guild(
                                     Official_discord_id)
-                                a = g.icon_url_as(format="png")
+                                a = g.icon.url
                                 webhook = await cn.create_webhook(name="sevenbot-private-webhook-" + channel, avatar=await a.read())
                             fl = []
                             un = "SevenBot Personal Global"
@@ -699,7 +699,7 @@ class GlobalCog(commands.Cog):
                     if webhook is None:
                         g = self.bot.get_guild(
                             Official_discord_id)
-                        a = g.icon_url_as(format="png")
+                        a = g.icon.url
                         webhook = await cn.create_webhook(name="sevenbot-global-webhook", avatar=await a.read())
                     fl = []
                     un = "SevenBot Global"
@@ -748,7 +748,7 @@ class GlobalCog(commands.Cog):
                     if webhook is None:
                         g = self.bot.get_guild(
                             Official_discord_id)
-                        a = g.icon_url_as(format="png")
+                        a = g.icon.url
                         webhook = await cn.create_webhook(name="sevenbot-private-webhook-" + pk, avatar=await a.read())
                     fl = []
                     un = "SevenBot Personal Global"
@@ -999,4 +999,4 @@ def setup(_bot):
     global bot
     bot = _bot
 #     logging.info("cog.py reloaded")
-    _bot.add_cog(GlobalCog(_bot))
+    _bot.add_cog(GlobalCog(_bot), override=True)

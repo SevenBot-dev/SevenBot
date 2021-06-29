@@ -117,4 +117,4 @@ class BatchCog(commands.Cog):
 def setup(_bot):
     global bot
     bot = _bot
-    _bot.add_cog(BatchCog(_bot))
+    _bot.add_cog(BatchCog(_bot), override=True)

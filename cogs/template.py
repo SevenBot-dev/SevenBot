@@ -20,4 +20,4 @@ class TemplateCog(commands.Cog):
 def setup(_bot):
     global bot
     bot = _bot
-    _bot.add_cog(TemplateCog(_bot))
+    _bot.add_cog(TemplateCog(_bot), override=True)

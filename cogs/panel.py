@@ -33,7 +33,7 @@ class PanelCog(commands.Cog):
             e = discord.Embed(title=get_txt(g.id, "vote_error")[0],
                               description=get_txt(g.id, "vote_error")[0], color=Error)
             return await ctx.reply(embed=e)
-        dt = datetime.datetime.utcnow()
+        dt = discord.utils.utcnow()
         g = ctx.guild
         dt += time
         e = discord.Embed(
@@ -59,7 +59,7 @@ class PanelCog(commands.Cog):
     async def party(self, ctx, title, time: Optional[convert_timedelta], max: int):
         if time is None:
             time = datetime.timedelta(hours=1)
-        dt = datetime.datetime.utcnow()
+        dt = discord.utils.utcnow()
         dt += time
         e = discord.Embed(title="募集", color=Widget, timestamp=dt)
         e.add_field(name="タイトル", value=title, inline=False)
@@ -89,4 +89,4 @@ class PanelCog(commands.Cog):
 def setup(_bot):
     global bot
     bot = _bot
-    _bot.add_cog(PanelCog(_bot))
+    _bot.add_cog(PanelCog(_bot), override=True)

@@ -1,7 +1,6 @@
 import asyncio
 import collections
 import colorsys
-import datetime
 import hashlib
 import io
 import math
@@ -206,7 +205,7 @@ class FunCog(commands.Cog):
             m0 = message.embeds[0]
             if m0.title.startswith(get_txt(guild.id, "big-number")["title"] + " - "):
                 if m0.title.endswith(get_txt(guild.id, "big-number")["waiting"]):
-                    n = datetime.datetime.utcnow()
+                    n = discord.utils.utcnow()
                     guild = self.bot.get_guild(pl.guild_id)
                     user = guild.get_member(pl.user_id)
                     if message.id not in Bignum_join.keys():
@@ -329,7 +328,7 @@ class FunCog(commands.Cog):
                             Bignum_join[message.id] = Bignum_join[message.id]
             elif m0.title.startswith(get_txt(guild.id, "ww")["title"] + " - "):
                 if m0.title.endswith(get_txt(guild.id, "ww")["waiting"]):
-                    n = datetime.datetime.utcnow()
+                    n = discord.utils.utcnow()
                     guild = self.bot.get_guild(pl.guild_id)
                     user = guild.get_member(pl.user_id)
                     if message.id not in Wolf_join.keys():
@@ -760,9 +759,9 @@ class FunCog(commands.Cog):
         try:
             async with timeout(5):
                 async with aiohttp.ClientSession() as session:
-                    async with session.get(str(turns[0].avatar_url_as(format="png"))) as r:
+                    async with session.get(str(turns[0].avatar.replace(format="png").url)) as r:
                         f = io.BytesIO(await r.read())
-                    async with session.get(str(turns[1].avatar_url_as(format="png"))) as r:
+                    async with session.get(str(turns[1].avatar.replace(format="png").url)) as r:
                         f2 = io.BytesIO(await r.read())
         except asyncio.TimeoutError:
             e = discord.Embed(title=get_txt(
@@ -944,7 +943,7 @@ class FunCog(commands.Cog):
         if webhook is None:
             g = self.bot.get_guild(
                 Official_discord_id)
-            a = g.icon_url_as(format="png")
+            a = g.icon.url
             webhook = await message.channel.create_webhook(name="sevenbot-parse-webhook", avatar=await a.read())
         wm = None
         if not (res + ignore).splitlines() == message.content.splitlines():
@@ -1221,4 +1220,4 @@ class FunCog(commands.Cog):
 def setup(_bot):
     global bot
     bot = _bot
-    _bot.add_cog(FunCog(_bot))
+    _bot.add_cog(FunCog(_bot), override=True)
