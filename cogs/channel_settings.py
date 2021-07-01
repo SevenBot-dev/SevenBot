@@ -293,4 +293,4 @@ class ChannelSettingCog(commands.Cog):
 def setup(_bot):
     global bot
     bot = _bot
-    _bot.add_cog(ChannelSettingCog(_bot))
+    _bot.add_cog(ChannelSettingCog(_bot), override=True)

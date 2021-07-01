@@ -154,4 +154,4 @@ class TimedRoleCog(commands.Cog):
 def setup(_bot):
     global bot
     bot = _bot
-    _bot.add_cog(TimedRoleCog(_bot))
+    _bot.add_cog(TimedRoleCog(_bot), override=True)

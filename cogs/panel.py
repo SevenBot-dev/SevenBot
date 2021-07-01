@@ -33,7 +33,7 @@ class PanelCog(commands.Cog):
             e = discord.Embed(title=get_txt(g.id, "vote_error")[0],
                               description=get_txt(g.id, "vote_error")[0], color=Error)
             return await ctx.reply(embed=e)
-        dt = datetime.datetime.utcnow()
+        dt = discord.utils.utcnow()
         g = ctx.guild
         dt += time
         e = discord.Embed(
@@ -49,7 +49,7 @@ class PanelCog(commands.Cog):
         e.add_field(name=Texts[Guild_settings[g.id]["lang"]]
                     ["voting"][4], value=s, inline=False)
         e.set_author(
-            name=f"{ctx.author.display_name}(ID:{ctx.author.id})", icon_url=ctx.author.avatar_url)
+            name=f"{ctx.author.display_name}(ID:{ctx.author.id})", icon_url=ctx.author.avatar.url)
         e.set_footer(text=get_txt(ctx.guild.id, "voting")[5])
         m = await ctx.reply(embed=e)
         for sfi in range(len(select)):
@@ -59,14 +59,14 @@ class PanelCog(commands.Cog):
     async def party(self, ctx, title, time: Optional[convert_timedelta], max: int):
         if time is None:
             time = datetime.timedelta(hours=1)
-        dt = datetime.datetime.utcnow()
+        dt = discord.utils.utcnow()
         dt += time
         e = discord.Embed(title="募集", color=Widget, timestamp=dt)
         e.add_field(name="タイトル", value=title, inline=False)
         e.add_field(name="最大人数", value=f"{max}人", inline=False)
         e.add_field(name="参加者(現在0人)", value="現在参加者はいません", inline=False)
         e.set_author(
-            name=f"{ctx.author}(ID:{ctx.author.id})", icon_url=ctx.author.avatar_url)
+            name=f"{ctx.author}(ID:{ctx.author.id})", icon_url=ctx.author.avatar.url)
         e.set_footer(text=get_txt(ctx.guild.id, "voting")[5])
         m = await ctx.reply(embed=e)
         await m.add_reaction(Official_emojis["check5"])
@@ -89,4 +89,4 @@ class PanelCog(commands.Cog):
 def setup(_bot):
     global bot
     bot = _bot
-    _bot.add_cog(PanelCog(_bot))
+    _bot.add_cog(PanelCog(_bot), override=True)

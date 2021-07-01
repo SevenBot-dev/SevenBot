@@ -20,7 +20,7 @@ from common_resources.tools import (flatten, convert_timedelta)
 
 async def punish(target, p):
     if p["action"] == "mute":
-        dt = datetime.datetime.utcnow(
+        dt = discord.utils.utcnow(
         ) + datetime.timedelta(seconds=p["length"])
         sdt = dt.strftime(Time_format)
         Guild_settings[target.guild.id]["muted"][target.id] = sdt
@@ -128,7 +128,7 @@ class ModerationCog(commands.Cog):
                     return m.author.id == tmp_user.id
                 checks.append(tmp)
             elif k == "length":
-                dt = datetime.datetime.utcnow() - convert_timedelta(v)
+                dt = discord.utils.utcnow() - convert_timedelta(v)
 
                 def tmp(m):
                     return m.created_at > dt
@@ -303,7 +303,7 @@ class ModerationCog(commands.Cog):
         em = discord.Embed(title=get_txt(ctx.guild.id, "fatal_role_dm_title").format(
             ctx.guild.name), description=message, color=Chat)
         em.set_author(name=f"{ctx.author}(ID:{ctx.author.id})",
-                      icon_url=ctx.author.avatar_url)
+                      icon_url=ctx.author.avatar.url)
         for m in role.members:
             c += 1
             await asyncio.sleep(5)
@@ -500,7 +500,7 @@ class ModerationCog(commands.Cog):
                 title=f"`{u.display_name}`のミュートを解除しました。", color=Success)
             await ctx.reply(embed=e)
         else:
-            dt = datetime.datetime.utcnow() + time
+            dt = discord.utils.utcnow() + time
             sdt = dt.strftime(Time_format)
             Guild_settings[ctx.guild.id]["muted"][u.id] = sdt
             e = discord.Embed(
@@ -512,4 +512,4 @@ def setup(_bot):
     global bot
     bot = _bot
 #     logging.info("cog.py reloaded")
-    _bot.add_cog(ModerationCog(_bot))
+    _bot.add_cog(ModerationCog(_bot), override=True)

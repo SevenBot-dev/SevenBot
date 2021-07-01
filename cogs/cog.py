@@ -359,7 +359,7 @@ class MainCog(commands.Cog):
             return
         if message.author.id in GBan.keys():
             return
-        if (message.channel.id in Guild_settings[message.guild.id]["deactivate_command"]) and not message.author.permissions_in(message.channel).manage_channels:
+        if (message.channel.id in Guild_settings[message.guild.id]["deactivate_command"]) and not message.channel.permissions_for(message.author).manage_channels:
             if is_command(message):
                 e = discord.Embed(
                     title="このチャンネルではコマンドを使用できません。", description="ここでコマンドを実行するには`チャンネルを管理`が必要です。", color=Error)
@@ -392,7 +392,7 @@ class MainCog(commands.Cog):
             return
         ls = list(Guild_settings[message.guild.id]["muted"].keys())
         if message.author.id in ls:
-            dt = datetime.datetime.utcnow()
+            dt = discord.utils.utcnow()
             mtr = Guild_settings[message.guild.id]["muted"][au]
             mt = datetime.datetime.strptime(mtr, Time_format)
             if mt > dt:
@@ -432,7 +432,7 @@ class MainCog(commands.Cog):
                 e2 = discord.Embed(title="あなたはミュートされています。", info=Error)
                 await message.author.send(embed=e2)
             else:
-                dt = datetime.datetime.utcnow()
+                dt = discord.utils.utcnow()
                 flag = True
                 g = Sevennet_replies.get(message.author.id)
                 if g is not None:
@@ -486,9 +486,9 @@ class MainCog(commands.Cog):
                     mid = hashlib.md5(
                         str(message.id).encode()).hexdigest()[0:8]
                     e.set_author(name=f"{message.author}(ID:{message.author.id})",
-                                 icon_url=message.author.avatar_url_as(static_format="png"))
+                                 icon_url=message.author.avatar.url)
                     e.set_footer(text=f"Server: {message.guild.name} | ID: {mid} | ±0 ( +0 / -0 )",
-                                 icon_url=message.guild.icon_url_as(static_format="png"))
+                                 icon_url=message.guild.icon.url)
                     mids = []
                     cs = []
                     for c in Sevennet_channels:
@@ -516,7 +516,7 @@ class MainCog(commands.Cog):
                     e = discord.Embed(
                         title=get_txt(message.guild.id, "trans_after"), description=tr, color=Trans)
                     e.set_author(
-                        name=f"{message.author.name}(ID:{message.author.id})", icon_url=message.author.avatar_url)
+                        name=f"{message.author.name}(ID:{message.author.id})", icon_url=message.author.avatar.url)
                     e.set_footer(text="Powered by async_google_trans_new",
                                  icon_url="https://i.imgur.com/zPOogXx.png")
                     await message.reply(embed=e)
@@ -537,7 +537,7 @@ class MainCog(commands.Cog):
                 ch_webhooks, name="sevenbot-2ch-link-webhook")
             if webhook is None:
                 g = self.bot.get_guild(Official_discord_id)
-                a = g.icon_url_as(format="png")
+                a = g.icon.url
                 webhook = await message.channel.create_webhook(name="sevenbot-2ch-link-webhook", avatar=await a.read())
             if flag:
                 e = discord.Embed(title="負荷をかけないでください！",
@@ -547,7 +547,7 @@ class MainCog(commands.Cog):
                 await webhook.send(content=res,
                                    username=message.author.display_name,
                                    allowed_mentions=discord.AllowedMentions.none(),
-                                   avatar_url=message.author.avatar_url_as(
+                                   avatar_url=message.author.avatar.url_as(
                                        format="png"),
                                    files=message.attachments,
                                    embeds=message.embeds)
@@ -662,7 +662,7 @@ class MainCog(commands.Cog):
             e = discord.Embed(title=get_txt(ctx.guild.id, "help_categories")[0],
                               description=desc, url="https://sevenbot.jp/commands", color=Bot_info)
             e.set_author(
-                name=f"{ctx.author.display_name}(ID:{ctx.author.id})", icon_url=ctx.author.avatar_url)
+                name=f"{ctx.author.display_name}(ID:{ctx.author.id})", icon_url=ctx.author.avatar.url)
             return await ctx.reply(embed=e)
         elif detail == "uses":
             desc = ""
@@ -674,7 +674,7 @@ class MainCog(commands.Cog):
             e = discord.Embed(title=get_txt(ctx.guild.id, "help_ranking"),
                               description=desc, color=Bot_info)
             e.set_author(
-                name=f"{ctx.author.display_name}(ID:{ctx.author.id})", icon_url=ctx.author.avatar_url)
+                name=f"{ctx.author.display_name}(ID:{ctx.author.id})", icon_url=ctx.author.avatar.url)
             e.set_footer(
                 text=get_txt(ctx.guild.id, "help_categories")[3])
             return await ctx.reply(embed=e)
@@ -688,7 +688,7 @@ class MainCog(commands.Cog):
             e = discord.Embed(title=get_txt(ctx.guild.id, "help_categories")[2].format(detail),
                               description=desc, color=Bot_info, url="https://sevenbot.jp/commands#category-" + detail)
             e.set_author(
-                name=f"{ctx.author.display_name}(ID:{ctx.author.id})", icon_url=ctx.author.avatar_url)
+                name=f"{ctx.author.display_name}(ID:{ctx.author.id})", icon_url=ctx.author.avatar.url)
             e.set_footer(
                 text=get_txt(ctx.guild.id, "help_categories")[3])
             return await ctx.reply(embed=e)
@@ -698,7 +698,7 @@ class MainCog(commands.Cog):
                 c = self.bot.get_command(detail)
                 if c.hidden:
                     e = SEmbed(title=get_txt(ctx.guild.id, "help_title") + " - " + str(c), description=get_txt(ctx.guild.id, "help_hidden"),
-                               color=Bot_info, author=SAuthor(name=f"{ctx.author.display_name}(ID:{ctx.author.id})", icon_url=ctx.author.avatar_url))
+                               color=Bot_info, author=SAuthor(name=f"{ctx.author.display_name}(ID:{ctx.author.id})", icon_url=ctx.author.avatar.url))
                     return await ctx.reply(embed=e)
                 desc_txt = get_txt(ctx.guild.id, "help_detail").get(str(
                     c), get_txt(ctx.guild.id, "help_detail_none")).lstrip("\n ")
@@ -728,7 +728,7 @@ class MainCog(commands.Cog):
                 e.add_field(name=get_txt(ctx.guild.id, "help_detail_count")[0],
                             value=get_txt(ctx.guild.id, "help_detail_count")[1].format(Command_counter.get(str(c).split()[0], 0)), inline=False)
                 e.set_author(
-                    name=f"{ctx.author.display_name}(ID:{ctx.author.id})", icon_url=ctx.author.avatar_url)
+                    name=f"{ctx.author.display_name}(ID:{ctx.author.id})", icon_url=ctx.author.avatar.url)
                 return await ctx.reply(embed=e)
             else:
                 e = discord.Embed(title=get_txt(ctx.guild.id, "help_title") + " - " + detail,
@@ -881,7 +881,7 @@ class MainCog(commands.Cog):
             return
         if m.embeds[0].title == get_txt(g.id, "voting")[0]:
             mt = m.embeds[0].timestamp
-            n = datetime.datetime.utcnow()
+            n = discord.utils.utcnow()
             if mt < n:
                 return
             me = m.embeds[0]
@@ -890,7 +890,6 @@ class MainCog(commands.Cog):
                 select.append(f.split("：", 1)[-1])
             s = ""
             cl = []
-            m = await c.fetch_message(pl.message_id)
             for rc in m.reactions:
                 if rc.count not in cl:
                     cl.append(rc.count)
@@ -965,7 +964,7 @@ class MainCog(commands.Cog):
                         pass
                 return
             elif pl.emoji.name == "reply":
-                dt = datetime.datetime.utcnow()
+                dt = discord.utils.utcnow()
                 dt += datetime.timedelta(seconds=10)
                 Sevennet_replies[user.id] = [mid, dt]
                 await message.remove_reaction(pl.emoji, user)
@@ -982,7 +981,7 @@ class MainCog(commands.Cog):
                 p = ""
             sg = self.bot.get_guild(pinf["guild"])
             m0.set_footer(
-                text=f"Server: {sg.name} | ID: {mid} | {p}{uc-dc} ( +{uc} / -{dc} )", icon_url=sg.icon_url_as(static_format="png"))
+                text=f"Server: {sg.name} | ID: {mid} | {p}{uc-dc} ( +{uc} / -{dc} )", icon_url=sg.icon.url)
             loop = asyncio.get_event_loop()
             for channel in pinf["messages"]:
                 cn = self.bot.get_channel(channel[0])
@@ -1026,7 +1025,7 @@ class MainCog(commands.Cog):
             elif message.embeds[0].title == "募集":
                 ft = m0.footer.text
                 mt = m0.timestamp
-                n = datetime.datetime.utcnow()
+                n = discord.utils.utcnow()
                 guild = self.bot.get_guild(pl.guild_id)
                 user = guild.get_member(pl.user_id)
                 cm = m0.fields[2].value.split("\n")
@@ -1065,7 +1064,7 @@ class MainCog(commands.Cog):
             elif message.embeds[0].title == "チケット作成":
                 await message.remove_reaction(pl.emoji, user)
                 if pl.emoji.name == "add":
-                    dt = datetime.datetime.utcnow()
+                    dt = discord.utils.utcnow()
                     if user.id in list(Guild_settings[guild.id]["ticket_time"].keys()):
                         ldt = datetime.datetime.strptime(
                             Guild_settings[guild.id]["ticket_time"][user.id], Time_format)
@@ -1103,7 +1102,7 @@ class MainCog(commands.Cog):
                 mt = message.embeds[0].timestamp
                 if not mt:
                     return
-                n = datetime.datetime.utcnow()
+                n = discord.utils.utcnow()
                 if mt < n:
                     return
                 loop = asyncio.get_event_loop()
@@ -1238,7 +1237,7 @@ class MainCog(commands.Cog):
 
     @commands.command()
     async def ping(self, ctx):
-        starttime = datetime.datetime.utcnow()
+        starttime = discord.utils.utcnow()
         ctime = ctx.message.created_at
         e = discord.Embed(title=get_txt(ctx.guild.id, "ping_title"),
                           description=get_txt(ctx.guild.id, "wait"), color=Bot_info)
@@ -1495,7 +1494,7 @@ class MainCog(commands.Cog):
             u.display_name), color=Info)
         if used_api:
             e.title += get_txt(ctx.guild.id, "lookup")[12]
-        e.set_thumbnail(url=u.avatar_url_as(static_format="png"))
+        e.set_thumbnail(url=u.avatar.url)
         e.add_field(name=Texts[Guild_settings[ctx.guild.id]
                                ["lang"]]["lookup"][1], value=u.display_name)
         e.add_field(name=Texts[Guild_settings[ctx.guild.id]
@@ -1549,8 +1548,8 @@ class MainCog(commands.Cog):
         e = discord.Embed(title=guild.name + " - "
                           + f"`{guild.id}`", color=Info, timestamp=guild.created_at)
         e.set_author(name=f"{guild.owner.display_name}({guild.owner}, ID:{guild.owner.id})",
-                     icon_url=guild.owner.avatar_url_as(static_format="png"))
-        e.set_thumbnail(url=guild.icon_url_as(static_format="png"))
+                     icon_url=guild.owner.avatar.url)
+        e.set_thumbnail(url=guild.icon.url)
         chs = str(Official_emojis["cc"]) + " " + get_txt(ctx.guild.id, "serverinfo")[
             "channels"][1] + ":" + str(len(guild.categories)) + "\n"
         chs += str(Official_emojis["tc"]) + " " + get_txt(ctx.guild.id, "serverinfo")[
@@ -1589,7 +1588,7 @@ class MainCog(commands.Cog):
             e2 = discord.Embed(
                 title="SevenNetに仲間が入ってきた!", description=f"{ctx.guild.name}がSevenNetに参加しました！", timestamp=ctx.message.created_at, color=Chat)
             e2.set_thumbnail(
-                url=ctx.guild.icon_url_as(static_format='png'))
+                url=ctx.guild.icon.url)
             e2.set_footer(text=f"現在のチャンネル数：{len(Sevennet_channels)+1}")
             for c in Sevennet_channels:
                 cn = self.bot.get_channel(c)
@@ -1625,7 +1624,7 @@ class MainCog(commands.Cog):
             await ctx.reply(embed=e)
             e2 = discord.Embed(
                 title="SevenNetの仲間が抜けちゃった…", description=f"{ctx.guild.name}がSevenNetから退出しました。", timestamp=ctx.message.created_at, color=Chat)
-            e2.set_thumbnail(url=ctx.guild.icon_url)
+            e2.set_thumbnail(url=ctx.guild.icon.url)
             e2.set_footer(text=f"現在のチャンネル数：{len(Sevennet_channels)}")
             for c in Sevennet_channels:
                 cn = self.bot.get_channel(c)
@@ -1959,7 +1958,7 @@ class MainCog(commands.Cog):
 def setup(_bot):
     global bot
     bot = _bot
-    _bot.add_cog(MainCog(_bot))
+    _bot.add_cog(MainCog(_bot), override=True)
 
     @bot.before_invoke
     async def count_commands(ctx):

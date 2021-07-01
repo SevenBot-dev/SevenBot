@@ -99,7 +99,7 @@ class AdminCog(commands.Cog):
                             ch_webhooks, name=whname)
                         if webhook is None:
                             g = self.bot.get_guild(Official_discord_id)
-                            a = g.icon_url_as(format="png")
+                            a = g.icon.url
                             webhook = await cn.create_webhook(name=whname, avatar=await a.read())
                         un = "SevenBot GMute System"
                         loop.create_task(
@@ -174,10 +174,10 @@ class AdminCog(commands.Cog):
                     color=Chat)
                 e3.set_author(
                     name=f"{message.author.name}(ID:{message.author.id})",
-                    icon_url=message.author.avatar_url)
+                    icon_url=message.author.avatar.url)
                 e3.set_footer(
                     text=f"{message.guild.name}(ID:{message.guild.id})",
-                    icon_url=message.guild.icon_url)
+                    icon_url=message.guild.icon.url)
                 await ctx.send(embed=e3)
             else:
                 await ctx.send(f"{message.author.name}:", embed=message.embeds[0])
@@ -339,7 +339,7 @@ class AdminCog(commands.Cog):
                             ch_webhooks, name=whname)
                         if webhook is None:
                             g = self.bot.get_guild(Official_discord_id)
-                            a = g.icon_url_as(format="png")
+                            a = g.icon.url
                             webhook = await cn.create_webhook(name=whname, avatar=await a.read())
                         un = "SevenBot GBan System"
                         loop.create_task(
@@ -474,4 +474,4 @@ def setup(_bot):
     global bot
     bot = _bot
 #     logging.info("cog.py reloaded")
-    _bot.add_cog(AdminCog(_bot))
+    _bot.add_cog(AdminCog(_bot), override=True)

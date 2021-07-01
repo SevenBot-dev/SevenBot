@@ -63,7 +63,7 @@ class MessageExpandCog(commands.Cog):
                     except BaseException:
                         pass
                     em.set_author(name=m.author.display_name,
-                                  icon_url=m.author.avatar_url_as(static_format="png"))
+                                  icon_url=m.author.avatar.url)
                     footer = Texts[Guild_settings[message.guild.id]
                                    ["lang"]]["expand_message_footer"].format(m.channel)
                     if not ids[0] == message.guild.id:
@@ -71,11 +71,11 @@ class MessageExpandCog(commands.Cog):
                                        ["lang"]]["expand_message_footer3"].format(m.guild.name) + footer
                     if m.embeds == []:
                         em.set_footer(text=footer, icon_url=self.bot.get_guild(
-                            ids[0]).icon_url_as(static_format="png"))
+                            ids[0]).icon.url)
                         await message.reply(embed=em)
                     else:
                         em.set_footer(text=footer + Texts[Guild_settings[message.guild.id]["lang"]]
-                                      ["expand_message_footer2"].format(len(m.embeds)), icon_url=self.bot.get_guild(ids[0]).icon_url_as(static_format="png"))
+                                      ["expand_message_footer2"].format(len(m.embeds)), icon_url=self.bot.get_guild(ids[0]).icon.url)
                         await components.reply(message, embeds=[em] + m.embeds[:9])
                 except Exception as er:
                     e = discord.Embed(title=get_txt(message.guild.id, "expand_message_fail"),
@@ -121,4 +121,4 @@ class MessageExpandCog(commands.Cog):
 def setup(_bot):
     global bot
     bot = _bot
-    _bot.add_cog(MessageExpandCog(_bot))
+    _bot.add_cog(MessageExpandCog(_bot), override=True)

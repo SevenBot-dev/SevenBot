@@ -33,7 +33,7 @@ class BumpCog(commands.Cog):
             try:
                 if message.embeds[0].image != discord.Embed().Empty:
                     if "disboard.org/images/bot-command-image-bump.png" in str(message.embeds[0].image.url):
-                        dt = datetime.datetime.utcnow()
+                        dt = discord.utils.utcnow()
                         dt += datetime.timedelta(hours=2)
                         sdt = dt.strftime(Time_format)
                         Bump_alerts[message.guild.id] = [
@@ -47,7 +47,7 @@ class BumpCog(commands.Cog):
             try:
                 if message.embeds[0].fields:
                     if message.guild.name in message.embeds[0].fields[0].name:
-                        dt = datetime.datetime.utcnow()
+                        dt = discord.utils.utcnow()
                         dt += datetime.timedelta(hours=1)
                         sdt = dt.strftime(Time_format)
                         Dissoku_alerts[message.guild.id] = [
@@ -69,7 +69,7 @@ class BumpCog(commands.Cog):
             try:
                 bt = datetime.datetime.strptime(
                     Bump_alerts[gi][0], Time_format)
-                nt = datetime.datetime.utcnow()
+                nt = discord.utils.utcnow()
                 if bt < nt:
                     e = discord.Embed(title=get_txt(gi, "bump_alert"),
                                       description=get_txt(gi, "bump_alert_desc"), color=Bump_color)
@@ -91,7 +91,7 @@ class BumpCog(commands.Cog):
             try:
                 bt = datetime.datetime.strptime(
                     Dissoku_alerts[gi][0], Time_format)
-                nt = datetime.datetime.utcnow()
+                nt = discord.utils.utcnow()
                 if bt < nt:
                     e = discord.Embed(title=get_txt(gi, "dissoku_alert"),
                                       description=get_txt(gi, "dissoku_alert_desc"), color=Dissoku_color)
@@ -211,4 +211,4 @@ class BumpCog(commands.Cog):
 def setup(_bot):
     global bot
     bot = _bot
-    _bot.add_cog(BumpCog(_bot))
+    _bot.add_cog(BumpCog(_bot), override=True)

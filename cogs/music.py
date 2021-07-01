@@ -515,16 +515,16 @@ class MusicCog(commands.Cog):
                         info.get("description", get_txt(g.id, "no_desc")).split("\n")[:8]), color=Success)
                     e.set_thumbnail(url=info["thumbnails"][-1]["url"])
                     e.set_author(
-                        name=f"{u_req.display_name}(ID:{u_req.id})", icon_url=u_req.avatar_url_as(static_format="png"))
+                        name=f"{u_req.display_name}(ID:{u_req.id})", icon_url=u_req.avatar.url)
                     e.set_footer(text=get_txt(g.id, "yt_footer").format(
                         c, len(Queues[voice.channel.id][0]), rf))
                     add_fav_component.enabled = True
                     loop.create_task(components.edit(msg, embed=e, components=[add_fav_component]))
                     loop.create_task(self.wait_favorite_add(msg, add_fav_component, au, u))
-                    tdt = datetime.datetime.utcnow()
+                    tdt = discord.utils.utcnow()
                     tdt += datetime.timedelta(seconds=info["duration"])
                     while True:
-                        dt = datetime.datetime.utcnow()
+                        dt = discord.utils.utcnow()
                         if dt > tdt or Queues[voice.channel.id][2] or Queues[voice.channel.id][5]:
                             Queues[voice.channel.id][2] = False
                             break
@@ -552,7 +552,7 @@ class MusicCog(commands.Cog):
                 e = discord.Embed(title=f"`{info['title']}`" + get_txt(g.id, "yt_queued"), url=get_url(info), description="\n".join(
                     info.get("description", get_txt(g.id, "no_desc")).split("\n")[:8]), color=Success)
                 e.set_author(
-                    name=f"{au.display_name}(ID:{au.id})", icon_url=au.avatar_url)
+                    name=f"{au.display_name}(ID:{au.id})", icon_url=au.avatar.url)
                 e.set_footer(text=get_txt(g.id, "yt_queued_footer").format(
                     len(Queues[voice.channel.id][0])))
                 e.set_thumbnail(url=info["thumbnails"][-1]["url"])
@@ -900,4 +900,4 @@ def setup(_bot):
     bot = _bot
     Queues = _bot.consts["qu"]
 #     logging.info("cog.py reloaded")
-    _bot.add_cog(MusicCog(_bot))
+    _bot.add_cog(MusicCog(_bot), override=True)
