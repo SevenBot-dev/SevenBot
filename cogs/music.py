@@ -317,7 +317,7 @@ class MusicCog(commands.Cog):
                 components.Button("キャンセル", custom_id="favorite_cancel", style=components.ButtonType.danger)
             ]
         ]
-        msg = await components.send(cn, embed=e, components=buttons)
+        msg = await components.reply(ctx, embed=e, components=buttons)
         ga = []
         for nm in Number_emojis[1:(len(res) + 1 if len(res) + 1 < 10 else 11)]:
             loop.create_task(msg.add_reaction(nm))

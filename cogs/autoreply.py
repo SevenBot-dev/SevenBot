@@ -200,7 +200,7 @@ class AutoreplyCog(commands.Cog):
                 components.Button("次のページ", "right", style=2),
                 components.Button("終了", "exit", style=4),
             ]
-            msg = await components.send(ctx, embed=e, reference=ctx.message.to_reference(), components=buttons)
+            msg = await components.reply(ctx, embed=e, components=buttons)
             page = 0
             while True:
                 try:
