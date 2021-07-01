@@ -4,7 +4,7 @@ import os
 import aiohttp
 import discord
 from discord import Forbidden
-from discord.ext import commands  # , tasks
+from discord.ext import commands, components  # , tasks
 from sembed import SEmbed  # SAuthor, SField, SFooter
 
 import _pathmagic  # type: ignore # noqa
@@ -468,6 +468,30 @@ class AdminCog(commands.Cog):
     async def testpre(self, ctx):
         game = discord.Game(hash(ctx.message.id))
         await self.bot.change_presence(status=discord.Status.idle, activity=game)
+
+    @commands.command(hidden=True)
+    @commands.is_owner()
+    async def shutdown(self, ctx=None):
+        msg = await components.send(ctx, "シャットダウンしますか？", components=[components.Button("する", "shutdown_yes", style=components.ButtonType.danger), components.Button("しない", "shutdown_no", style=components.ButtonType.secondary)])
+        com = await self.bot.wait_for("button_click", check=lambda c: c.message == msg)
+        if com.custom_id == "shutdown_yes":
+            with open("./shutdown", "w"):
+                pass
+            await com.send("シャットダウンします...")
+        else:
+            await com.send("キャンセルされました。")
+
+    @commands.command(hidden=True)
+    @commands.is_owner()
+    async def reboot(self, ctx=None):
+        msg = await components.send(ctx, "再起動しますか？", components=[components.Button("する", "reboot_yes", style=components.ButtonType.danger), components.Button("しない", "reboot_no", style=components.ButtonType.secondary)])
+        com = await self.bot.wait_for("button_click", check=lambda c: c.message == msg)
+        if com.custom_id == "reboot_yes":
+            with open("./reboot", "w"):
+                pass
+            await com.send("再起動します...")
+        else:
+            await com.send("キャンセルされました。")
 
 
 def setup(_bot):
