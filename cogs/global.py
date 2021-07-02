@@ -117,7 +117,7 @@ class GlobalCog(commands.Cog):
                         deletes.append(c)
                         continue
                     else:
-                        if cn.permissions_for(self.bot.user).manage_webhooks:
+                        if cn.permissions_for(cn.guild.me).manage_webhooks:
                             if not c == message.channel.id:
                                 ga.append(single_send(cn))
                                 # await
@@ -172,7 +172,7 @@ class GlobalCog(commands.Cog):
                         deletes.append(c)
                         continue
                     else:
-                        if cn.permissions_for(self.bot.user).manage_webhooks:
+                        if cn.permissions_for(cn.guild.me).manage_webhooks:
                             if not c == message.channel.id:
                                 ga.append(single_send(cn))
                 loop.create_task(message.add_reaction(
@@ -232,7 +232,7 @@ class GlobalCog(commands.Cog):
             else:
                 # print(cn)
                 try:
-                    if cn.permissions_for(self.bot.user).manage_webhooks:
+                    if cn.permissions_for(cn.guild.me).manage_webhooks:
                         if not c == message.channel.id:
                             ch_webhooks = await cn.webhooks()
                             webhook = discord.utils.get(
@@ -303,7 +303,7 @@ class GlobalCog(commands.Cog):
                             await cn.send(embed=e3)
                 except discord.HTTPException:
                     pass
-        if not message.channel.permissions_for(self.bot.user).manage_webhooks:
+        if not message.channel.permissions_for(message.guild.me).manage_webhooks:
             await message.delete()
         for d in deletes:
             each.remove(d)
