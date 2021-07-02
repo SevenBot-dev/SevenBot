@@ -67,26 +67,28 @@ class BumpCog(commands.Cog):
                 e = discord.Embed(title=get_txt(guild, "bump_alert"),
                                   description=get_txt(guild, "bump_alert_desc"), color=Bump_color)
                 c = self.bot.get_channel(channel)
-                m = ""
-                if Guild_settings[c.guild.id]["bump_role"]:
-                    r = c.guild.get_role(
-                        Guild_settings[c.guild.id]["bump_role"])
-                    if r:
-                        m = r.mention
+                if c is not None:
+                    m = ""
+                    if Guild_settings[guild]["bump_role"]:
+                        r = c.guild.get_role(
+                            Guild_settings[guild]["bump_role"])
+                        if r:
+                            m = r.mention
                 await c.send(content=m, embed=e, allowed_mentions=discord.AllowedMentions(roles=True))
                 del Bump_alerts[guild]
         for guild, (alert_time, channel) in Dissoku_alerts.items():
             if alert_time < time.time():
                 e = discord.Embed(title=get_txt(guild, "dissoku_alert"),
                                   description=get_txt(guild, "dissoku_alert_desc"), color=Dissoku_color)
-                c = self.bot.get_channel(channel)
-                m = ""
-                if Guild_settings[c.guild.id]["dissoku_role"]:
-                    r = c.guild.get_role(
-                        Guild_settings[c.guild.id]["dissoku_role"])
-                    if r:
-                        m = r.mention
-                await c.send(content=m, embed=e, allowed_mentions=discord.AllowedMentions(roles=True))
+                if c is not None:
+                    c = self.bot.get_channel(channel)
+                    m = ""
+                    if Guild_settings[guild]["dissoku_role"]:
+                        r = c.guild.get_role(
+                            Guild_settings[guild]["dissoku_role"])
+                        if r:
+                            m = r.mention
+                    await c.send(content=m, embed=e, allowed_mentions=discord.AllowedMentions(roles=True))
                 del Dissoku_alerts[guild]
 
     @commands.group(invoke_without_command=True)
