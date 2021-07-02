@@ -1,4 +1,5 @@
 import datetime
+import time
 from typing import Optional
 
 import discord
@@ -61,52 +62,32 @@ class BumpCog(commands.Cog):
 
     @tasks.loop(seconds=10)
     async def batch_bump_alert(self):
-
-        for rg in self.bot.guilds:
-            gi = rg.id
-            if gi not in Bump_alerts.keys():
-                continue
-            try:
-                bt = datetime.datetime.strptime(
-                    Bump_alerts[gi][0], Time_format)
-                nt = discord.utils.utcnow()
-                if bt < nt:
-                    e = discord.Embed(title=get_txt(gi, "bump_alert"),
-                                      description=get_txt(gi, "bump_alert_desc"), color=Bump_color)
-                    c = self.bot.get_channel(Bump_alerts[gi][1])
-                    m = ""
-                    if Guild_settings[c.guild.id]["bump_role"]:
-                        r = c.guild.get_role(
-                            Guild_settings[c.guild.id]["bump_role"])
-                        if r:
-                            m = r.mention
-                    await c.send(content=m, embed=e, allowed_mentions=discord.AllowedMentions(roles=True))
-                    del Bump_alerts[gi]
-
-            except BaseException:
-                pass
-        for gi, gs in Guild_settings.items():
-            if gi not in Dissoku_alerts.keys():
-                continue
-            try:
-                bt = datetime.datetime.strptime(
-                    Dissoku_alerts[gi][0], Time_format)
-                nt = discord.utils.utcnow()
-                if bt < nt:
-                    e = discord.Embed(title=get_txt(gi, "dissoku_alert"),
-                                      description=get_txt(gi, "dissoku_alert_desc"), color=Dissoku_color)
-                    c = self.bot.get_channel(Dissoku_alerts[gi][1])
-                    m = ""
-                    if Guild_settings[c.guild.id]["dissoku_role"]:
-                        r = c.guild.get_role(
-                            Guild_settings[c.guild.id]["dissoku_role"])
-                        if r:
-                            m = r.mention
-                    await c.send(content=m, embed=e, allowed_mentions=discord.AllowedMentions(roles=True))
-                    del Dissoku_alerts[gi]
-
-            except Exception:
-                pass
+        for guild, (alert_time, channel) in Bump_alerts.items():
+            if alert_time < time.time():
+                e = discord.Embed(title=get_txt(guild, "bump_alert"),
+                                  description=get_txt(guild, "bump_alert_desc"), color=Bump_color)
+                c = self.bot.get_channel(channel)
+                m = ""
+                if Guild_settings[c.guild.id]["bump_role"]:
+                    r = c.guild.get_role(
+                        Guild_settings[c.guild.id]["bump_role"])
+                    if r:
+                        m = r.mention
+                await c.send(content=m, embed=e, allowed_mentions=discord.AllowedMentions(roles=True))
+                del Bump_alerts[guild]
+        for guild, (alert_time, channel) in Dissoku_alerts.items():
+            if alert_time < time.time():
+                e = discord.Embed(title=get_txt(guild, "dissoku_alert"),
+                                  description=get_txt(guild, "dissoku_alert_desc"), color=Dissoku_color)
+                c = self.bot.get_channel(channel)
+                m = ""
+                if Guild_settings[c.guild.id]["dissoku_role"]:
+                    r = c.guild.get_role(
+                        Guild_settings[c.guild.id]["dissoku_role"])
+                    if r:
+                        m = r.mention
+                await c.send(content=m, embed=e, allowed_mentions=discord.AllowedMentions(roles=True))
+                del Dissoku_alerts[guild]
 
     @commands.group(invoke_without_command=True)
     @commands.has_permissions(manage_messages=True)
