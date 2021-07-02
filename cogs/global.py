@@ -75,7 +75,7 @@ class GlobalCog(commands.Cog):
                     if webhook is None:
                         g = self.bot.get_guild(
                             Official_discord_id)
-                        a = g.icon.url
+                        a = g.icon
                         webhook = await cn.create_webhook(name=whname, avatar=await a.read())
                     fl = []
                     for at in message.attachments:
@@ -148,7 +148,7 @@ class GlobalCog(commands.Cog):
                     if webhook is None:
                         g = self.bot.get_guild(
                             Official_discord_id)
-                        a = g.icon.url
+                        a = g.icon
                         webhook = await cn.create_webhook(name=whname, avatar=await a.read())
                     fl = []
                     for at in message.attachments:
@@ -240,7 +240,7 @@ class GlobalCog(commands.Cog):
                             if webhook is None:
                                 g = self.bot.get_guild(
                                     Official_discord_id)
-                                a = g.icon.url
+                                a = g.icon
                                 webhook = await cn.create_webhook(name=whname, avatar=await a.read())
                             fl = []
                             for at in message.attachments:
@@ -606,7 +606,7 @@ class GlobalCog(commands.Cog):
                             if webhook is None:
                                 g = self.bot.get_guild(
                                     Official_discord_id)
-                                a = g.icon.url
+                                a = g.icon
                                 webhook = await cn.create_webhook(name="sevenbot-private-webhook-" + channel, avatar=await a.read())
                             fl = []
                             un = "SevenBot Personal Global"
@@ -699,7 +699,7 @@ class GlobalCog(commands.Cog):
                     if webhook is None:
                         g = self.bot.get_guild(
                             Official_discord_id)
-                        a = g.icon.url
+                        a = g.icon
                         webhook = await cn.create_webhook(name="sevenbot-global-webhook", avatar=await a.read())
                     fl = []
                     un = "SevenBot Global"
@@ -748,7 +748,7 @@ class GlobalCog(commands.Cog):
                     if webhook is None:
                         g = self.bot.get_guild(
                             Official_discord_id)
-                        a = g.icon.url
+                        a = g.icon
                         webhook = await cn.create_webhook(name="sevenbot-private-webhook-" + pk, avatar=await a.read())
                     fl = []
                     un = "SevenBot Personal Global"
