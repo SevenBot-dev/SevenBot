@@ -181,7 +181,7 @@ class GlobalCog(commands.Cog):
 
     async def send_mute(self, message):
         await message.delete()
-        e2 = discord.Embed(title="あなたはミュートされています。", info=Error)
+        e2 = discord.Embed(title="あなたはミュートされています。", color=Error)
         await message.author.send(embed=e2)
 
     async def send_messages(self, message, *, username=None, embed=None):
