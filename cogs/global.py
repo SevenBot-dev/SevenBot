@@ -1,3 +1,4 @@
+# -*- ignore_on_debug -*-
 import asyncio
 import hashlib
 import io

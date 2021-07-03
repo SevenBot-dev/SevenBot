@@ -1,3 +1,4 @@
+# -*- ignore_on_debug -*-
 import time
 from typing import Optional
 

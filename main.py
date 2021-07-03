@@ -130,6 +130,9 @@ class SevenBot(commands.Bot):
         bot.load_extension("discord.ext.components")
         for o in os.listdir("./cogs"):
             if o.endswith(".py") and not o.startswith("_"):
+                with open(f"./cogs/{o}") as f:
+                    if f.read().startswith("# -*- ignore_on_debug -*-") and self.debug:
+                        continue
                 bot.load_extension("cogs." + os.path.splitext(os.path.basename(o))[0])
         self.levenshtein = levenshtein.Levenshtein(self, max_length=1)
         print("on_ready done")
