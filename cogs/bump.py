@@ -46,7 +46,7 @@ class BumpCog(commands.Cog):
                 if message.embeds[0].fields:
                     if message.guild.name in message.embeds[0].fields[0].name:
                         Dissoku_alerts[message.guild.id] = [
-                            time.time() + 3600 * 2, message.channel.id]
+                            time.time() + 3600, message.channel.id]
                         e = discord.Embed(title=get_txt(message.guild.id, "dissoku_detected"),
                                           description=get_txt(message.guild.id, "dissoku_detected_desc"), color=Dissoku_color)
                         await message.channel.send(embed=e)
