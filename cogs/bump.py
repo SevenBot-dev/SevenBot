@@ -1,4 +1,3 @@
-import datetime
 import time
 from typing import Optional
 
@@ -6,7 +5,7 @@ import discord
 from discord.ext import commands, tasks
 
 import _pathmagic  # type: ignore # noqa
-from common_resources.consts import Time_format, Activate_aliases, Error, Success, Deactivate_aliases
+from common_resources.consts import Activate_aliases, Error, Success, Deactivate_aliases
 
 Bump_id = 302050872383242240
 Dissoku_id = 761562078095867916
@@ -34,11 +33,8 @@ class BumpCog(commands.Cog):
             try:
                 if message.embeds[0].image != discord.Embed().Empty:
                     if "disboard.org/images/bot-command-image-bump.png" in str(message.embeds[0].image.url):
-                        dt = discord.utils.utcnow()
-                        dt += datetime.timedelta(hours=2)
-                        sdt = dt.strftime(Time_format)
                         Bump_alerts[message.guild.id] = [
-                            sdt, message.channel.id]
+                            time.time() + 3600 * 2, message.channel.id]
                         e = discord.Embed(title=get_txt(message.guild.id, "bump_detected"),
                                           description=get_txt(message.guild.id, "bump_detected_desc"), color=Bump_color)
                         await message.channel.send(embed=e)
@@ -48,11 +44,8 @@ class BumpCog(commands.Cog):
             try:
                 if message.embeds[0].fields:
                     if message.guild.name in message.embeds[0].fields[0].name:
-                        dt = discord.utils.utcnow()
-                        dt += datetime.timedelta(hours=1)
-                        sdt = dt.strftime(Time_format)
                         Dissoku_alerts[message.guild.id] = [
-                            sdt, message.channel.id]
+                            time.time() + 3600 * 2, message.channel.id]
                         e = discord.Embed(title=get_txt(message.guild.id, "dissoku_detected"),
                                           description=get_txt(message.guild.id, "dissoku_detected_desc"), color=Dissoku_color)
                         await message.channel.send(embed=e)
@@ -62,7 +55,7 @@ class BumpCog(commands.Cog):
 
     @tasks.loop(seconds=10)
     async def batch_bump_alert(self):
-        for guild, (alert_time, channel) in Bump_alerts.items():
+        for guild, (alert_time, channel) in list(Bump_alerts.items()):
             if alert_time < time.time():
                 e = discord.Embed(title=get_txt(guild, "bump_alert"),
                                   description=get_txt(guild, "bump_alert_desc"), color=Bump_color)
@@ -74,14 +67,14 @@ class BumpCog(commands.Cog):
                             Guild_settings[guild]["bump_role"])
                         if r:
                             m = r.mention
-                await c.send(content=m, embed=e, allowed_mentions=discord.AllowedMentions(roles=True))
+                    await c.send(content=m, embed=e, allowed_mentions=discord.AllowedMentions(roles=True))
                 del Bump_alerts[guild]
-        for guild, (alert_time, channel) in Dissoku_alerts.items():
+        for guild, (alert_time, channel) in list(Dissoku_alerts.items()):
             if alert_time < time.time():
                 e = discord.Embed(title=get_txt(guild, "dissoku_alert"),
                                   description=get_txt(guild, "dissoku_alert_desc"), color=Dissoku_color)
+                c = self.bot.get_channel(channel)
                 if c is not None:
-                    c = self.bot.get_channel(channel)
                     m = ""
                     if Guild_settings[guild]["dissoku_role"]:
                         r = c.guild.get_role(
