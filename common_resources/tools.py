@@ -10,14 +10,17 @@ from discord.ext import commands
 from discord_emoji.table import UNICODE_TO_DISCORD
 
 Datetime_re = re.compile(
-    r"(\d+[w(週間?)(weeks?)])?(\d+[d(日)(days?)])? ?(\d+[:h(時間)(hours?)])?(\d+[:m(分)(minutes?)])?(\d+[s(秒)seconds?)]?)?")
+    r"(\d+[w(週間?)(weeks?)])?(\d+[d(日)(days?)])? ?(\d+[:h(時間)(hours?)])?(\d+[:m(分)(minutes?)])?(\d+[s(秒)seconds?)]?)?"
+)
 Datetime_args = ["weeks", "days", "hours", "minutes", "seconds"]
 Shard_re = re.compile(r"(\d+)([^\d]+)?")
 
 
 def flatten(l):
     for el in l:
-        if isinstance(el, collections.abc.Iterable) and not isinstance(el, (str, bytes)):
+        if isinstance(el, collections.abc.Iterable) and not isinstance(
+            el, (str, bytes)
+        ):
             yield from flatten(el)
         else:
             yield el
@@ -88,7 +91,7 @@ def convert_timedelta(arg):
 def chrsize_len(text):
     count = 0
     for c in text:
-        if unicodedata.east_asian_width(c) in 'FWA':
+        if unicodedata.east_asian_width(c) in "FWA":
             count += 2
         else:
             count += 1
@@ -98,9 +101,21 @@ def chrsize_len(text):
 async def send_subcommands(ctx):
     desc = ""
     for c in ctx.command.commands:
-        desc += f"**`{c.name}`** " + (ctx.bot.get_txt(ctx.guild.id, "help_detail").get(str(c), "_" + ctx.bot.get_txt(ctx.guild.id, "help_detail_none") + "_")).split("\n")[0] + "\n"
-    e = discord.Embed(title=ctx.bot.get_txt(ctx.guild.id, "subcommand").format(ctx.command.name),
-                      description=desc, color=0x00ccff)
+        desc += (
+            f"**`{c.name}`** "
+            + (
+                ctx.bot.get_txt(ctx.guild.id, "help_detail").get(
+                    str(c),
+                    "_" + ctx.bot.get_txt(ctx.guild.id, "help_detail_none") + "_",
+                )
+            ).split("\n")[0]
+            + "\n"
+        )
+    e = discord.Embed(
+        title=ctx.bot.get_txt(ctx.guild.id, "subcommand").format(ctx.command.name),
+        description=desc,
+        color=0x00CCFF,
+    )
     await ctx.send(embed=e)
 
 

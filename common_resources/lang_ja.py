@@ -1,10 +1,7 @@
 import json
 import os
 
-Event_dict = {
-    "join": "参加時",
-    "leave": "退出時"
-}
+Event_dict = {"join": "参加時", "leave": "退出時"}
 Stat_dict = {
     "members": "メンバー数",
     "humans": "ユーザー数",
@@ -14,7 +11,7 @@ Stat_dict = {
     "channels": "チャンネル",
     "text_channels": "テキストチャンネル",
     "voice_channels": "ボイスチャンネル",
-    "roles": "ロール"
+    "roles": "ロール",
 }
 en = ""
 for ek, ev in Event_dict.items():
@@ -22,5 +19,7 @@ for ek, ev in Event_dict.items():
 st = ""
 for ek, ev in Stat_dict.items():
     st += f"{ek} - {ev}\n"
-with open(os.path.dirname(__file__) + "/../translations/ja/main.json", "r", encoding="utf8") as f:
+with open(
+    os.path.dirname(__file__) + "/../translations/ja/main.json", "r", encoding="utf8"
+) as f:
     JA_TEXTS = json.load(f)

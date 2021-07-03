@@ -8,7 +8,15 @@ from discord.ext import commands, components  # , tasks
 from sembed import SEmbed  # SAuthor, SField, SFooter
 
 import _pathmagic  # type: ignore # noqa
-from common_resources.consts import (Info, Success, Error, Chat, Process, Owner_ID, Official_discord_id)
+from common_resources.consts import (
+    Info,
+    Success,
+    Error,
+    Chat,
+    Process,
+    Owner_ID,
+    Official_discord_id,
+)
 
 
 ret = {}
@@ -62,12 +70,22 @@ class AdminCog(commands.Cog):
 
     @commands.command(hidden=True)
     async def gmute(self, ctx, uid: int, reason):
-        if not (ctx.author.id == Owner_ID or (self.bot.get_guild(715540925081714788) and discord.utils.found(lambda r: r.name == "Moderator", self.bot.get_guild(715540925081714788).get_member(ctx.author.id)))):
+        if not (
+            ctx.author.id == Owner_ID
+            or (
+                self.bot.get_guild(715540925081714788)
+                and discord.utils.found(
+                    lambda r: r.name == "Moderator",
+                    self.bot.get_guild(715540925081714788).get_member(ctx.author.id),
+                )
+            )
+        ):
             await SEmbed(get_txt(ctx.guild.id, "mod_only"))
             return
         user = await self.bot.fetch_user(uid)
-        e = discord.Embed(title=f"`{user}`をGMuteしますか？",
-                          description=f"```{reason}```", color=Process)
+        e = discord.Embed(
+            title=f"`{user}`をGMuteしますか？", description=f"```{reason}```", color=Process
+        )
         msg = await ctx.send(embed=e)
         await msg.add_reaction(Official_emojis["check5"])
         await msg.add_reaction(Official_emojis["check6"])
@@ -77,13 +95,13 @@ class AdminCog(commands.Cog):
                 return r.message.id == msg.id
             else:
                 return False
+
         try:
             r, u = await self.bot.wait_for("reaction_add", check=check, timeout=10)
             if r.emoji.name == "check5":
                 e = discord.Embed(
-                    title="`{user}`をGMuteしました。",
-                    description="",
-                    color=Success)
+                    title="`{user}`をGMuteしました。", description="", color=Success
+                )
                 msg = await msg.edit(embed=e)
                 Global_mute.append(user.id)
                 loop = asyncio.get_event_loop()
@@ -95,29 +113,30 @@ class AdminCog(commands.Cog):
                         Private_chats["gban"].remove(c)
                     else:
                         ch_webhooks = await cn.webhooks()
-                        webhook = discord.utils.get(
-                            ch_webhooks, name=whname)
+                        webhook = discord.utils.get(ch_webhooks, name=whname)
                         if webhook is None:
                             g = self.bot.get_guild(Official_discord_id)
                             a = g.icon.url
-                            webhook = await cn.create_webhook(name=whname, avatar=await a.read())
+                            webhook = await cn.create_webhook(
+                                name=whname, avatar=await a.read()
+                            )
                         un = "SevenBot GMute System"
                         loop.create_task(
                             webhook.send(
                                 content=f"**`{str(user)}` をGMuteしました。**\n理由：{reason}",
                                 username=un,
-                                avatar_url="https://i.imgur.com/Ij3u1OX.png"))
+                                avatar_url="https://i.imgur.com/Ij3u1OX.png",
+                            )
+                        )
                         # await
                         # webhook.edit(avater_url="https://i.imgur.com/JffqEAl.png")
 
             else:
-                e = discord.Embed(title="キャンセルしました。",
-                                  description="", color=Success)
+                e = discord.Embed(title="キャンセルしました。", description="", color=Success)
                 msg = await msg.edit(embed=e)
 
         except asyncio.TimeoutError:
-            e = discord.Embed(title="タイムアウトしました。",
-                              description="", color=Error)
+            e = discord.Embed(title="タイムアウトしました。", description="", color=Error)
             msg = await msg.edit(embed=e)
 
     @commands.command(hidden=True)
@@ -133,7 +152,8 @@ class AdminCog(commands.Cog):
             e = discord.Embed(
                 title="サーバーが見付かりませんでした",
                 description="`sb#server_list`でIDを確認してください。",
-                color=Error)
+                color=Error,
+            )
             await ctx.send(embed=e)
             return
         for gc in g.text_channels:
@@ -141,8 +161,8 @@ class AdminCog(commands.Cog):
             r += f"`{gc.name}`\n"
             i += f"`{gc.id}`\n"
         e = discord.Embed(
-            title=f"サーバー`{g.name}`のテキストチャンネル一覧({len(g.text_channels)}個)：",
-            color=Info)
+            title=f"サーバー`{g.name}`のテキストチャンネル一覧({len(g.text_channels)}個)：", color=Info
+        )
         e.add_field(name="名前", value=r)
         e.add_field(name="ID", value=i)
         await ctx.send(embed=e)
@@ -158,11 +178,11 @@ class AdminCog(commands.Cog):
             e = discord.Embed(
                 title="チャンネルが見付かりませんでした",
                 description="`sb#server_channels <ID>`でIDを確認してください。",
-                color=Error)
+                color=Error,
+            )
             await ctx.send(embed=e)
             return
-        e = discord.Embed(
-            title=f"テキストチャンネル`{g.name}`の履歴({count}個)：", color=Info)
+        e = discord.Embed(title=f"テキストチャンネル`{g.name}`の履歴({count}個)：", color=Info)
         await ctx.send(embed=e)
         l = await g.history(limit=count).flatten()
         l.reverse()
@@ -171,13 +191,16 @@ class AdminCog(commands.Cog):
                 e3 = discord.Embed(
                     description=message.content,
                     timestamp=message.created_at,
-                    color=Chat)
+                    color=Chat,
+                )
                 e3.set_author(
                     name=f"{message.author.name}(ID:{message.author.id})",
-                    icon_url=message.author.avatar.url)
+                    icon_url=message.author.avatar.url,
+                )
                 e3.set_footer(
                     text=f"{message.guild.name}(ID:{message.guild.id})",
-                    icon_url=message.guild.icon.url)
+                    icon_url=message.guild.icon.url,
+                )
                 await ctx.send(embed=e3)
             else:
                 await ctx.send(f"{message.author.name}:", embed=message.embeds[0])
@@ -268,16 +291,27 @@ class AdminCog(commands.Cog):
 
             def _print(*txt):
                 ret[ctx.message.id] += " ".join(map(str, txt)) + "\n"
+
             exec(
-                'async def __ex(self,_bot,_ctx,ctx,session,print,get_msg): '
-                + '\n'.join(f'    {l}' for l in script.split('\n'))
+                "async def __ex(self,_bot,_ctx,ctx,session,print,get_msg): "
+                + "\n".join(f"    {l}" for l in script.split("\n"))
             )
-            r = await locals()['__ex'](self, self.bot, ctx, ctx, session, _print, get_msg)
+            r = await locals()["__ex"](
+                self, self.bot, ctx, ctx, session, _print, get_msg
+            )
         try:
             if ret[ctx.message.id]:
-                await ctx.send(f"stdout:```py\n{str(ret[ctx.message.id])[:1980]}\n```".replace(self.bot.http.token, "[Token]"))
+                await ctx.send(
+                    f"stdout:```py\n{str(ret[ctx.message.id])[:1980]}\n```".replace(
+                        self.bot.http.token, "[Token]"
+                    )
+                )
             if r:
-                await ctx.send(f"return:```py\n{str(r)[:1980]}\n```".replace(self.bot.http.token, "[Token]"))
+                await ctx.send(
+                    f"return:```py\n{str(r)[:1980]}\n```".replace(
+                        self.bot.http.token, "[Token]"
+                    )
+                )
         except BaseException:
             pass
         await ctx.message.add_reaction(Official_emojis["check8"])
@@ -292,8 +326,9 @@ class AdminCog(commands.Cog):
     @commands.is_owner()
     async def gban(self, ctx, uid: int, reason):
         user = await self.bot.fetch_user(uid)
-        e = discord.Embed(title=f"`{user}`をGBanしますか？",
-                          description=f"```{reason}```", color=Process)
+        e = discord.Embed(
+            title=f"`{user}`をGBanしますか？", description=f"```{reason}```", color=Process
+        )
         msg = await ctx.send(embed=e)
         await msg.add_reaction(Official_emojis["check5"])
         await msg.add_reaction(Official_emojis["check6"])
@@ -303,13 +338,13 @@ class AdminCog(commands.Cog):
                 return r.message.id == msg.id
             else:
                 return False
+
         try:
             r, u = await self.bot.wait_for("reaction_add", check=check, timeout=10)
             if r.emoji.name == "check5":
                 e = discord.Embed(
-                    title=f"`{user}`をGBanしました。",
-                    description="",
-                    color=Success)
+                    title=f"`{user}`をGBanしました。", description="", color=Success
+                )
                 msg = await msg.edit(embed=e)
                 GBan[user.id] = "SevenBot#1769によりGBanされました。\n理由：" + reason
                 ga = []
@@ -317,9 +352,9 @@ class AdminCog(commands.Cog):
                     try:
                         ga.append(
                             g.ban(
-                                user,
-                                reason="SevenBot#1769によりGBanされました。\n理由："
-                                + reason))
+                                user, reason="SevenBot#1769によりGBanされました。\n理由：" + reason
+                            )
+                        )
                     except Forbidden:
                         pass
                 try:
@@ -335,37 +370,37 @@ class AdminCog(commands.Cog):
                         Private_chats["gban"].remove(c)
                     else:
                         ch_webhooks = await cn.webhooks()
-                        webhook = discord.utils.get(
-                            ch_webhooks, name=whname)
+                        webhook = discord.utils.get(ch_webhooks, name=whname)
                         if webhook is None:
                             g = self.bot.get_guild(Official_discord_id)
                             a = g.icon.url
-                            webhook = await cn.create_webhook(name=whname, avatar=await a.read())
+                            webhook = await cn.create_webhook(
+                                name=whname, avatar=await a.read()
+                            )
                         un = "SevenBot GBan System"
                         loop.create_task(
                             webhook.send(
                                 content=f"**`{str(user)}` をGBanしました。**\n理由：{reason}",
                                 username=un,
-                                avatar_url="https://i.imgur.com/wofeow9.png"))
+                                avatar_url="https://i.imgur.com/wofeow9.png",
+                            )
+                        )
                         # await
                         # webhook.edit(avater_url="https://i.imgur.com/JffqEAl.png")
 
             else:
-                e = discord.Embed(title="キャンセルしました。",
-                                  description="", color=Success)
+                e = discord.Embed(title="キャンセルしました。", description="", color=Success)
                 msg = await msg.edit(embed=e)
 
         except asyncio.TimeoutError:
-            e = discord.Embed(title="タイムアウトしました。",
-                              description="", color=Error)
+            e = discord.Embed(title="タイムアウトしました。", description="", color=Error)
             msg = await msg.edit(embed=e)
 
     @commands.command(hidden=True)
     @commands.is_owner()
     async def blacklist(self, ctx, sid: int):
         server = await self.bot.fetch_guild(sid)
-        e = discord.Embed(
-            title=f"`{server.name}`をブラックリストに入れますか？", color=Process)
+        e = discord.Embed(title=f"`{server.name}`をブラックリストに入れますか？", color=Process)
         msg = await ctx.send(embed=e)
         await msg.add_reaction(Official_emojis["check5"])
         await msg.add_reaction(Official_emojis["check6"])
@@ -375,22 +410,20 @@ class AdminCog(commands.Cog):
                 return r.message.id == msg.id
             else:
                 return False
+
         try:
             r, _ = await self.bot.wait_for("reaction_add", check=check, timeout=10)
             if r.emoji.name == "check5":
-                e = discord.Embed(title="ブラックリストしました。",
-                                  description="", color=Success)
+                e = discord.Embed(title="ブラックリストしました。", description="", color=Success)
                 msg = await msg.edit(embed=e)
                 Blacklists.append(sid)
                 await server.leave()
             else:
-                e = discord.Embed(title="キャンセルしました。",
-                                  description="", color=Success)
+                e = discord.Embed(title="キャンセルしました。", description="", color=Success)
                 msg = await msg.edit(embed=e)
 
         except asyncio.TimeoutError:
-            e = discord.Embed(title="タイムアウトしました。",
-                              description="", color=Error)
+            e = discord.Embed(title="タイムアウトしました。", description="", color=Error)
             msg = await msg.edit(embed=e)
 
     @commands.command(hidden=True)
@@ -407,11 +440,11 @@ class AdminCog(commands.Cog):
                 return r.message.id == msg.id
             else:
                 return False
+
         try:
             r, _ = await self.bot.wait_for("reaction_add", check=check, timeout=10)
             if r.emoji.name == "check5":
-                e = discord.Embed(title="GUnBanしました。",
-                                  description="", color=Success)
+                e = discord.Embed(title="GUnBanしました。", description="", color=Success)
                 msg = await msg.edit(embed=e)
                 try:
                     del GBan[user.id]
@@ -428,13 +461,11 @@ class AdminCog(commands.Cog):
                 except Forbidden:
                     pass
             else:
-                e = discord.Embed(title="キャンセルしました。",
-                                  description="", color=Success)
+                e = discord.Embed(title="キャンセルしました。", description="", color=Success)
                 msg = await msg.edit(embed=e)
 
         except asyncio.TimeoutError:
-            e = discord.Embed(title="タイムアウトしました。",
-                              description="", color=Error)
+            e = discord.Embed(title="タイムアウトしました。", description="", color=Error)
             msg = await msg.edit(embed=e)
 
     @commands.command(hidden=True, aliases=["re"])
@@ -448,17 +479,17 @@ class AdminCog(commands.Cog):
             except commands.errors.NoEntryPointError:
                 pass
             self.bot.levenshtein._listup_commands(self.bot)
-            self.bot.cogs["InnerLevenshtein"].command_names = self.bot.levenshtein._command_names
+            self.bot.cogs[
+                "InnerLevenshtein"
+            ].command_names = self.bot.levenshtein._command_names
             return await ctx.message.add_reaction(Official_emojis["check8"])
         for o in os.listdir(os.path.dirname(os.path.abspath(__file__))):
             try:
                 if not o.endswith(".py") or o.startswith("_"):
                     continue
-                bot.reload_extension(
-                    "cogs." + os.path.splitext(os.path.basename(o))[0])
+                bot.reload_extension("cogs." + os.path.splitext(os.path.basename(o))[0])
             except commands.errors.ExtensionNotLoaded:
-                bot.load_extension(
-                    "cogs." + os.path.splitext(os.path.basename(o))[0])
+                bot.load_extension("cogs." + os.path.splitext(os.path.basename(o))[0])
             except commands.errors.NoEntryPointError:
                 pass
         await ctx.message.add_reaction(Official_emojis["check8"])
@@ -472,7 +503,18 @@ class AdminCog(commands.Cog):
     @commands.command(hidden=True)
     @commands.is_owner()
     async def shutdown(self, ctx=None):
-        msg = await components.send(ctx, "シャットダウンしますか？", components=[components.Button("する", "shutdown_yes", style=components.ButtonType.danger), components.Button("しない", "shutdown_no", style=components.ButtonType.secondary)])
+        msg = await components.send(
+            ctx,
+            "シャットダウンしますか？",
+            components=[
+                components.Button(
+                    "する", "shutdown_yes", style=components.ButtonType.danger
+                ),
+                components.Button(
+                    "しない", "shutdown_no", style=components.ButtonType.secondary
+                ),
+            ],
+        )
         com = await self.bot.wait_for("button_click", check=lambda c: c.message == msg)
         if com.custom_id == "shutdown_yes":
             with open("./shutdown", "w"):
@@ -484,7 +526,18 @@ class AdminCog(commands.Cog):
     @commands.command(hidden=True)
     @commands.is_owner()
     async def reboot(self, ctx=None):
-        msg = await components.send(ctx, "再起動しますか？", components=[components.Button("する", "reboot_yes", style=components.ButtonType.danger), components.Button("しない", "reboot_no", style=components.ButtonType.secondary)])
+        msg = await components.send(
+            ctx,
+            "再起動しますか？",
+            components=[
+                components.Button(
+                    "する", "reboot_yes", style=components.ButtonType.danger
+                ),
+                components.Button(
+                    "しない", "reboot_no", style=components.ButtonType.secondary
+                ),
+            ],
+        )
         com = await self.bot.wait_for("button_click", check=lambda c: c.message == msg)
         if com.custom_id == "reboot_yes":
             with open("./reboot", "w"):
@@ -497,5 +550,5 @@ class AdminCog(commands.Cog):
 def setup(_bot):
     global bot
     bot = _bot
-#     logging.info("cog.py reloaded")
+    #     logging.info("cog.py reloaded")
     _bot.add_cog(AdminCog(_bot), override=True)

@@ -6,8 +6,13 @@ from discord.ext import commands, tasks
 from discord.errors import Forbidden, NotFound
 
 import _pathmagic  # type: ignore # noqa
-from common_resources.consts import (Activate_aliases, Deactivate_aliases,
-                                     Success, Error, Stat_dict)
+from common_resources.consts import (
+    Activate_aliases,
+    Deactivate_aliases,
+    Success,
+    Error,
+    Stat_dict,
+)
 
 
 class ServerStatCog(commands.Cog):
@@ -35,7 +40,10 @@ class ServerStatCog(commands.Cog):
         for l in list:
             if l not in Stat_dict.keys():
                 e = discord.Embed(
-                    title=f"統計{l}が見付かりませんでした。", description="`sb#help server_stat`で確認してください。", color=Error)
+                    title=f"統計{l}が見付かりませんでした。",
+                    description="`sb#help server_stat`で確認してください。",
+                    color=Error,
+                )
                 return await ctx.reply(embed=e)
         if Guild_settings[ctx.guild.id]["do_stat_channels"]:
             for sc in Guild_settings[ctx.guild.id]["stat_channels"].values():
@@ -47,17 +55,21 @@ class ServerStatCog(commands.Cog):
                     await c.delete()
         else:
             overwrites = {
-                ctx.guild.default_role: discord.PermissionOverwrite(
-                    connect=False)
+                ctx.guild.default_role: discord.PermissionOverwrite(connect=False)
             }
             cat = await ctx.guild.create_category("統計", overwrites=overwrites)
         for l in list:
-            n = await ctx.guild.create_voice_channel(f"{Stat_dict[l]}： --", category=cat)
+            n = await ctx.guild.create_voice_channel(
+                f"{Stat_dict[l]}： --", category=cat
+            )
             Guild_settings[ctx.guild.id]["stat_channels"][l] = n.id
         Guild_settings[ctx.guild.id]["stat_channels"]["category"] = cat.id
         Guild_settings[ctx.guild.id]["do_stat_channels"] = True
-        e = discord.Embed(title="統計チャンネルが有効になりました。",
-                          description="無効化するには`sb#server_stat deactivate`を実行してください。", color=Success)
+        e = discord.Embed(
+            title="統計チャンネルが有効になりました。",
+            description="無効化するには`sb#server_stat deactivate`を実行してください。",
+            color=Success,
+        )
         return await ctx.reply(embed=e)
 
     @server_stat.command(name="deactivate", aliases=Deactivate_aliases)
@@ -72,7 +84,10 @@ class ServerStatCog(commands.Cog):
             Guild_settings[ctx.guild.id]["stat_channels"] = {}
             Guild_settings[ctx.guild.id]["do_stat_channels"] = False
             e = discord.Embed(
-                title="統計チャンネルが無効になりました。", description="もう一度有効にするには`sb#server_stat activate`を使用してください。", color=Success)
+                title="統計チャンネルが無効になりました。",
+                description="もう一度有効にするには`sb#server_stat activate`を使用してください。",
+                color=Success,
+            )
             return await ctx.reply(embed=e)
 
     @tasks.loop(minutes=5, seconds=10)
@@ -91,19 +106,24 @@ class ServerStatCog(commands.Cog):
                         if sck == "members":
                             val = g.member_count
                         elif sck == "humans":
-                            val = len(
-                                list(filter(lambda m: not m.bot, g.members)))
+                            val = len(list(filter(lambda m: not m.bot, g.members)))
                         elif sck == "bots":
                             val = len(list(filter(lambda m: m.bot, g.members)))
                         elif sck == "channels":
-                            val = len(g.text_channels) + len(g.voice_channels) - \
-                                len(Guild_settings[g.id]
-                                    ["stat_channels"].keys()) + 1
+                            val = (
+                                len(g.text_channels)
+                                + len(g.voice_channels)
+                                - len(Guild_settings[g.id]["stat_channels"].keys())
+                                + 1
+                            )
                         elif sck == "text_channels":
                             val = len(g.text_channels)
                         elif sck == "voice_channels":
-                            val = len(
-                                g.voice_channels) - len(Guild_settings[g.id]["stat_channels"].keys()) + 1
+                            val = (
+                                len(g.voice_channels)
+                                - len(Guild_settings[g.id]["stat_channels"].keys())
+                                + 1
+                            )
                         elif sck == "roles":
                             val = len(g.roles)
                         else:

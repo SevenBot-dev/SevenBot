@@ -9,7 +9,7 @@ import re2 as re
 from texttable import Texttable
 
 import _pathmagic  # type: ignore # noqa
-from common_resources.consts import (Info, Success, Error, Alert)
+from common_resources.consts import Info, Success, Error, Alert
 
 
 class AutoreplyCog(commands.Cog):
@@ -43,7 +43,11 @@ class AutoreplyCog(commands.Cog):
                     for c in ch:
                         try:
                             fake_ctx = await self.bot.get_context(message)
-                            channel = await commands.converter.TextChannelConverter().convert(fake_ctx, c)
+                            channel = (
+                                await commands.converter.TextChannelConverter().convert(
+                                    fake_ctx, c
+                                )
+                            )
                         except commands.errors.BadArgument:
                             pass
                         else:
@@ -51,7 +55,9 @@ class AutoreplyCog(commands.Cog):
                                 ar[0] = m2.group(2)
                                 return await self.do_reply(ar, message, content)
             elif cmd == "has-image":
-                if message.attachments and [a for a in message.attachments if a.content_type.startswith("image")]:
+                if message.attachments and [
+                    a for a in message.attachments if a.content_type.startswith("image")
+                ]:
                     ar[0] = cnt
                     return await self.do_reply(ar, message, content)
             else:
@@ -64,11 +70,17 @@ class AutoreplyCog(commands.Cog):
     @commands.Cog.listener("on_message")
     async def on_message_ar(self, message):
         global Guild_settings
-        if message.author.id in GBan.keys() or message.channel.id in self.bot.global_chats:
+        if (
+            message.author.id in GBan.keys()
+            or message.channel.id in self.bot.global_chats
+        ):
             return
         if not self.bot.is_ready():
             return
-        if message.author.bot or message.channel.id in Guild_settings[message.guild.id]["lainan_talk"]:
+        if (
+            message.author.bot
+            or message.channel.id in Guild_settings[message.guild.id]["lainan_talk"]
+        ):
             return
         if message.author.id in SB_Bans.keys() and is_command(message):
             if SB_Bans[message.author.id] > time.time():
@@ -99,10 +111,13 @@ class AutoreplyCog(commands.Cog):
                     await message.reply(msg_content)
             except asyncio.TimeoutError:
                 pass
+
         ga = []
         if arp is not None:
             for ar in arp.values():
-                if await self.do_reply(ar, message, message.content) and not is_command(message):
+                if await self.do_reply(ar, message, message.content) and not is_command(
+                    message
+                ):
                     ga.append(ar_send(message.channel, ar[1]))
         await asyncio.gather(*ga)
         if random_tmp:
@@ -124,12 +139,18 @@ class AutoreplyCog(commands.Cog):
         if "autoreply" not in Guild_settings[ctx.guild.id]:
             Guild_settings[ctx.guild.id]["autoreply"] = {}
         Guild_settings[ctx.guild.id]["autoreply"][rid] = [base, reply]
-        e = discord.Embed(title=f"自動返信に`{base}`を追加しました。",
-                          description=f"戻すには`sb#autoreply remove {base}`または`sb#autoreply remove {rid}`を使用してください", color=Success)
+        e = discord.Embed(
+            title=f"自動返信に`{base}`を追加しました。",
+            description=f"戻すには`sb#autoreply remove {base}`または`sb#autoreply remove {rid}`を使用してください",
+            color=Success,
+        )
         await ctx.reply(embed=e)
         if reply.startswith("!"):
-            e = discord.Embed(title="注意！",
-                              description="コマンドは`!コマンド名 内容`から`コマンド名:内容`へ移行しました。", color=Alert)
+            e = discord.Embed(
+                title="注意！",
+                description="コマンドは`!コマンド名 内容`から`コマンド名:内容`へ移行しました。",
+                color=Alert,
+            )
             await ctx.reply(embed=e)
 
     @autoreply.command(name="remove", aliases=["del", "delete", "rem"])
@@ -140,8 +161,7 @@ class AutoreplyCog(commands.Cog):
         count = 0
         new = {}
         if txt in Guild_settings[ctx.guild.id]["autoreply"].keys():
-            res += "`" + \
-                Guild_settings[ctx.guild.id]["autoreply"][txt][1] + "`\n"
+            res += "`" + Guild_settings[ctx.guild.id]["autoreply"][txt][1] + "`\n"
             for ark, ar in Guild_settings[ctx.guild.id]["autoreply"].items():
                 if ark != txt:
                     new[ark] = ar
@@ -155,10 +175,14 @@ class AutoreplyCog(commands.Cog):
                     new[ark] = ar
         if count == 0:
             e = discord.Embed(
-                title=f"自動返信に`{txt}`は含まれていません。", description="`sb#autoreply list`で確認してください。", color=Error)
+                title=f"自動返信に`{txt}`は含まれていません。",
+                description="`sb#autoreply list`で確認してください。",
+                color=Error,
+            )
         else:
             e = discord.Embed(
-                title=f"{count}個の自動返信を削除しました。", description=res, color=Success)
+                title=f"{count}個の自動返信を削除しました。", description=res, color=Success
+            )
             Guild_settings[ctx.guild.id]["autoreply"] = new
         return await ctx.reply(embed=e)
 
@@ -170,31 +194,49 @@ class AutoreplyCog(commands.Cog):
         gs = Guild_settings[g]
         if gs["autoreply"] == {}:
             e = discord.Embed(
-                title=get_txt(ctx.guild.id, "ar_list_no"), description=get_txt(ctx.guild.id, "ar_list_no_desc"), color=Error)
+                title=get_txt(ctx.guild.id, "ar_list_no"),
+                description=get_txt(ctx.guild.id, "ar_list_no_desc"),
+                color=Error,
+            )
             return await ctx.reply(embed=e)
         else:
+
             def make_new():
                 table = Texttable(max_width=80)
                 table.set_deco(Texttable.HEADER)
-                table.set_cols_dtype(['t', 't', 't'])
+                table.set_cols_dtype(["t", "t", "t"])
                 table.set_cols_align(["l", "l", "l"])
                 table.set_cols_width([8, 19, 20])
                 table.add_row(get_txt(ctx.guild.id, "ar_list_row"))
                 return table
+
             table = make_new()
             res = []
             for k, v in gs["autoreply"].items():
                 b = table.draw()
-                table.add_row([k, v[0].replace("\n", get_txt(ctx.guild.id, "ar_list_br")),
-                               v[1].replace("\n", get_txt(ctx.guild.id, "ar_list_br"))])
+                table.add_row(
+                    [
+                        k,
+                        v[0].replace("\n", get_txt(ctx.guild.id, "ar_list_br")),
+                        v[1].replace("\n", get_txt(ctx.guild.id, "ar_list_br")),
+                    ]
+                )
                 if len(table.draw()) > 2000:
                     res.append(b)
                     table = make_new()
-                    table.add_row([k, v[0].replace("\n", get_txt(ctx.guild.id, "ar_list_br")),
-                                   v[1].replace("\n", get_txt(ctx.guild.id, "ar_list_br"))])
+                    table.add_row(
+                        [
+                            k,
+                            v[0].replace("\n", get_txt(ctx.guild.id, "ar_list_br")),
+                            v[1].replace("\n", get_txt(ctx.guild.id, "ar_list_br")),
+                        ]
+                    )
             res.append(table.draw())
-            e = discord.Embed(title=get_txt(ctx.guild.id, "ar_list")
-                              + f" - {1}/{len(res)}", description=f"```asciidoc\n{res[0]}```", color=Info)
+            e = discord.Embed(
+                title=get_txt(ctx.guild.id, "ar_list") + f" - {1}/{len(res)}",
+                description=f"```asciidoc\n{res[0]}```",
+                color=Info,
+            )
             buttons = [
                 components.Button("前のページ", "left", style=2),
                 components.Button("次のページ", "right", style=2),
@@ -204,7 +246,12 @@ class AutoreplyCog(commands.Cog):
             page = 0
             while True:
                 try:
-                    com = await self.bot.wait_for("button_click", check=lambda com: com.message == msg and com.member == ctx.author, timeout=60)
+                    com = await self.bot.wait_for(
+                        "button_click",
+                        check=lambda com: com.message == msg
+                        and com.member == ctx.author,
+                        timeout=60,
+                    )
                     await com.defer_update()
                     if com.custom_id == "left":
                         if page > 0:
@@ -216,8 +263,12 @@ class AutoreplyCog(commands.Cog):
                         buttons[1].enabled = page != (len(res) - 1)
                     elif com.custom_id == "exit":
                         break
-                    e = discord.Embed(title=get_txt(
-                        ctx.guild.id, "ar_list") + f" - {page+1}/{len(res)}", description=f"```asciidoc\n{res[page]}```", color=Info)
+                    e = discord.Embed(
+                        title=get_txt(ctx.guild.id, "ar_list")
+                        + f" - {page+1}/{len(res)}",
+                        description=f"```asciidoc\n{res[page]}```",
+                        color=Info,
+                    )
                     await msg.edit(embed=e)
                 except asyncio.TimeoutError:
                     break

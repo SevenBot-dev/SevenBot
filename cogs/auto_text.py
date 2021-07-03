@@ -84,9 +84,16 @@ class AutoTextCog(commands.Cog):
             and after.id in Guild_settings[member.guild.id]["auto_text"]
             and after not in Auto_text_channels
         ):
-            ntc = await after.category.create_text_channel(after.name, topic=f"このチャンネルは{after.mention}に誰もいなくなったら自動的に消去されます。")
+            ntc = await after.category.create_text_channel(
+                after.name, topic=f"このチャンネルは{after.mention}に誰もいなくなったら自動的に消去されます。"
+            )
             Auto_text_channels[after] = ntc
-            await ntc.send(member.mention, embed=SEmbed("", f"このチャンネルは{after.mention}に誰もいなくなったら自動的に消去されます。", color=Info))
+            await ntc.send(
+                member.mention,
+                embed=SEmbed(
+                    "", f"このチャンネルは{after.mention}に誰もいなくなったら自動的に消去されます。", color=Info
+                ),
+            )
 
 
 def setup(_bot):

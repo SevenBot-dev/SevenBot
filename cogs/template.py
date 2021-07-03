@@ -2,8 +2,13 @@ import discord
 from discord.ext import commands
 
 import _pathmagic  # type: ignore # noqa
-from common_resources.consts import (Activate_aliases, Deactivate_aliases,
-                                     Info, Success, Error)
+from common_resources.consts import (
+    Activate_aliases,
+    Deactivate_aliases,
+    Info,
+    Success,
+    Error,
+)
 
 
 class TemplateCog(commands.Cog):

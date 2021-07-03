@@ -1,4 +1,3 @@
-
 import ast
 import copy
 import datetime
@@ -22,13 +21,15 @@ from common_resources.tokens import TOKEN, cstr, dbl_token, web_pass
 from common_resources.consts import Official_discord_id, Sub_discord_id
 from common_resources.tools import flatten
 
-logger = logging.getLogger('discord')
+logger = logging.getLogger("discord")
 logger.setLevel(logging.INFO)
 # handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
 # handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 # logger.addHandler(handler)
 handler = logging.StreamHandler()
-handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
+handler.setFormatter(
+    logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s")
+)
 logger.addHandler(handler)
 
 
@@ -38,7 +39,7 @@ Channel_ids = {
     "emoji_print": 756254956817743903,
     "global_report": 756255003341225996,
     "boot_log": 747764100922343554,
-    "error": 763877469928554517
+    "error": 763877469928554517,
 }
 Premium_guild = 715540925081714788
 Premium_role = 779685018964066336
@@ -48,9 +49,9 @@ Save_channel_id = 765489262123548673
 def prefix(bot, message):
     if Guild_settings[message.guild.id]["prefix"] is None:
         if bot.debug:
-            return ['sb/']
+            return ["sb/"]
         else:
-            return ['sb#', "sb. ", 'sb.']
+            return ["sb#", "sb. ", "sb."]
     else:
         return Guild_settings[message.guild.id]["prefix"]
 
@@ -65,7 +66,10 @@ intent.typing = False
 # Save_game2 = discord.Game(name="Complete!" + "⠀" * 100)
 print("Loading save from attachment...", end="")
 try:
-    r = requests.get(f"https://discord.com/api/v8/channels/{Save_channel_id}/messages?limit=1", headers={"authorization": "Bot " + TOKEN})
+    r = requests.get(
+        f"https://discord.com/api/v8/channels/{Save_channel_id}/messages?limit=1",
+        headers={"authorization": "Bot " + TOKEN},
+    )
     r.raise_for_status()
     s = requests.get(r.json()[0]["attachments"][0]["url"])
     s.raise_for_status()
@@ -79,7 +83,17 @@ print("Loading saves from db...", end="")
 gs = {}
 tmp_client = pymongo.MongoClient(cstr)
 for g in tmp_client.sevenbot.guild_settings.find({}, {"_id": False}):
-    for ik in ["levels", "level_counts", "warns", "warn_settings.punishments", "ticket_time", "ticket_subject", "level_boosts", "level_roles", "timed_role"]:
+    for ik in [
+        "levels",
+        "level_counts",
+        "warns",
+        "warn_settings.punishments",
+        "ticket_time",
+        "ticket_subject",
+        "level_boosts",
+        "level_roles",
+        "timed_role",
+    ]:
         t = g
         for ikc in ik.split("."):
             t = t[ikc]
@@ -103,10 +117,7 @@ class SevenBot(commands.Bot):
         self.web_pass = web_pass
         self.debug = len(sys.argv) != 1 and sys.argv[1] == "debug"
         self.texts = common_resources.Texts
-        self.default_user_settings = {
-            "level_dm": False,
-            "favorite_musics": []
-        }
+        self.default_user_settings = {"level_dm": False, "favorite_musics": []}
         print("Debug mode: " + str(self.debug))
         self.check(commands.cooldown(2, 2))
 
@@ -139,15 +150,23 @@ class SevenBot(commands.Bot):
         print("on_ready done")
 
     def is_premium(self, user: Union[discord.User, discord.Member]):
-        return (self.get_guild(Premium_guild).get_member(user.id) and (self.get_guild(Premium_guild).get_member(user.id).premium_since or Premium_role in [r.id for r in self.get_guild(715540925081714788).get_member(user.id).roles]))
+        return self.get_guild(Premium_guild).get_member(user.id) and (
+            self.get_guild(Premium_guild).get_member(user.id).premium_since
+            or Premium_role
+            in [
+                r.id
+                for r in self.get_guild(715540925081714788).get_member(user.id).roles
+            ]
+        )
 
     async def save(self):
         # await self.change_presence(activity=Save_game, status=discord.Status.dnd)
+        if self.debug:
+            return
         gs2 = list(Guild_settings.keys())
-        if not self.debug:
-            for gs in gs2:
-                if self.get_guild(gs) is None:
-                    del Guild_settings[gs]
+        for gs in gs2:
+            if self.get_guild(gs) is None:
+                del Guild_settings[gs]
         # r = str(self.raw_config)
         # ar = []
         # PastebinAPI.paste(PB_key, r, paste_private = "private",paste_expire_date = None)
@@ -167,11 +186,17 @@ class SevenBot(commands.Bot):
                 if not self.get_guild(gk["gid"]):
                     await self.db.guild_settings.delete_one({"gid": gk["gid"]})
 
-        sio = await self.loop.run_in_executor(None, lambda: io.StringIO(str({k: v for k, v in self.raw_config.items() if k != "gs"})))
+        sio = await self.loop.run_in_executor(
+            None,
+            lambda: io.StringIO(
+                str({k: v for k, v in self.raw_config.items() if k != "gs"})
+            ),
+        )
         await (await self.fetch_channel(765489262123548673)).send(
-            file=discord.File(sio, filename=f"save_{datetime.datetime.now()}.txt"))
+            file=discord.File(sio, filename=f"save_{datetime.datetime.now()}.txt")
+        )
         sio.close()
-#         print(games)
+        #         print(games)
         try:
             pass  # await self.change_presence(activity=Save_game2, status=discord.Status.online)
         except BaseException:
@@ -189,9 +214,21 @@ class SevenBot(commands.Bot):
     async def send_subcommands(self, ctx):
         desc = ""
         for c in ctx.command.commands:
-            desc += f"**`{c.name}`** " + (self.get_txt(ctx.guild.id, "help_detail").get(str(c), "_" + self.get_txt(ctx.guild.id, "help_detail_none") + "_")).split("\n")[0] + "\n"
-        e = discord.Embed(title=self.get_txt(ctx.guild.id, "subcommand").format(ctx.command.name),
-                          description=desc, color=0x00ccff)
+            desc += (
+                f"**`{c.name}`** "
+                + (
+                    self.get_txt(ctx.guild.id, "help_detail").get(
+                        str(c),
+                        "_" + self.get_txt(ctx.guild.id, "help_detail_none") + "_",
+                    )
+                ).split("\n")[0]
+                + "\n"
+            )
+        e = discord.Embed(
+            title=self.get_txt(ctx.guild.id, "subcommand").format(ctx.command.name),
+            description=desc,
+            color=0x00CCFF,
+        )
         await ctx.send(embed=e)
 
     async def init_user_settings(self, uid):
@@ -201,10 +238,19 @@ class SevenBot(commands.Bot):
 
     @property
     def global_chats(self):
-        return set(self.raw_config["snc"]) | set(self.raw_config["gc"]) | set(flatten(c["channels"] for c in self.consts["pci"].values()))
+        return (
+            set(self.raw_config["snc"])
+            | set(self.raw_config["gc"])
+            | set(flatten(c["channels"] for c in self.consts["pci"].values()))
+        )
 
 
-bot = SevenBot(command_prefix=prefix, help_command=None, allowed_mentions=discord.AllowedMentions(everyone=False, replied_user=False), intents=intent)
+bot = SevenBot(
+    command_prefix=prefix,
+    help_command=None,
+    allowed_mentions=discord.AllowedMentions(everyone=False, replied_user=False),
+    intents=intent,
+)
 
 
 @bot.command()
@@ -224,7 +270,7 @@ async def on_message(msg):
 Texts = common_resources.Texts
 
 if __name__ == "__main__":
-    print('*********************')
+    print("*********************")
     print("      SevenBot       ")
     print("  Created by 名無し。  ")
     print("*********************")
