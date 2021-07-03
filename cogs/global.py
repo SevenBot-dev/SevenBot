@@ -325,7 +325,7 @@ class GlobalCog(commands.Cog):
             "isBot": message.author.bot,
             "guildId": message.guild.id,
             "guildName": message.guild.name,
-            "guildIcon": message.guild.icon,
+            "guildIcon": message.guild.icon.key,
             "channelId": message.channel.id,
             "channelName": message.channel.name,
             "messageId": message.id,
