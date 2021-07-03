@@ -3,21 +3,24 @@ import copy
 import datetime
 import math
 import sys
+import textwrap
 import time
 from functools import partial
 from html import unescape
 
 import discord
-from googleapiclient.discovery import build
-from sembed import SEmbed  # type:ignore
 import youtube_dl
 from discord import Forbidden
 from discord.ext import commands, components
+from googleapiclient.discovery import build
+from sembed import SEmbed  # type:ignore
 
 import _pathmagic  # type: ignore # noqa
-from common_resources.consts import (Info, Success, Error, Process, Premium_color)
-from common_resources.tools import (to_lts)
+from common_resources.consts import (Error, Info, Premium_color, Process,
+                                     Success)
 from common_resources.tokens import YOUTUBE_API_KEY
+from common_resources.tools import to_lts
+
 
 Default_queue = [[], 0, False, 0, False, False, 0.5]
 Number_emojis = []
@@ -289,8 +292,8 @@ class MusicCog(commands.Cog):
             info["url"] = url
             info["time"] = time.time() + 60 * 60 * 24 * 7
             return info
-        except youtube_dl.DownloadError as e:
-            raise e
+        except youtube_dl.DownloadError:
+            pass
 
     @music.command(name="favorite", aliases=["fav"])
     async def mus_favorite(self, ctx):
@@ -302,14 +305,14 @@ class MusicCog(commands.Cog):
             return
         res = favs["favorite_musics"]
 
-        cn = ctx.channel
         loop = asyncio.get_event_loop()
         e = discord.Embed(title=get_txt(ctx.guild.id, "getting"),
                           description=get_txt(ctx.guild.id, "wait"), color=Process)
         buttons = [
             [
-                components.Button("前のページ", custom_id="favorite_prev", style=components.ButtonType.gray),
-                components.Button("次のページ", custom_id="favorite_next", style=components.ButtonType.gray)
+                components.SelectMenu("favorite_page", [
+                    components.SelectOption(f"ページ{n+1}", f"favorite_page_{n}")
+                    for n in range(math.ceil(len(res) / 10))], placeholder="ページ")
             ],
             [
                 components.Button("再生", custom_id="favorite_play", style=components.ButtonType.blurple),
@@ -318,14 +321,11 @@ class MusicCog(commands.Cog):
             ]
         ]
         msg = await components.reply(ctx, embed=e, components=buttons)
-        ga = []
-        for nm in Number_emojis[1:(len(res) + 1 if len(res) + 1 < 10 else 11)]:
-            loop.create_task(msg.add_reaction(nm))
 
         ga = []
         for rf in res:
             ga.append(self.get_music_info(rf))
-        music_infos = await asyncio.gather(*ga)
+        music_infos = list(filter(lambda m: m, await asyncio.gather(*ga)))
 #             r += f'{Number_emojis[i+1]}:```\n{unescape(f["title"])} - {unescape(f["uploader"])} - {get_url(rf)}```\n'
         e = SEmbed(
             title=Texts[Guild_settings[ctx.guild.id]["lang"]]["favorite"],
@@ -336,35 +336,41 @@ class MusicCog(commands.Cog):
         await msg.edit(embed=e)
         try:
             while True:
-                com = await self.bot.wait_for("button_click", check=lambda com: com.message == msg)
-                if com.custom_id in ("favorite_prev", "favorite_next"):
+                wait, _ = await asyncio.wait({
+                    loop.create_task(self.bot.wait_for("button_click", check=lambda com: com.message == msg)),
+                    loop.create_task(self.bot.wait_for("menu_select", check=lambda com: com.message == msg)),
+                }, return_when=asyncio.FIRST_COMPLETED)
+                com = wait.pop().result()
+                if com.custom_id == "favorite_page":
                     await com.defer_update()
-                    page += -1 if com.custom_id == "favorite_prev" else 1
-                    page %= math.ceil(len(res) / 10)
+                    page = int(com.value.removeprefix("favorite_page_"))
                     e.description = self.make_favorite_description(music_infos[(page * 10):(page * 10 + 10)])
                     e.footer.text = f'{get_txt(ctx.guild.id,"page")} {page + 1}/{math.ceil(len(res)/10)}'
                     await msg.edit(embed=e)
                 elif com.custom_id in ("favorite_play", "favorite_delete"):
-                    if com.custom_id == "favorite_play":
-                        await com.defer_update()
-                    else:
-                        await com.defer_source()
                     for b in buttons:
                         for bu in b:
                             bu.enabled = False
                     await components.edit(msg, components=buttons)
-                    numbers = []
-                    msg = await msg.channel.fetch_message(msg.id)
-                    for mi, mr in enumerate(msg.reactions):
-                        if mr.emoji in Number_emojis:
-                            if mr.count == 2:
-                                numbers.append(mi)
+                    await com.defer_source(hidden=True)
+                    options = []
+                    for i, info in enumerate(music_infos[(page * 10):(page * 10 + 10)], 0):
+                        options.append(components.SelectOption(
+                            textwrap.shorten(info["title"], 25, placeholder="..."), f"favorite_music_select_{i}", textwrap.shorten(f'{info["uploader"]} - {info["url"]}', 50, placeholder="..."), emoji=Number_emojis[i + 1]
+                        ))
+                    select_msg = await com.send("曲を選んで下さい。", components=[
+                        components.SelectMenu("favorite_music_select", options, min_values=0, max_values=len(options))
+                    ], hidden=True)
+                    select_com = await self.bot.wait_for("menu_select", check=lambda select_tmp_com: select_tmp_com.message.id == select_msg.id)
+                    if select_com.values == []:
+                        return await select_com.send("キャンセルしました。", hidden=True)
+                    await select_com.defer_update()
+                    numbers = list(map(lambda v: int(v.removeprefix("favorite_music_select_")), select_com.values))
                     deletes = set()
-                    await msg.clear_reactions()
                     for i, number in enumerate(numbers):
                         url = res[page * 10 + number]
                         if com.custom_id == "favorite_play":
-                            await self.mus_play({"message": com, "channel": ctx.channel, "guild": ctx.guild, "author": ctx.author, "force_queue": i > 0}, url)
+                            loop.create_task(await self.mus_play({"message": com, "channel": ctx.channel, "guild": ctx.guild, "author": ctx.author, "force_queue": i > 0}, url))
                         else:
                             deletes.add(url)
                     if com.custom_id == "favorite_delete":
