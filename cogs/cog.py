@@ -95,6 +95,7 @@ Categories = {
         "change_prefix",
         "server_stat",
         "warn_settings",
+        "auto_text",
     ],
 }
 Default_settings = {
