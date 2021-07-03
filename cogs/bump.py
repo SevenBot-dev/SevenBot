@@ -90,11 +90,14 @@ class BumpCog(commands.Cog):
                         r = c.guild.get_role(Guild_settings[guild]["bump_role"])
                         if r:
                             m = r.mention
-                    await c.send(
-                        content=m,
-                        embed=e,
-                        allowed_mentions=discord.AllowedMentions(roles=True),
-                    )
+                    try:
+                        await c.send(
+                            content=m,
+                            embed=e,
+                            allowed_mentions=discord.AllowedMentions(roles=True),
+                        )
+                    except discord.errors.Forbidden:
+                        pass
                 del Bump_alerts[guild]
         for guild, (alert_time, channel) in list(Dissoku_alerts.items()):
             if alert_time < time.time():
@@ -110,11 +113,14 @@ class BumpCog(commands.Cog):
                         r = c.guild.get_role(Guild_settings[guild]["dissoku_role"])
                         if r:
                             m = r.mention
-                    await c.send(
-                        content=m,
-                        embed=e,
-                        allowed_mentions=discord.AllowedMentions(roles=True),
-                    )
+                    try:
+                        await c.send(
+                            content=m,
+                            embed=e,
+                            allowed_mentions=discord.AllowedMentions(roles=True),
+                        )
+                    except discord.errors.Forbidden:
+                        pass
                 del Dissoku_alerts[guild]
 
     @commands.group(invoke_without_command=True)
