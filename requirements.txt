@@ -5,7 +5,7 @@ discord.py @ git+https://github.com/rapptz/discord.py@7386a971f85bfc66f31132e8f0
 discord-emoji~=1.3.1
 discord-ext-levenshtein~=0.3.0
 dnspython~=2.1.0
-dpy-components~=0.3.1
+dpy-components~=0.4.2
 dpy-syntaxer~=1.0.1
 google-api-python-client~=2.9.0
 httpx~=0.18.2
