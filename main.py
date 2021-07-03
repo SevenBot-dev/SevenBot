@@ -127,6 +127,7 @@ class SevenBot(commands.Bot):
         if not self.debug:
             self.DBL_client = topgg.DBLClient(self, dbl_token, autopost=True)
         bot.load_extension("jishaku")
+        bot.load_extension("dpy_peper")
         bot.load_extension("discord.ext.components")
         for o in os.listdir("./cogs"):
             if o.endswith(".py") and not o.startswith("_"):

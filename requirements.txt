@@ -7,6 +7,7 @@ discord-ext-levenshtein~=0.3.0
 dnspython~=2.1.0
 dpy-components~=0.4.2
 dpy-syntaxer~=1.0.1
+dpy-peper~=1.0.1
 google-api-python-client~=2.9.0
 httpx~=0.18.2
 jishaku~=2.0.0
