@@ -545,7 +545,7 @@ class GlobalCog(commands.Cog):
                                 "type": "sb-guildJoin",
                                 "guildName": ctx.guild.name,
                                 "guildId": ctx.guild.id,
-                                "guildIcon": ctx.guild.icon,
+                                "guildIcon": ctx.guild.icon.key,
                                 "channelName": ctx.channel.name,
                                 "channelID": ctx.channel.id}, ensure_ascii=False))
                         # return
@@ -731,7 +731,7 @@ class GlobalCog(commands.Cog):
                     "type": "sb-guildLeft",
                     "guildName": ctx.guild.name,
                     "guildId": ctx.guild.id,
-                    "guildIcon": ctx.guild.icon,
+                    "guildIcon": ctx.guild.icon.key,
                     "channelName": ctx.channel.name,
                     "channelID": ctx.channel.id}, ensure_ascii=False))
             loop = asyncio.get_event_loop()
