@@ -163,8 +163,8 @@ class GlobalCog(commands.Cog):
                     return await webhook.send(embed=e,  # content.replace("@", "@​")
                                               username=un,
                                               allowed_mentions=discord.AllowedMentions.none(),
-                                              avatar_url=message.author.avatar.url_as(
-                                                  static_format="png"),
+                                              avatar_url=message.author.avatar.replace(
+                                                  static_format="png").url,
                                               wait=True)
                 for c in each:
                     cn = self.bot.get_channel(c)
@@ -281,8 +281,8 @@ class GlobalCog(commands.Cog):
                             ga.append(webhook.send(content=content,  # content.replace("@", "@​")
                                                    username=un,
                                                    allowed_mentions=discord.AllowedMentions.none(),
-                                                   avatar_url=message.author.avatar.url_as(
-                                                       static_format="png"),
+                                                   avatar_url=message.author.avatar.replace(
+                                                       static_format="png").url,
                                                    files=fl,
                                                    embed=embed or rem,
                                                    wait=True))
