@@ -62,7 +62,10 @@ class MessageExpandCog(commands.Cog):
                     )
                     await message.channel.send(embed=e)
                 try:
-                    m = await c.fetch_message(ids[2])
+                    try:
+                        m = await c.fetch_message(ids[2])
+                    except discord.errors.NotFound:
+                        return
                     mc = m.content
                     if not (m.guild == message.guild or m.author == message.author):
                         return
@@ -78,7 +81,7 @@ class MessageExpandCog(commands.Cog):
                     except BaseException:
                         pass
                     em.set_author(
-                        name=m.author.display_name, icon_url=m.author.avatar.url
+                        name=m.author.display_name, icon_url=getattr(m.author.avatar, "url", discord.Embed.Empty)
                     )
                     footer = Texts[Guild_settings[message.guild.id]["lang"]][
                         "expand_message_footer"
@@ -92,7 +95,7 @@ class MessageExpandCog(commands.Cog):
                         )
                     if m.embeds == []:
                         em.set_footer(
-                            text=footer, icon_url=self.bot.get_guild(ids[0]).icon.url
+                            text=footer, icon_url=getattr(self.bot.get_guild(ids[0]).icon, "url", discord.Embed.Empty)
                         )
                         await message.reply(embed=em)
                     else:
@@ -101,7 +104,7 @@ class MessageExpandCog(commands.Cog):
                             + Texts[Guild_settings[message.guild.id]["lang"]][
                                 "expand_message_footer2"
                             ].format(len(m.embeds)),
-                            icon_url=self.bot.get_guild(ids[0]).icon.url,
+                            icon_url=getattr(self.bot.get_guild(ids[0]).icon, "url", discord.Embed.Empty),
                         )
                         await components.reply(message, embeds=[em] + m.embeds[:9])
                 except Exception as er:
