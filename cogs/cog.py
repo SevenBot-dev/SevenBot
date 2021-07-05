@@ -1375,7 +1375,7 @@ class MainCog(commands.Cog):
             elif message.embeds[0].title == "チケット作成":
                 await message.remove_reaction(pl.emoji, user)
                 if pl.emoji.name == "add":
-                    dt = discord.utils.utcnow()
+                    dt = datetime.datetime.utcnow()
                     if user.id in list(Guild_settings[guild.id]["ticket_time"].keys()):
                         ldt = datetime.datetime.strptime(
                             Guild_settings[guild.id]["ticket_time"][user.id],
