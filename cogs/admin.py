@@ -326,7 +326,7 @@ class AdminCog(commands.Cog):
                     await ctx.send(
                         embed=SEmbed(
                             "stdout:",
-                            f"```py\n{ret[ctx.message.id][:4080]}\n```".replace(
+                            f"```py\n{str(ret[ctx.message.id])[:4080]}\n```".replace(
                                 self.bot.http.token, "[Token]"
                             ),
                         )
@@ -335,7 +335,7 @@ class AdminCog(commands.Cog):
                     await ctx.send(
                         embed=SEmbed(
                             "return:",
-                            f"```py\n{task.result()[:4080]}\n```".replace(
+                            f"```py\n{str(task.result()[0])[:4080]}\n```".replace(
                                 self.bot.http.token, "[Token]"
                             ),
                         )
