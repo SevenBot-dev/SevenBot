@@ -319,30 +319,27 @@ class AdminCog(commands.Cog):
             )
             for p in pending:
                 p.cancel()
-        try:
-            task = done.pop()
-            if task.get_name() == "exec":
-                if ret[ctx.message.id]:
-                    await ctx.send(
-                        embed=SEmbed(
-                            "stdout:",
-                            f"```py\n{str(ret[ctx.message.id])[:4080]}\n```".replace(
-                                self.bot.http.token, "[Token]"
-                            ),
-                        )
+        task = done.pop()
+        if task.get_name() == "exec":
+            if ret[ctx.message.id]:
+                await ctx.send(
+                    embed=SEmbed(
+                        "stdout:",
+                        f"```py\n{str(ret[ctx.message.id])[:4080]}\n```".replace(
+                            self.bot.http.token, "[Token]"
+                        ),
                     )
-                if task.result():
-                    await ctx.send(
-                        embed=SEmbed(
-                            "return:",
-                            f"```py\n{str(task.result()[0])[:4080]}\n```".replace(
-                                self.bot.http.token, "[Token]"
-                            ),
-                        )
+                )
+            if task.result():
+                await ctx.send(
+                    embed=SEmbed(
+                        "return:",
+                        f"```py\n{str(task.result())[:4080]}\n```".replace(
+                            self.bot.http.token, "[Token]"
+                        ),
                     )
-            await ctx.message.remove_reaction(Official_emojis["check4"], self.bot.user)
-        except BaseException:
-            pass
+                )
+        await ctx.message.remove_reaction(Official_emojis["check4"], self.bot.user)
         await ctx.message.add_reaction(Official_emojis["check8"])
         del ret[ctx.message.id]
 
