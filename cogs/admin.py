@@ -282,7 +282,8 @@ class AdminCog(commands.Cog):
     @commands.command(hidden=True, name="exec")
     @commands.is_owner()
     async def _exec(self, ctx, *, script):
-        script = script.removeprefix("```py").removesuffix("```")
+        script = script.removeprefix("```py").removesuffix("```").strip()
+        loop = asyncio.get_event_loop()
         async with aiohttp.ClientSession() as session:
             ret[ctx.message.id] = ""
 
@@ -293,25 +294,53 @@ class AdminCog(commands.Cog):
                 ret[ctx.message.id] += " ".join(map(str, txt)) + "\n"
 
             exec(
-                "async def __ex(self,_bot,_ctx,ctx,session,print,get_msg): "
+                ";".join(
+                    ["from sembed import SEmbed,SAuthor,SFooter,SField", "import io"]
+                )
+                + "\nasync def __ex(self,_bot,_ctx,ctx,session,print,get_msg):\n"
                 + "\n".join(f"    {l}" for l in script.split("\n"))
             )
-            r = await locals()["__ex"](
-                self, self.bot, ctx, ctx, session, _print, get_msg
+            exec_task = loop.create_task(
+                locals()["__ex"](self, self.bot, ctx, ctx, session, _print, get_msg),
+                name="exec",
             )
+            await ctx.message.add_reaction(Official_emojis["check4"])
+            cancel_task = loop.create_task(
+                self.bot.wait_for(
+                    "raw_reaction_add",
+                    check=lambda payload: payload.message_id == ctx.message.id
+                    and payload.user_id == ctx.author.id
+                    and payload.emoji.id == Official_emojis["check4"],
+                ),
+                name="cancel",
+            )
+            done, pending = await asyncio.wait(
+                {cancel_task, exec_task}, return_when=asyncio.FIRST_COMPLETED
+            )
+            for p in pending:
+                p.cancel()
         try:
-            if ret[ctx.message.id]:
-                await ctx.send(
-                    f"stdout:```py\n{str(ret[ctx.message.id])[:1980]}\n```".replace(
-                        self.bot.http.token, "[Token]"
+            task = done.pop()
+            if task.get_name() == "exec":
+                if ret[ctx.message.id]:
+                    await ctx.send(
+                        embed=SEmbed(
+                            "stdout:",
+                            f"```py\n{ret[ctx.message.id][:4080]}\n```".replace(
+                                self.bot.http.token, "[Token]"
+                            ),
+                        )
                     )
-                )
-            if r:
-                await ctx.send(
-                    f"return:```py\n{str(r)[:1980]}\n```".replace(
-                        self.bot.http.token, "[Token]"
+                if task.result():
+                    await ctx.send(
+                        embed=SEmbed(
+                            "return:",
+                            f"```py\n{task.result()[:4080]}\n```".replace(
+                                self.bot.http.token, "[Token]"
+                            ),
+                        )
                     )
-                )
+            await ctx.message.remove_reaction(Official_emojis["check4"], self.bot.user)
         except BaseException:
             pass
         await ctx.message.add_reaction(Official_emojis["check8"])
