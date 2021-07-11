@@ -22,6 +22,7 @@ from discord import Forbidden, NotFound
 from discord.ext import commands, syntaxer, components
 from discord.ext.commands import BadArgument, CommandNotFound, Context, bot
 from sembed import SAuthor, SEmbed, SField
+import sentry_sdk
 from texttable import Texttable
 
 import _pathmagic  # type: ignore # noqa: F401
@@ -2557,13 +2558,19 @@ def setup(_bot):
     async def on_error(_, *args, **__):
         try:
             ex = sys.exc_info()[1]
-            print(traceback.format_exc())
             if not bot.is_ready():
                 return
             if isinstance(
                 ex, (AttributeError, aiohttp.client_exceptions.ClientOSError)
             ):
                 return
+            if isinstance(ex, discord.errors.HTTPException):
+                if ex.status == 400:
+                    if "message_reference: Unknown message" not in ex.text:
+                        return sentry_sdk.capture_exception(ex)
+                elif ex.status in (403, 404):
+                    return sentry_sdk.capture_exception(ex)
+
             if len(args) == 0:
                 c = bot.get_channel(763877469928554517)
                 e = discord.Embed(

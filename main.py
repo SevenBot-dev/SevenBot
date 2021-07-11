@@ -12,12 +12,13 @@ from typing import Union
 import discord
 import pymongo
 import requests
+import sentry_sdk
 import topgg
 from discord.ext import commands, levenshtein
 from motor import motor_asyncio as motor
 
 from common_resources import consts as common_resources
-from common_resources.tokens import TOKEN, cstr, dbl_token, web_pass
+from common_resources.tokens import TOKEN, cstr, dbl_token, web_pass, sentry_url
 from common_resources.consts import Official_discord_id, Sub_discord_id
 from common_resources.tools import flatten
 
@@ -32,6 +33,10 @@ handler.setFormatter(
 )
 logger.addHandler(handler)
 
+sentry_sdk.init(
+    sentry_url,
+    traces_sample_rate=1.0,
+)
 
 Channel_ids = {
     "log": 756254787191963768,
