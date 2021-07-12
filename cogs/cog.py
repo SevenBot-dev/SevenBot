@@ -2569,7 +2569,7 @@ def setup(_bot):
                     if "message_reference: Unknown message" not in ex.text:
                         return sentry_sdk.capture_exception(ex)
                 elif ex.status in (403, 404):
-                    return sentry_sdk.capture_exception(ex)
+                    return
 
             if len(args) == 0:
                 c = bot.get_channel(763877469928554517)
@@ -2578,7 +2578,6 @@ def setup(_bot):
                     description="```" + traceback.format_exc() + "```",
                     color=Error,
                 )
-            else:
                 e = None
                 if isinstance(args[0], Context):
                     c = args[0].message.channel
@@ -2600,6 +2599,7 @@ def setup(_bot):
                         color=Error,
                     )
             try:
+                sentry_sdk.capture_exception(ex)
                 msg = await c.send(embed=e)
                 await msg.add_reaction(Official_emojis["down"])
                 await bot.wait_for(
