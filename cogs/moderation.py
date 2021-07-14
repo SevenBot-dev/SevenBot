@@ -14,7 +14,7 @@ from texttable import Texttable
 
 
 import _pathmagic  # type: ignore # noqa
-from common_resources.consts import Info, Success, Error, Chat, Time_format
+from common_resources.consts import Info, Success, Error, Chat
 from common_resources.tools import flatten, convert_timedelta
 
 
