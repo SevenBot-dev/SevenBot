@@ -422,7 +422,7 @@ class MainCog(commands.Cog):
             if mtr > time.time():
                 e = discord.Embed(
                     title=f"{message.author.name}はミュートされています。",
-                    description=f"<t:{mtr}:R>にミュートが解除されます。",
+                    description=f"<t:{int(mtr)}:R>にミュートが解除されます。",
                     color=Alert,
                 )
                 e.set_footer(text=get_txt(message.guild.id, "message_delete").format(5))
