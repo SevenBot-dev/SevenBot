@@ -419,11 +419,10 @@ class MainCog(commands.Cog):
         if message.author.id in ls:
             dt = discord.utils.utcnow()
             mtr = Guild_settings[message.guild.id]["muted"][au]
-            mt = datetime.datetime.strptime(mtr, Time_format)
-            if mt > dt:
+            if mtr > time.time():
                 e = discord.Embed(
                     title=f"{message.author.name}はミュートされています。",
-                    description=f"あと{text_to_delta((mt-dt),message)}",
+                    description=f"<t:{mtr}:R>にミュートが解除されます。",
                     color=Alert,
                 )
                 e.set_footer(text=get_txt(message.guild.id, "message_delete").format(5))
@@ -1944,11 +1943,11 @@ class MainCog(commands.Cog):
         )
         e.add_field(
             name=get_txt(ctx.guild.id, "lookup")[3],
-            value=u.created_at.strftime(Time_format),
+            value=discord.utils.format_dt(u.created_at),
         )
         e.add_field(
             name=get_txt(ctx.guild.id, "lookup")[4],
-            value=u.joined_at.strftime(Time_format)
+            value=discord.utils.format_dt(u.joined_at)
             if isinstance(u, discord.Member)
             else get_txt(ctx.guild.id, "lookup")[9],
         )

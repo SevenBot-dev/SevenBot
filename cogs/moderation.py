@@ -21,8 +21,7 @@ from common_resources.tools import flatten, convert_timedelta
 async def punish(target, p):
     if p["action"] == "mute":
         dt = discord.utils.utcnow() + datetime.timedelta(seconds=p["length"])
-        sdt = dt.strftime(Time_format)
-        Guild_settings[target.guild.id]["muted"][target.id] = sdt
+        Guild_settings[target.guild.id]["muted"][target.id] = dt.timestamp()
     elif p["action"] == "kick":
         await target.kick()
     elif p["action"] == "ban":
@@ -578,11 +577,9 @@ class ModerationCog(commands.Cog):
             await ctx.reply(embed=e)
         else:
             dt = discord.utils.utcnow() + time
-            sdt = dt.strftime(Time_format)
-            Guild_settings[ctx.guild.id]["muted"][u.id] = sdt
+            Guild_settings[ctx.guild.id]["muted"][u.id] = dt.timestamp()
             e = discord.Embed(
-                title=f"`{u.display_name}`を{delta_to_text(time,ctx)}ミュートしました。",
-                description=f"終了時刻：{sdt}",
+                title=f"`{u.display_name}`を{discord.utils.format_dt(dt)}までミュートしました。",
                 color=Success,
             )
             await ctx.reply(embed=e)
