@@ -45,7 +45,9 @@ class BumpCog(commands.Cog):
                         ]
                         e = discord.Embed(
                             title=get_txt(message.guild.id, "bump_detected"),
-                            description=get_txt(message.guild.id, "bump_detected_desc"),
+                            description=get_txt(
+                                message.guild.id, "bump_detected_desc"
+                            ).format(int(time.time()) + 3600 * 2),
                             color=Bump_color,
                         )
                         await message.channel.send(embed=e)
@@ -66,7 +68,7 @@ class BumpCog(commands.Cog):
                             title=get_txt(message.guild.id, "dissoku_detected"),
                             description=get_txt(
                                 message.guild.id, "dissoku_detected_desc"
-                            ),
+                            ).format(int(time.time()) + 3600),
                             color=Dissoku_color,
                         )
                         await message.channel.send(embed=e)
