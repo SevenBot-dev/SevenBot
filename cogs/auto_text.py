@@ -77,7 +77,10 @@ class AutoTextCog(commands.Cog):
     @commands.Cog.listener()
     async def on_voice_channel_update(self, member, before, after):
         if before is not None and (not before.members) and before in Auto_text_channels:
-            await Auto_text_channels[before].delete()
+            try:
+                await Auto_text_channels[before].delete()
+            except discord.errors.NotFound:
+                pass
             del Auto_text_channels[before]
         if (
             after is not None
