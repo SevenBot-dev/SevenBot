@@ -237,7 +237,7 @@ translator = AsyncTranslator()
 
 class MainCog(commands.Cog):
     def __init__(self, bot):
-        global Guild_settings, Official_emojis, Texts, Global_chat, Command_counter, Global_mute, GBan, Sevennet_channels, Sevennet_posts
+        global Guild_settings, Official_emojis, Texts, Global_chat, Command_counter, Global_mute, GBan, Sevennet_channels, Sevennet_posts, Blacklists
         global get_txt, is_command
         self.bot: commands.Bot = bot
         if not self.bot.consts.get("gcm"):
@@ -252,6 +252,7 @@ class MainCog(commands.Cog):
             Sevennet_channels = self.bot.raw_config["snc"]
             Sevennet_posts = self.bot.raw_config["snp"]
             Global_mute = self.bot.raw_config["gm"]
+            Blacklists = self.bot.raw_config["il"]
             GBan = self.bot.raw_config["gb"]
             Texts = self.bot.texts
             for i in range(11):
