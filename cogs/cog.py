@@ -1983,7 +1983,7 @@ class MainCog(commands.Cog):
         return await ctx.reply(embed=e)
 
     @commands.command(aliases=["guildinfo", "si", "gi"])
-    async def serverinfo(self, ctx, guild: discord.Guild = None):
+    async def serverinfo(self, ctx, *, guild: discord.Guild = None):
         if guild is None:
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "serverinfo")["unknown"], color=Error
