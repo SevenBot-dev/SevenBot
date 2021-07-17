@@ -155,7 +155,7 @@ class MessageExpandCog(commands.Cog):
             e = discord.Embed(
                 title=get_txt(gi, "deactivate_fail"),
                 description=get_txt(ctx.guild.id, "deactivate_desc").format(
-                    "sb#expand_message deactivate"
+                    "sb#expand_message activate"
                 ),
                 color=Error,
             )
@@ -165,7 +165,7 @@ class MessageExpandCog(commands.Cog):
             e = discord.Embed(
                 title=get_txt(gi, "deactivate").format("メッセージ展開"),
                 description=get_txt(gi, "deactivate_desc").format(
-                    "sb#expand_message deactivate"
+                    "sb#expand_message activate"
                 ),
                 color=Success,
             )
