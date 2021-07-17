@@ -1336,7 +1336,7 @@ class FunCog(commands.Cog):
         avater_mask_draw.rectangle((size[0] / 2, 0, size[0], size[1]), fill=255)
         avater1.paste(avater2, mask=avater_mask)
         avater_draw = ImageDraw.Draw(avater1)
-        fnt_vs = ImageFont.truetype("hiraw6.OTF", 320)
+        fnt_vs = ImageFont.truetype("./fonts/bold.OTF", 320)
         w, h = avater_draw.textsize("s", fnt_vs)
         avater_draw.rectangle(
             (size[0] / 2 - 32, 0, size[0] / 2 + 32, size[1]), fill=255
@@ -1359,7 +1359,7 @@ class FunCog(commands.Cog):
             draw.line((160 * i, 0, 160 * i, 480), (255, 255, 255), 8, "curve")
             draw.line((0, 160 * i, 480, 160 * i), (255, 255, 255), 8, "curve")
         fields = [0, 0, 0, 0, 0, 0, 0, 0, 0]
-        fnt = ImageFont.truetype("hiraw3.OTF", 128)
+        fnt = ImageFont.truetype("./fonts/midium.OTF", 128)
         e = discord.Embed(
             title=get_txt(ctx.guild.id, "ox_title"),
             description=get_txt(ctx.guild.id, "ox_prepare"),
