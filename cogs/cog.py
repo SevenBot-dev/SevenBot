@@ -275,6 +275,8 @@ class MainCog(commands.Cog):
     @commands.Cog.listener(name="on_guild_remove")
     async def on_guild_remove(self, g):
         global Guild_settings
+        if g.id in Blacklists:
+            return
         await self.bot.get_channel(756254787191963768).send(
             f"<サーバー退出>\n名前：{g.name}\nID：{g.id}"
         )
