@@ -153,13 +153,14 @@ BRACKET_TRANS = str.maketrans(BRACKET_DICT)
 
 class FunCog(commands.Cog):
     def __init__(self, _bot):
-        global Guild_settings, Official_emojis, get_txt, is_command, Texts
+        global Guild_settings, Official_emojis, get_txt, is_command, Texts, Number_emojis
         self.bot = _bot
         get_txt = _bot.get_txt
         is_command = _bot.is_command
         Texts = _bot.texts
         Guild_settings = _bot.guild_settings
         Official_emojis = _bot.consts["oe"]
+        Number_emojis = _bot.consts["ne"]
 
     @commands.Cog.listener("on_message")
     async def on_message_lainan(self, message):
@@ -1300,6 +1301,7 @@ class FunCog(commands.Cog):
     @commands.command(name="tic_tac_toe", aliases=["ox", "tictactoe"])
     async def tic_tac_toe(self, ctx, target: discord.Member):
         turns = [ctx.author, target]
+        loop = asyncio.get_event_loop()
         if random.randrange(2):
             turns.reverse()
         index = 0
@@ -1367,10 +1369,8 @@ class FunCog(commands.Cog):
         )
 
         msg = await ctx.reply(embed=e)
-        loop = asyncio.get_event_loop()
         for n in Number_emojis[1:10]:
-            loop.create_task(msg.add_reaction(n))
-        await ctx.message.delete()
+            await msg.add_reaction(n)
         e.set_author(
             name=f"{ctx.author.display_name}(ID:{ctx.author.id}) vs {target.display_name}(ID:{target.id})",
             icon_url=amsg.attachments[0].url,
