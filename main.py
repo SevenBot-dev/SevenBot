@@ -56,7 +56,7 @@ def prefix(bot, message):
         if bot.debug:
             return ["sb/"]
         else:
-            return ["sb#", "sb. ", "sb."]
+            return ["sb#", "sb."]
     else:
         return Guild_settings[message.guild.id]["prefix"]
 
@@ -255,6 +255,8 @@ bot = SevenBot(
     help_command=None,
     allowed_mentions=discord.AllowedMentions(everyone=False, replied_user=False),
     intents=intent,
+    strip_after_prefix=True,
+    case_insensitive=True,
 )
 
 
