@@ -237,7 +237,7 @@ translator = AsyncTranslator()
 
 class MainCog(commands.Cog):
     def __init__(self, bot):
-        global Guild_settings, Official_emojis, Texts, Global_chat, Command_counter, Global_mute, GBan, Sevennet_channels, Sevennet_posts
+        global Guild_settings, Official_emojis, Texts, Global_chat, Command_counter, Global_mute, GBan, Sevennet_channels, Sevennet_posts, Blacklists
         global get_txt, is_command
         self.bot: commands.Bot = bot
         if not self.bot.consts.get("gcm"):
@@ -252,6 +252,7 @@ class MainCog(commands.Cog):
             Sevennet_channels = self.bot.raw_config["snc"]
             Sevennet_posts = self.bot.raw_config["snp"]
             Global_mute = self.bot.raw_config["gm"]
+            Blacklists = self.bot.raw_config["il"]
             GBan = self.bot.raw_config["gb"]
             Texts = self.bot.texts
             for i in range(11):
@@ -274,6 +275,8 @@ class MainCog(commands.Cog):
     @commands.Cog.listener(name="on_guild_remove")
     async def on_guild_remove(self, g):
         global Guild_settings
+        if g.id in Blacklists:
+            return
         await self.bot.get_channel(756254787191963768).send(
             f"<サーバー退出>\n名前：{g.name}\nID：{g.id}"
         )
@@ -1983,8 +1986,7 @@ class MainCog(commands.Cog):
         return await ctx.reply(embed=e)
 
     @commands.command(aliases=["guildinfo", "si", "gi"])
-    async def serverinfo(self, ctx, guild: int = None):
-        guild = self.bot.get_guild(guild or ctx.guild.id)
+    async def serverinfo(self, ctx, *, guild: discord.Guild = None):
         if guild is None:
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "serverinfo")["unknown"], color=Error
