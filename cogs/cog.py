@@ -1987,6 +1987,7 @@ class MainCog(commands.Cog):
 
     @commands.command(aliases=["guildinfo", "si", "gi"])
     async def serverinfo(self, ctx, *, guild: discord.Guild = None):
+        guild = guild or ctx.guild
         if guild is None:
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "serverinfo")["unknown"], color=Error
