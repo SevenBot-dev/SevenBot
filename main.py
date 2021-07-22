@@ -72,7 +72,7 @@ intent.typing = False
 print("Loading save from attachment...", end="")
 try:
     r = requests.get(
-        f"https://discord.com/api/v8/channels/{Save_channel_id}/messages?limit=1",
+        f"https://discord.com/api/v9/channels/{Save_channel_id}/messages?limit=1",
         headers={"authorization": "Bot " + TOKEN},
     )
     r.raise_for_status()
