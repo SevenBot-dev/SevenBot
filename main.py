@@ -24,9 +24,6 @@ from common_resources.tools import flatten
 
 logger = logging.getLogger("discord")
 logger.setLevel(logging.INFO)
-# handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
-# handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
-# logger.addHandler(handler)
 handler = logging.StreamHandler()
 handler.setFormatter(
     logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s")
@@ -63,12 +60,6 @@ def prefix(bot, message):
 
 intent = discord.Intents.all()
 intent.typing = False
-# intent.members=True
-# intent.messages=True
-# intent.reactions=True
-
-# Save_game = discord.Game(name="Saving..." + "⠀" * 100)
-# Save_game2 = discord.Game(name="Complete!" + "⠀" * 100)
 print("Loading save from attachment...", end="")
 try:
     r = requests.get(
@@ -109,6 +100,17 @@ for g in tmp_client.sevenbot.guild_settings.find({}, {"_id": False}):
 print("Done")
 
 
+class SBEmoji(discord.Emoji):
+    def __init__(self, emoji):
+        self.emoji = emoji
+
+    def __eq__(self, other):
+        return self.emoji.name == other.name and self.guild == other.guild
+
+    def __getattr__(self, attr):
+        return getattr(self.emoji, attr)
+
+
 class SevenBot(commands.Bot):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -134,10 +136,10 @@ class SevenBot(commands.Bot):
             self.consts["ch"][k] = self.get_channel(v)
         g = self.get_guild(Official_discord_id)
         for oe in g.emojis:
-            self.consts["oe"][oe.name] = oe
+            self.consts["oe"][oe.name] = SBEmoji(oe)
         g = self.get_guild(Sub_discord_id)
         for oe in g.emojis:
-            self.consts["oe"][oe.name] = oe
+            self.consts["oe"][oe.name] = SBEmoji(oe)
         for i in range(11):
             self.consts["ne"].append(self.consts["oe"]["b" + str(i)])
         if not self.debug:
