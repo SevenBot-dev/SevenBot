@@ -43,7 +43,7 @@ class LevelCog(commands.Cog):
             return
         if (
             message.author.bot
-            or message.channel.id in Guild_settings[message.guild.id]["lainan_talk"]
+#            or message.channel.id in Guild_settings[message.guild.id]["lainan_talk"]
         ):
             return
         if message.guild is None:
