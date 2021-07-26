@@ -83,9 +83,7 @@ class BatchCog(commands.Cog):
                 },
             }
         )
-        async for r in self.bot.db.status_log.find():
-            if time.time() - r["time"] > 60 * 60 * 24:
-                await self.bot.db.status_log.delete_one(r)
+        await self.bot.db.status_log.delete_many({"time": {"$lt": time.time() - 60 * 60 * 24 * 3}})
 
     @batch_send_status.before_loop
     async def batch_send_status_before(self):
