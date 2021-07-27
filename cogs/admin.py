@@ -24,7 +24,7 @@ ret = {}
 
 class AdminCog(commands.Cog):
     def __init__(self, bot):
-        global Guild_settings, Official_emojis, Global_chat, Global_mute, Private_chats, Sevennet_channels, GBan, Blacklists
+        global Guild_settings, Official_emojis, Global_chat, Global_mute, Private_chat_info, Sevennet_channels, GBan, Blacklists
         global get_txt
         self.bot: commands.Bot = bot
         Guild_settings = bot.guild_settings
@@ -32,7 +32,7 @@ class AdminCog(commands.Cog):
         GBan = bot.raw_config["gb"]
         Blacklists = bot.raw_config["bs"]
         Official_emojis = bot.consts["oe"]
-        Private_chats = bot.raw_config["pc"]
+        Private_chat_info = bot.consts["pci"]
         Global_mute = bot.raw_config["gm"]
         Sevennet_channels = bot.raw_config["snc"]
         get_txt = bot.get_txt
@@ -106,11 +106,11 @@ class AdminCog(commands.Cog):
                 Global_mute.append(user.id)
                 loop = asyncio.get_event_loop()
                 whname = "sevenbot-private-webhook-gban"
-                for c in Private_chats["gban"]:
+                for c in Private_chat_info["gban"]["channels"]:
                     cn = self.bot.get_channel(c)
 
                     if cn is None:
-                        Private_chats["gban"].remove(c)
+                        Private_chat_info["gban"]["channels"].remove(c)
                     else:
                         ch_webhooks = await cn.webhooks()
                         webhook = discord.utils.get(ch_webhooks, name=whname)
@@ -389,11 +389,11 @@ class AdminCog(commands.Cog):
                     pass
                 loop = asyncio.get_event_loop()
                 whname = "sevenbot-private-webhook-gban"
-                for c in Private_chats["gban"]:
+                for c in Private_chat_info["gban"]["channels"]:
                     cn = self.bot.get_channel(c)
 
                     if cn is None:
-                        Private_chats["gban"].remove(c)
+                        Private_chat_info["gban"]["channels"].remove(c)
                     else:
                         ch_webhooks = await cn.webhooks()
                         webhook = discord.utils.get(ch_webhooks, name=whname)
