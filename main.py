@@ -122,7 +122,7 @@ class SevenBot(commands.Bot):
         self.web_pass = web_pass
         self.debug = len(sys.argv) != 1 and sys.argv[1] == "debug"
         self.texts = common_resources.Texts
-        self.default_user_settings = {"level_dm": False, "favorite_musics": []}
+        self.default_user_settings = {"level_dm": False, "favorite_musics": [], "tts_settings": {}}
         print("Debug mode: " + str(self.debug))
         self.check(commands.cooldown(2, 2))
 
@@ -237,9 +237,9 @@ class SevenBot(commands.Bot):
         await ctx.send(embed=e)
 
     async def init_user_settings(self, uid):
-        nd = copy.deepcopy(self.bot.default_user_settings)
+        nd = copy.deepcopy(self.default_user_settings)
         nd["uid"] = uid
-        await self.bot.db.user_settings.insert_one(nd)
+        await self.db.user_settings.insert_one(nd)
 
     @property
     def global_chats(self):
