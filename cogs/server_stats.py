@@ -34,10 +34,17 @@ class ServerStatCog(commands.Cog):
 
     @server_stat.command(name="activate", aliases=Activate_aliases)
     @commands.has_permissions(manage_guild=True)
-    async def ss_activate(self, ctx, *list):
+    async def ss_activate(self, ctx, *stats):
         global Guild_settings
         cat = None
-        for l in list:
+        if not stats:
+            e = discord.Embed(
+                title=f"統計が指定されていません。",
+                description="`sb#help server_stat`で確認してください。",
+                color=Error,
+            )
+            return await ctx.reply(embed=e)
+        for l in stats:
             if l not in Stat_dict.keys():
                 e = discord.Embed(
                     title=f"統計{l}が見付かりませんでした。",
@@ -58,7 +65,7 @@ class ServerStatCog(commands.Cog):
                 ctx.guild.default_role: discord.PermissionOverwrite(connect=False)
             }
             cat = await ctx.guild.create_category("統計", overwrites=overwrites)
-        for l in list:
+        for l in stats:
             n = await ctx.guild.create_voice_channel(
                 f"{Stat_dict[l]}： --", category=cat
             )
@@ -92,8 +99,8 @@ class ServerStatCog(commands.Cog):
 
     @tasks.loop(minutes=5, seconds=10)
     async def batch_update_stat_channel(self):
-        try:
-            for g in self.bot.guilds:
+        for g in self.bot.guilds:
+            try:
                 if Guild_settings[g.id]["do_stat_channels"]:
                     for sck, scv in Guild_settings[g.id]["stat_channels"].items():
                         if sck == "category":
@@ -137,9 +144,9 @@ class ServerStatCog(commands.Cog):
                             await s.edit(name=f"{Stat_dict[sck]}: {val}")
                         except (NotFound, Forbidden):
                             pass
-            await asyncio.sleep(5)
-        except Exception:
-            pass
+                await asyncio.sleep(5)
+            except Exception:
+                pass
 
     def cog_unload(self):
         self.batch_update_stat_channel.stop()
