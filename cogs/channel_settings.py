@@ -2,7 +2,12 @@ import discord
 from discord.ext import commands
 
 import _pathmagic  # type: ignore # noqa
-from common_resources.consts import Activate_aliases, Deactivate_aliases, Success, Error
+from common_resources.consts import (
+    Activate_aliases,
+    Deactivate_aliases,
+    Success,
+    Error,
+)
 
 
 class ChannelSettingCog(commands.Cog):
@@ -26,7 +31,8 @@ class ChannelSettingCog(commands.Cog):
     async def ch_slowmode(self, ctx, sec: int):
         await ctx.channel.edit(slowmode_delay=sec)
         e = discord.Embed(
-            title=get_txt(ctx.guild.id, "ch")["slowmode"][0].format(sec), color=Success
+            title=get_txt(ctx.guild.id, "ch")["slowmode"][0].format(sec),
+            color=Success,
         )
         return await ctx.reply(embed=e)
 
@@ -51,7 +57,11 @@ class ChannelSettingCog(commands.Cog):
     async def deactivate_auto_parse(self, ctx):
         global Guild_settings
         if ctx.channel.id not in Guild_settings[ctx.guild.id]["auto_parse"]:
-            e = discord.Embed(title="既に無効化されています。", description="", color=Error)
+            e = discord.Embed(
+                title="既に無効化されています。",
+                description="",
+                color=Error
+            )
             return await ctx.reply(embed=e)
         else:
             Guild_settings[ctx.guild.id]["auto_parse"].remove(ctx.channel.id)
@@ -90,7 +100,11 @@ class ChannelSettingCog(commands.Cog):
     async def deactivate_2ch_link(self, ctx):
         global Guild_settings
         if ctx.channel.id not in Guild_settings[ctx.guild.id]["2ch_link"]:
-            e = discord.Embed(title="既に無効化されています。", description="", color=Error)
+            e = discord.Embed(
+                title="既に無効化されています。",
+                description="",
+                color=Error
+            )
             return await ctx.reply(embed=e)
         else:
             Guild_settings[ctx.guild.id]["2ch_link"].remove(ctx.channel.id)
@@ -160,7 +174,9 @@ class ChannelSettingCog(commands.Cog):
             e = discord.Embed(title="既に無効化されています。", description="", color=Error)
             return await ctx.reply(embed=e)
         else:
-            Guild_settings[ctx.guild.id]["deactivate_command"].append(ctx.channel.id)
+            Guild_settings[ctx.guild.id]["deactivate_command"].append(
+                ctx.channel.id
+            )
             e = discord.Embed(
                 title=f"`#{ctx.channel.name}`での管理者以外のコマンドを無効にしました。",
                 description="",
@@ -172,7 +188,9 @@ class ChannelSettingCog(commands.Cog):
     @commands.has_permissions(manage_channels=True)
     async def activate_command(self, ctx):
         if ctx.channel.id in Guild_settings[ctx.guild.id]["deactivate_command"]:
-            Guild_settings[ctx.guild.id]["deactivate_command"].remove(ctx.channel.id)
+            Guild_settings[ctx.guild.id]["deactivate_command"].remove(
+                ctx.channel.id
+            )
             e = discord.Embed(
                 title=f"`#{ctx.channel.name}`でのコマンドを有効にしました。",
                 description="",
@@ -195,11 +213,16 @@ class ChannelSettingCog(commands.Cog):
     @commands.has_permissions(manage_channels=True)
     async def ch_level_activate(self, ctx):
         global Guild_settings
-        if ctx.channel.id not in Guild_settings[ctx.guild.id]["level_ignore_channel"]:
+        if (
+            ctx.channel.id
+            not in Guild_settings[ctx.guild.id]["level_ignore_channel"]
+        ):
             e = discord.Embed(title="既に有効です。", color=Error)
             return await ctx.reply(embed=e)
         else:
-            Guild_settings[ctx.guild.id]["level_ignore_channel"].remove(ctx.channel.id)
+            Guild_settings[ctx.guild.id]["level_ignore_channel"].remove(
+                ctx.channel.id
+            )
             e = discord.Embed(
                 title="このチャンネルでのレベリングが有効になりました。", description="", color=Success
             )
@@ -209,11 +232,16 @@ class ChannelSettingCog(commands.Cog):
     @commands.has_permissions(manage_channels=True)
     async def ch_level_deactivate(self, ctx):
         global Guild_settings
-        if ctx.channel.id in Guild_settings[ctx.guild.id]["level_ignore_channel"]:
+        if (
+            ctx.channel.id
+            in Guild_settings[ctx.guild.id]["level_ignore_channel"]
+        ):
             e = discord.Embed(title="既に無効です。", description="", color=Error)
             return await ctx.reply(embed=e)
         else:
-            Guild_settings[ctx.guild.id]["level_ignore_channel"].append(ctx.channel.id)
+            Guild_settings[ctx.guild.id]["level_ignore_channel"].append(
+                ctx.channel.id
+            )
             e = discord.Embed(
                 title="このチャンネルでのレベリングが無効になりました。", description="", color=Success
             )
@@ -231,12 +259,16 @@ class ChannelSettingCog(commands.Cog):
     @commands.has_permissions(manage_channels=True)
     async def activate_translate(self, ctx, lang):
         global Guild_settings
-        if ctx.channel.id in list(Guild_settings[ctx.guild.id]["trans_channel"].keys()):
+        if ctx.channel.id in list(
+            Guild_settings[ctx.guild.id]["trans_channel"].keys()
+        ):
             e = discord.Embed(title="既に有効です。", color=Error)
             return await ctx.reply(embed=e)
         else:
             Guild_settings[ctx.guild.id]["trans_channel"][ctx.channel.id] = lang
-            e = discord.Embed(title="自動翻訳が有効になりました。", description="", color=Success)
+            e = discord.Embed(
+                title="自動翻訳が有効になりました。", description="", color=Success
+            )
             return await ctx.reply(embed=e)
 
     @ch_trans.command(name="deactivate", aliases=Deactivate_aliases)
@@ -250,7 +282,9 @@ class ChannelSettingCog(commands.Cog):
             return await ctx.reply(embed=e)
         else:
             del Guild_settings[ctx.guild.id]["trans_channel"][ctx.channel.id]
-            e = discord.Embed(title="自動翻訳が無効になりました。", description="", color=Success)
+            e = discord.Embed(
+                title="自動翻訳が無効になりました。", description="", color=Success
+            )
             return await ctx.reply(embed=e)
 
     @channel_setting.group(name="auto_publish")

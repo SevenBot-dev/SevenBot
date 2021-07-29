@@ -112,7 +112,14 @@ print("Done")
 class SevenBot(commands.Bot):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.consts = {"qu": {}, "ch": {}, "oe": {}, "ne": [], "tc": {}, "pci": {}}
+        self.consts = {
+            "qu": {},
+            "ch": {},
+            "oe": {},
+            "ne": [],
+            "tc": {},
+            "pci": {},
+        }
         self.raw_config = ast.literal_eval(raw_save)
         self.guild_settings = gs
         self.dbclient = motor.AsyncIOMotorClient(cstr)
@@ -122,7 +129,11 @@ class SevenBot(commands.Bot):
         self.web_pass = web_pass
         self.debug = len(sys.argv) != 1 and sys.argv[1] == "debug"
         self.texts = common_resources.Texts
-        self.default_user_settings = {"level_dm": False, "favorite_musics": [], "tts_settings": {}}
+        self.default_user_settings = {
+            "level_dm": False,
+            "favorite_musics": [],
+            "tts_settings": {},
+        }
         print("Debug mode: " + str(self.debug))
         self.check(commands.cooldown(2, 2))
 
@@ -148,9 +159,14 @@ class SevenBot(commands.Bot):
         for o in os.listdir("./cogs"):
             if o.endswith(".py") and not o.startswith("_"):
                 with open(f"./cogs/{o}") as f:
-                    if f.read().startswith("# -*- ignore_on_debug -*-") and self.debug:
+                    if (
+                        f.read().startswith("# -*- ignore_on_debug -*-")
+                        and self.debug
+                    ):
                         continue
-                bot.load_extension("cogs." + os.path.splitext(os.path.basename(o))[0])
+                bot.load_extension(
+                    "cogs." + os.path.splitext(os.path.basename(o))[0]
+                )
         self.levenshtein = levenshtein.Levenshtein(self, max_length=1)
         print("on_ready done")
 
@@ -160,7 +176,9 @@ class SevenBot(commands.Bot):
             or Premium_role
             in [
                 r.id
-                for r in self.get_guild(715540925081714788).get_member(user.id).roles
+                for r in self.get_guild(715540925081714788)
+                .get_member(user.id)
+                .roles
             ]
         )
 
@@ -198,7 +216,9 @@ class SevenBot(commands.Bot):
             ),
         )
         await (await self.fetch_channel(765489262123548673)).send(
-            file=discord.File(sio, filename=f"save_{datetime.datetime.now()}.txt")
+            file=discord.File(
+                sio, filename=f"save_{datetime.datetime.now()}.txt"
+            )
         )
         sio.close()
         #         print(games)
@@ -224,13 +244,17 @@ class SevenBot(commands.Bot):
                 + (
                     self.get_txt(ctx.guild.id, "help_detail").get(
                         str(c),
-                        "_" + self.get_txt(ctx.guild.id, "help_detail_none") + "_",
+                        "_"
+                        + self.get_txt(ctx.guild.id, "help_detail_none")
+                        + "_",
                     )
                 ).split("\n")[0]
                 + "\n"
             )
         e = discord.Embed(
-            title=self.get_txt(ctx.guild.id, "subcommand").format(ctx.command.name),
+            title=self.get_txt(ctx.guild.id, "subcommand").format(
+                ctx.command.name
+            ),
             description=desc,
             color=0x00CCFF,
         )
@@ -253,7 +277,9 @@ class SevenBot(commands.Bot):
 bot = SevenBot(
     command_prefix=prefix,
     help_command=None,
-    allowed_mentions=discord.AllowedMentions(everyone=False, replied_user=False),
+    allowed_mentions=discord.AllowedMentions(
+        everyone=False, replied_user=False
+    ),
     intents=intent,
     strip_after_prefix=True,
     case_insensitive=True,

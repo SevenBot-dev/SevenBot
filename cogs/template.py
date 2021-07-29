@@ -1,3 +1,4 @@
+# flake8: noqa
 import discord
 from discord.ext import commands
 

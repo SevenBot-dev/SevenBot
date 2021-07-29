@@ -55,11 +55,14 @@ class BatchCog(commands.Cog):
         )
         if (
             not self.bot.get_guild(715540925081714788).me.activity
-            or self.bot.get_guild(715540925081714788).me.activity.name.replace("⠀", "")
+            or self.bot.get_guild(715540925081714788).me.activity.name.replace(
+                "⠀", ""
+            )
             != n
         ):
             await self.bot.change_presence(
-                activity=discord.Game(name=n + "⠀" * 10), status=discord.Status.online
+                activity=discord.Game(name=n + "⠀" * 10),
+                status=discord.Status.online,
             )
 
     @tasks.loop(minutes=10)
@@ -78,12 +81,16 @@ class BatchCog(commands.Cog):
                 "mem": {"percent": mem.percent, "gb": mem.used / gb},
                 "time": time.time(),
                 "save": {
-                    "main": len(str(self.bot.raw_config).encode("utf8")) / 1024,
+                    "main": len(
+                        str(self.bot.raw_config).encode("utf8")
+                    ) / 1024,
                     "db": call["dataSize"] / 1024,
                 },
             }
         )
-        await self.bot.db.status_log.delete_many({"time": {"$lt": time.time() - 60 * 60 * 24 * 3}})
+        await self.bot.db.status_log.delete_many(
+            {"time": {"$lt": time.time() - 60 * 60 * 24 * 3}}
+        )
 
     @batch_send_status.before_loop
     async def batch_send_status_before(self):
@@ -96,7 +103,9 @@ class BatchCog(commands.Cog):
         except Exception as e:
             await self.bot.get_user(686547120534454315).send(
                 "batch_save:```\n"
-                + "".join(traceback.TracebackException.from_exception(e).format())
+                + "".join(
+                    traceback.TracebackException.from_exception(e).format()
+                )
                 + "```"
             )
 

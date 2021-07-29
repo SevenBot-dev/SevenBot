@@ -1,5 +1,4 @@
 import asyncio
-import collections
 import colorsys
 import hashlib
 import io
@@ -20,19 +19,14 @@ from PIL import Image, ImageFont, ImageDraw, ImageFilter
 from sembed import SEmbed, SField
 
 import _pathmagic  # type: ignore # noqa: F401
-from common_resources.consts import Official_discord_id, Gaming, Info, Error, Success
-from common_resources.tools import chrsize_len
-
-
-def flatten(l):
-    for el in l:
-        if isinstance(el, collections.abc.Iterable) and not isinstance(
-            el, (str, bytes)
-        ):
-            yield from flatten(el)
-        else:
-            yield el
-
+from common_resources.consts import (
+    Official_discord_id,
+    Gaming,
+    Info,
+    Error,
+    Success,
+)
+from common_resources.tools import chrsize_len, flatten
 
 Bignum_join = {}
 Wolf_join = {}
@@ -63,7 +57,11 @@ Channel_ids = {
 
 
 def death_generator(message):
-    r = list(map(lambda m: m.replace("\r", "").replace("\n", ""), message.split("\n")))
+    r = list(
+        map(
+            lambda m: m.replace("\r", "").replace("\n", ""), message.split("\n")
+        )
+    )
     ml = 0
     for ir in r:
         if chrsize_len(ir) > ml:
@@ -146,7 +144,8 @@ lainan_doing = False
 
 BRACKET_BASE = "()[]{}（）「」［］【】《》｢｣『』〈〉｛｝〔〕〘〙〚〛"
 BRACKET_DICT = {
-    BRACKET_BASE[i * 2]: BRACKET_BASE[i * 2 + 1] for i in range(len(BRACKET_BASE) // 2)
+    BRACKET_BASE[i * 2]: BRACKET_BASE[i * 2 + 1]
+    for i in range(len(BRACKET_BASE) // 2)
 }
 BRACKET_TRANS = str.maketrans(BRACKET_DICT)
 
@@ -167,7 +166,10 @@ class FunCog(commands.Cog):
         global lainan_doing
         if message.author.bot:
             return
-        elif message.channel.id not in Guild_settings[message.guild.id]["lainan_talk"]:
+        elif (
+            message.channel.id
+            not in Guild_settings[message.guild.id]["lainan_talk"]
+        ):
             return
         elif is_command(message):
             return
@@ -190,7 +192,8 @@ class FunCog(commands.Cog):
                     while LAINAN_QUEUE:
                         cr = LAINAN_QUEUE[0]
                         async with s.get(
-                            "https://api.lainan.one/?msg=" + urllib.parse.quote(cr[1])
+                            "https://api.lainan.one/?msg="
+                            + urllib.parse.quote(cr[1])
                         ) as r:
                             if r.status != 200:
                                 return
@@ -226,8 +229,12 @@ class FunCog(commands.Cog):
             and pl.user_id != self.bot.user.id
         ):
             m0 = message.embeds[0]
-            if m0.title.startswith(get_txt(guild.id, "big-number")["title"] + " - "):
-                if m0.title.endswith(get_txt(guild.id, "big-number")["waiting"]):
+            if m0.title.startswith(
+                get_txt(guild.id, "big-number")["title"] + " - "
+            ):
+                if m0.title.endswith(
+                    get_txt(guild.id, "big-number")["waiting"]
+                ):
                     n = discord.utils.utcnow()
                     guild = self.bot.get_guild(pl.guild_id)
                     user = guild.get_member(pl.user_id)
@@ -241,7 +248,9 @@ class FunCog(commands.Cog):
                         if user.mention == Bignum_join[message.id][0]:
                             if len(Bignum_join[message.id]) >= 3:
                                 e = discord.Embed(
-                                    title=get_txt(guild.id, "big-number")["title"]
+                                    title=get_txt(guild.id, "big-number")[
+                                        "title"
+                                    ]
                                     + " - "
                                     + get_txt(guild.id, "big-number")["ready"],
                                     description=get_txt(guild.id, "big-number")[
@@ -258,7 +267,9 @@ class FunCog(commands.Cog):
                                 await message.edit(embed=e)
                                 await asyncio.sleep(2)
                                 e2 = discord.Embed(
-                                    title=get_txt(guild.id, "big-number")["title"]
+                                    title=get_txt(guild.id, "big-number")[
+                                        "title"
+                                    ]
                                     + " - "
                                     + Texts[Guild_settings[guild.id]["lang"]][
                                         "big-number"
@@ -269,7 +280,9 @@ class FunCog(commands.Cog):
                                     color=Gaming,
                                 )
                                 e = discord.Embed(
-                                    title=get_txt(guild.id, "big-number")["title"]
+                                    title=get_txt(guild.id, "big-number")[
+                                        "title"
+                                    ]
                                     + " - "
                                     + Texts[Guild_settings[guild.id]["lang"]][
                                         "big-number"
@@ -286,7 +299,9 @@ class FunCog(commands.Cog):
 
                                 async def single_wait(e, user):
                                     while True:
-                                        await self.bot.get_user(user).send(embed=e)
+                                        await self.bot.get_user(user).send(
+                                            embed=e
+                                        )
                                         try:
                                             msg = await self.bot.wait_for(
                                                 "message",
@@ -301,34 +316,45 @@ class FunCog(commands.Cog):
                                             return False
                                         if not msg.content.isdecimal():
                                             continue
-                                        elif int(msg.content) not in range(1, 11):
+                                        elif int(msg.content) not in range(
+                                            1, 11
+                                        ):
                                             continue
-                                        if int(msg.content) not in inputs.keys():
+                                        if (
+                                            int(msg.content)
+                                            not in inputs.keys()
+                                        ):
                                             inputs[int(msg.content)] = []
-                                        inputs[int(msg.content)].append(msg.author.id)
+                                        inputs[int(msg.content)].append(
+                                            msg.author.id
+                                        )
                                         e3 = discord.Embed(
-                                            title=get_txt(guild.id, "big-number")[
-                                                "title"
-                                            ]
+                                            title=get_txt(
+                                                guild.id, "big-number"
+                                            )["title"]
                                             + " - "
-                                            + Texts[Guild_settings[guild.id]["lang"]][
-                                                "big-number"
-                                            ]["input"],
-                                            description=get_txt(guild.id, "big-number")[
-                                                "input_received"
-                                            ],
+                                            + Texts[
+                                                Guild_settings[guild.id]["lang"]
+                                            ]["big-number"]["input"],
+                                            description=get_txt(
+                                                guild.id, "big-number"
+                                            )["input_received"],
                                             color=Gaming,
                                         )
                                         await msg.channel.send(embed=e3)
                                         e4 = discord.Embed(
-                                            title=get_txt(guild.id, "big-number")[
-                                                "title"
-                                            ]
+                                            title=get_txt(
+                                                guild.id, "big-number"
+                                            )["title"]
                                             + " - "
-                                            + get_txt(guild.id, "big-number")["input"],
-                                            description=get_txt(guild.id, "big-number")[
-                                                "input_received2"
-                                            ].format(msg.author.mention),
+                                            + get_txt(guild.id, "big-number")[
+                                                "input"
+                                            ],
+                                            description=get_txt(
+                                                guild.id, "big-number"
+                                            )["input_received2"].format(
+                                                msg.author.mention
+                                            ),
                                             color=Gaming,
                                         )
                                         await message.channel.send(embed=e4)
@@ -343,34 +369,36 @@ class FunCog(commands.Cog):
                                         ga.append(single_wait(e2, mn.id))
                                     except Forbidden:
                                         e = discord.Embed(
-                                            title=get_txt(guild.id, "big-number")[
-                                                "title"
-                                            ]
+                                            title=get_txt(
+                                                guild.id, "big-number"
+                                            )["title"]
                                             + " - "
-                                            + Texts[Guild_settings[guild.id]["lang"]][
-                                                "big-number"
-                                            ]["cancel"],
-                                            description=get_txt(guild.id, "big-number")[
-                                                "no_dm"
-                                            ],
+                                            + Texts[
+                                                Guild_settings[guild.id]["lang"]
+                                            ]["big-number"]["cancel"],
+                                            description=get_txt(
+                                                guild.id, "big-number"
+                                            )["no_dm"],
                                             color=Gaming,
                                         )
                                         await message.edit(embed=e)
                                         return
 
                                 res = await asyncio.gather(*ga)
-                                if len(list(flatten(list(inputs.values())))) != len(
-                                    Bignum_join[message.id]
-                                ):
+                                if len(
+                                    list(flatten(list(inputs.values())))
+                                ) != len(Bignum_join[message.id]):
                                     e = discord.Embed(
-                                        title=get_txt(guild.id, "big-number")["title"]
+                                        title=get_txt(guild.id, "big-number")[
+                                            "title"
+                                        ]
                                         + " - "
-                                        + Texts[Guild_settings[guild.id]["lang"]][
-                                            "big-number"
-                                        ]["cancel"],
-                                        description=get_txt(guild.id, "big-number")[
-                                            "timeout"
-                                        ],
+                                        + Texts[
+                                            Guild_settings[guild.id]["lang"]
+                                        ]["big-number"]["cancel"],
+                                        description=get_txt(
+                                            guild.id, "big-number"
+                                        )["timeout"],
                                         color=Gaming,
                                     )
                                     await message.edit(embed=e)
@@ -405,25 +433,36 @@ class FunCog(commands.Cog):
                                     else:
                                         res = [message, tmax[message]]
                                     e = discord.Embed(
-                                        title=get_txt(guild.id, "big-number")["title"]
+                                        title=get_txt(guild.id, "big-number")[
+                                            "title"
+                                        ]
                                         + " - "
-                                        + get_txt(guild.id, "big-number")["result"],
-                                        description=get_txt(guild.id, "big-number")[
-                                            "result_desc1"
-                                        ].format(
-                                            guild.get_member(res[1]).mention, res[0]
+                                        + get_txt(guild.id, "big-number")[
+                                            "result"
+                                        ],
+                                        description=get_txt(
+                                            guild.id, "big-number"
+                                        )["result_desc1"].format(
+                                            guild.get_member(res[1]).mention,
+                                            res[0],
                                         )
                                         + ls,
                                         color=Gaming,
                                     )
                                 else:
                                     e = discord.Embed(
-                                        title=get_txt(guild.id, "big-number")["title"]
+                                        title=get_txt(guild.id, "big-number")[
+                                            "title"
+                                        ]
                                         + " - "
-                                        + get_txt(guild.id, "big-number")["result"],
-                                        description=get_txt(guild.id, "big-number")[
-                                            "result_desc2"
-                                        ].format(list(inputs.keys())[0])
+                                        + get_txt(guild.id, "big-number")[
+                                            "result"
+                                        ],
+                                        description=get_txt(
+                                            guild.id, "big-number"
+                                        )["result_desc2"].format(
+                                            list(inputs.keys())[0]
+                                        )
                                         + ls,
                                         color=Gaming,
                                     )
@@ -433,9 +472,9 @@ class FunCog(commands.Cog):
 
                             m0.set_field_at(
                                 0,
-                                name=get_txt(guild.id, "big-number")["players"].format(
-                                    len(Bignum_join[message.id])
-                                ),
+                                name=get_txt(guild.id, "big-number")[
+                                    "players"
+                                ].format(len(Bignum_join[message.id])),
                                 value="\n".join(Bignum_join[message.id]),
                             )
                             await message.edit(embed=m0)
@@ -445,9 +484,9 @@ class FunCog(commands.Cog):
                             e = discord.Embed(
                                 title=get_txt(guild.id, "big-number")["title"]
                                 + " - "
-                                + Texts[Guild_settings[guild.id]["lang"]]["big-number"][
-                                    "cancel"
-                                ],
+                                + Texts[Guild_settings[guild.id]["lang"]][
+                                    "big-number"
+                                ]["cancel"],
                                 description=get_txt(guild.id, "canceled"),
                                 color=Gaming,
                             )
@@ -461,9 +500,9 @@ class FunCog(commands.Cog):
                             Bignum_join[message.id].remove(user.mention)
                             m0.set_field_at(
                                 0,
-                                name=get_txt(guild.id, "big-number")["players"].format(
-                                    len(Bignum_join[message.id])
-                                ),
+                                name=get_txt(guild.id, "big-number")[
+                                    "players"
+                                ].format(len(Bignum_join[message.id])),
                                 value="\n".join(Bignum_join[message.id]),
                             )
                             await message.edit(embed=m0)
@@ -515,7 +554,9 @@ class FunCog(commands.Cog):
                                 inputs = {}
                                 ga = []
                                 wolf_members = [
-                                    guild.get_member(int(re.findall(Mention_re, mn)[0]))
+                                    guild.get_member(
+                                        int(re.findall(Mention_re, mn)[0])
+                                    )
                                     for mn in Wolf_join[message.id]
                                 ]
                                 tmp_roles = [1, 2, 3]
@@ -537,50 +578,59 @@ class FunCog(commands.Cog):
                                             title=get_txt(guild.id, "ww")[
                                                 "your_role"
                                             ].format(
-                                                get_txt(guild.id, "ww")["roles"][
-                                                    tmp_roles[mi]
-                                                ][0]
+                                                get_txt(guild.id, "ww")[
+                                                    "roles"
+                                                ][tmp_roles[mi]][0]
                                             ),
                                             description=get_txt(guild.id, "ww")[
                                                 "roles"
                                             ][tmp_roles[mi]][1]
                                             + "\n"
-                                            + get_txt(guild.id, "ww")["win_cond"][0]
+                                            + get_txt(guild.id, "ww")[
+                                                "win_cond"
+                                            ][0]
                                             + "\n"
-                                            + get_txt(guild.id, "ww")["win_cond"][
-                                                get_txt(guild.id, "ww")["roles"][
-                                                    tmp_roles[mi]
-                                                ][2]
+                                            + get_txt(guild.id, "ww")[
+                                                "win_cond"
+                                            ][
+                                                get_txt(guild.id, "ww")[
+                                                    "roles"
+                                                ][tmp_roles[mi]][2]
                                                 + 1
                                             ],
                                             color=Gaming,
                                         )
                                         if tmp_roles[mi] == 4:
                                             e.add_field(
-                                                name="このゲームの人狼", value="\n".join(wolfs)
+                                                name="このゲームの人狼",
+                                                value="\n".join(wolfs),
                                             )
 
                                         ga.append(mn.send(embed=e))
                                         if guild.get_role(
-                                            Guild_settings[guild.id]["ww_role"]["alive"]
+                                            Guild_settings[guild.id]["ww_role"][
+                                                "alive"
+                                            ]
                                         ):
                                             ga.append(
                                                 mn.add_roles(
                                                     guild.get_role(
-                                                        Guild_settings[guild.id][
-                                                            "ww_role"
-                                                        ]["alive"]
+                                                        Guild_settings[
+                                                            guild.id
+                                                        ]["ww_role"]["alive"]
                                                     )
                                                 )
                                             )
 
                                     except discord.errors.Forbidden:
                                         e = discord.Embed(
-                                            title=get_txt(guild.id, "ww")["title"]
+                                            title=get_txt(guild.id, "ww")[
+                                                "title"
+                                            ]
                                             + " - "
-                                            + Texts[Guild_settings[guild.id]["lang"]][
-                                                "ww"
-                                            ]["cancel"],
+                                            + Texts[
+                                                Guild_settings[guild.id]["lang"]
+                                            ]["ww"]["cancel"],
                                             description=get_txt(guild.id, "ww")[
                                                 "no_dm"
                                             ],
@@ -593,7 +643,10 @@ class FunCog(commands.Cog):
                                     get_txt(guild.id, "ww")["roles"]
                                 ):
                                     desc += (
-                                        rca[0] + " x" + str(tmp_roles.count(rci)) + "\n"
+                                        rca[0]
+                                        + " x"
+                                        + str(tmp_roles.count(rci))
+                                        + "\n"
                                     )
                                 rce = discord.Embed(
                                     title=get_txt(guild.id, "ww")["title"]
@@ -610,7 +663,9 @@ class FunCog(commands.Cog):
                                     for wm in wolf_members:
                                         wpl += "__" + wm.mention + "__\n"
                                     e = discord.Embed(
-                                        title=get_txt(guild.id, "ww")["day"].format(day)
+                                        title=get_txt(guild.id, "ww")[
+                                            "day"
+                                        ].format(day)
                                         + " - "
                                         + get_txt(guild.id, "ww")["noon"],
                                         description=get_txt(guild.id, "ww")[
@@ -623,8 +678,12 @@ class FunCog(commands.Cog):
                                         color=Gaming,
                                     )
                                     msg = await channel.send(embed=e)
-                                    await msg.add_reaction(Official_emojis["skip"])
-                                    await msg.add_reaction(Official_emojis["info"])
+                                    await msg.add_reaction(
+                                        Official_emojis["skip"]
+                                    )
+                                    await msg.add_reaction(
+                                        Official_emojis["info"]
+                                    )
 
                                     def check(reaction, user):
                                         if reaction.message.id != msg.id:
@@ -638,7 +697,10 @@ class FunCog(commands.Cog):
                                                 )
                                             )
                                             return False
-                                        elif reaction.emoji != Official_emojis["skip"]:
+                                        elif (
+                                            reaction.emoji
+                                            != Official_emojis["skip"]
+                                        ):
                                             loop.create_task(
                                                 reaction.message.remove_reaction(
                                                     reaction.emoji, user
@@ -646,13 +708,20 @@ class FunCog(commands.Cog):
                                             )
                                             if reaction.emoji.name == "info":
 
-                                                loop.create_task(user.send(embed=rce))
+                                                loop.create_task(
+                                                    user.send(embed=rce)
+                                                )
                                             return False
-                                        return reaction.count == len(wolf_members) + 1
+                                        return (
+                                            reaction.count
+                                            == len(wolf_members) + 1
+                                        )
 
                                     try:
                                         await self.bot.wait_for(
-                                            "reaction_add", timeout=180, check=check
+                                            "reaction_add",
+                                            timeout=180,
+                                            check=check,
                                         )
                                     except asyncio.TimeoutError:
                                         pass
@@ -662,19 +731,27 @@ class FunCog(commands.Cog):
                                     for message, mn in enumerate(wolf_members):
                                         vm += f"`{message+1}` : __{mn.display_name}__\n"
                                     e = discord.Embed(
-                                        title=get_txt(guild.id, "ww")["day"].format(day)
+                                        title=get_txt(guild.id, "ww")[
+                                            "day"
+                                        ].format(day)
                                         + " - "
                                         + get_txt(guild.id, "ww")["vote"],
-                                        description=get_txt(guild.id, "ww")["vote_desc"]
+                                        description=get_txt(guild.id, "ww")[
+                                            "vote_desc"
+                                        ]
                                         + "\n"
                                         + vm,
                                         color=Gaming,
                                     )
                                     e2 = discord.Embed(
-                                        title=get_txt(guild.id, "ww")["day"].format(day)
+                                        title=get_txt(guild.id, "ww")[
+                                            "day"
+                                        ].format(day)
                                         + " - "
                                         + get_txt(guild.id, "ww")["vote2"],
-                                        description=get_txt(guild.id, "ww")["vote_desc"]
+                                        description=get_txt(guild.id, "ww")[
+                                            "vote_desc"
+                                        ]
                                         + "\n"
                                         + vm,
                                         color=Gaming,
@@ -683,14 +760,17 @@ class FunCog(commands.Cog):
 
                                     async def single_wait(e, user, message):
                                         while True:
-                                            await self.bot.get_user(user).send(embed=e)
+                                            await self.bot.get_user(user).send(
+                                                embed=e
+                                            )
                                             try:
                                                 msg = await self.bot.wait_for(
                                                     "message",
                                                     check=(
                                                         lambda message: message.author.id
                                                         == user
-                                                        and message.guild is None
+                                                        and message.guild
+                                                        is None
                                                     ),
                                                     timeout=60,
                                                 )
@@ -702,18 +782,25 @@ class FunCog(commands.Cog):
                                                 1, message + 1
                                             ):
                                                 continue
-                                            if int(msg.content) not in inputs.keys():
+                                            if (
+                                                int(msg.content)
+                                                not in inputs.keys()
+                                            ):
                                                 inputs[int(msg.content)] = []
-                                            inputs[int(msg.content)].append(msg.author)
+                                            inputs[int(msg.content)].append(
+                                                msg.author
+                                            )
                                             e3 = discord.Embed(
                                                 title=get_txt(guild.id, "ww")[
                                                     "day"
                                                 ].format(day)
                                                 + " - "
-                                                + get_txt(guild.id, "ww")["vote2"],
-                                                description=get_txt(guild.id, "ww")[
-                                                    "vote_received"
+                                                + get_txt(guild.id, "ww")[
+                                                    "vote2"
                                                 ],
+                                                description=get_txt(
+                                                    guild.id, "ww"
+                                                )["vote_received"],
                                                 color=Gaming,
                                             )
                                             await msg.channel.send(embed=e3)
@@ -722,10 +809,14 @@ class FunCog(commands.Cog):
                                                     "day"
                                                 ].format(day)
                                                 + " - "
-                                                + get_txt(guild.id, "ww")["vote2"],
-                                                description=get_txt(guild.id, "ww")[
-                                                    "vote_received2"
-                                                ].format(msg.author.mention),
+                                                + get_txt(guild.id, "ww")[
+                                                    "vote2"
+                                                ],
+                                                description=get_txt(
+                                                    guild.id, "ww"
+                                                )["vote_received2"].format(
+                                                    msg.author.mention
+                                                ),
                                                 color=Gaming,
                                             )
                                             await channel.send(embed=e4)
@@ -734,7 +825,9 @@ class FunCog(commands.Cog):
                                     ga = []
                                     for mn in wolf_members:
                                         ga.append(
-                                            single_wait(e2, mn.id, len(wolf_members))
+                                            single_wait(
+                                                e2, mn.id, len(wolf_members)
+                                            )
                                         )
                                     await asyncio.gather(*ga)
                                     tmax = 0
@@ -753,19 +846,21 @@ class FunCog(commands.Cog):
                                                     "day"
                                                 ].format(day)
                                                 + " - "
-                                                + get_txt(guild.id, "ww")["vote3"],
-                                                description=get_txt(guild.id, "ww")[
-                                                    "vote_draw"
+                                                + get_txt(guild.id, "ww")[
+                                                    "vote3"
                                                 ],
+                                                description=get_txt(
+                                                    guild.id, "ww"
+                                                )["vote_draw"],
                                                 color=Gaming,
                                             )
                                         )
                                         for message, mn in enumerate(res):
                                             vm += f"`{message+1}` : __{mn.display_name}__\n"
                                         e2 = discord.Embed(
-                                            title=get_txt(guild.id, "ww")["day"].format(
-                                                day
-                                            )
+                                            title=get_txt(guild.id, "ww")[
+                                                "day"
+                                            ].format(day)
                                             + " - "
                                             + get_txt(guild.id, "ww")["vote3"],
                                             description=get_txt(guild.id, "ww")[
@@ -778,7 +873,9 @@ class FunCog(commands.Cog):
                                         inputs = {}
                                         ga = []
                                         for mn in wolf_members:
-                                            ga.append(single_wait(e2, mn.id, len(res)))
+                                            ga.append(
+                                                single_wait(e2, mn.id, len(res))
+                                            )
                                         await asyncio.gather(*ga)
                                         tmax = 0
                                         res2 = []
@@ -798,9 +895,11 @@ class FunCog(commands.Cog):
                                                 + get_txt(guild.id, "ww")[
                                                     "vote_result"
                                                 ],
-                                                description=get_txt(guild.id, "ww")[
-                                                    "vote_draw2"
-                                                ].format(res.mention),
+                                                description=get_txt(
+                                                    guild.id, "ww"
+                                                )["vote_draw2"].format(
+                                                    res.mention
+                                                ),
                                                 color=Gaming,
                                             )
                                         else:
@@ -813,37 +912,43 @@ class FunCog(commands.Cog):
                                                 + get_txt(guild.id, "ww")[
                                                     "vote_result"
                                                 ],
-                                                description=get_txt(guild.id, "ww")[
-                                                    "vote_result_desc"
-                                                ].format(res.mention),
+                                                description=get_txt(
+                                                    guild.id, "ww"
+                                                )["vote_result_desc"].format(
+                                                    res.mention
+                                                ),
                                                 color=Gaming,
                                             )
                                     else:
                                         res = res[0]
                                         rem = discord.Embed(
-                                            title=get_txt(guild.id, "ww")["day"].format(
-                                                day
-                                            )
+                                            title=get_txt(guild.id, "ww")[
+                                                "day"
+                                            ].format(day)
                                             + " - "
-                                            + get_txt(guild.id, "ww")["vote_result"],
+                                            + get_txt(guild.id, "ww")[
+                                                "vote_result"
+                                            ],
                                             description=get_txt(guild.id, "ww")[
                                                 "vote_result_desc"
                                             ].format(res.mention),
                                             color=Gaming,
                                         )
                                     rem.set_footer(
-                                        text=get_txt(guild.id, "ww")["remain"].format(
-                                            len(wolf_members) - 1
-                                        )
+                                        text=get_txt(guild.id, "ww")[
+                                            "remain"
+                                        ].format(len(wolf_members) - 1)
                                     )
                                     await channel.send(embed=rem)
                                     await res.send(
                                         embed=discord.Embed(
-                                            title=get_txt(guild.id, "ww")["day"].format(
-                                                day
-                                            )
+                                            title=get_txt(guild.id, "ww")[
+                                                "day"
+                                            ].format(day)
                                             + " - "
-                                            + get_txt(guild.id, "ww")["vote_result"],
+                                            + get_txt(guild.id, "ww")[
+                                                "vote_result"
+                                            ],
                                             description=get_txt(guild.id, "ww")[
                                                 "vote_result_dm"
                                             ],
@@ -852,23 +957,27 @@ class FunCog(commands.Cog):
                                     )
                                     died_role.append(wolf_roles[res])
                                     if guild.get_role(
-                                        Guild_settings[guild.id]["ww_role"]["alive"]
+                                        Guild_settings[guild.id]["ww_role"][
+                                            "alive"
+                                        ]
                                     ):
                                         await res.remove_roles(
                                             guild.get_role(
-                                                Guild_settings[guild.id]["ww_role"][
-                                                    "alive"
-                                                ]
+                                                Guild_settings[guild.id][
+                                                    "ww_role"
+                                                ]["alive"]
                                             )
                                         )
                                     if guild.get_role(
-                                        Guild_settings[guild.id]["ww_role"]["dead"]
+                                        Guild_settings[guild.id]["ww_role"][
+                                            "dead"
+                                        ]
                                     ):
                                         await res.add_roles(
                                             guild.get_role(
-                                                Guild_settings[guild.id]["ww_role"][
-                                                    "dead"
-                                                ]
+                                                Guild_settings[guild.id][
+                                                    "ww_role"
+                                                ]["dead"]
                                             )
                                         )
                                     wolf_members.remove(res)
@@ -881,16 +990,21 @@ class FunCog(commands.Cog):
                                     wolf_targets = {}
                                     ga = []
 
-                                    async def single_wait2(e, user, message, wm):
+                                    async def single_wait2(
+                                        e, user, message, wm
+                                    ):
                                         while True:
-                                            await self.bot.get_user(user).send(embed=e)
+                                            await self.bot.get_user(user).send(
+                                                embed=e
+                                            )
                                             try:
                                                 msg = await self.bot.wait_for(
                                                     "message",
                                                     check=(
                                                         lambda message: message.author.id
                                                         == user
-                                                        and message.guild is None
+                                                        and message.guild
+                                                        is None
                                                     ),
                                                     timeout=60,
                                                 )
@@ -913,13 +1027,18 @@ class FunCog(commands.Cog):
                                                             mn
                                                             not in wolf_targets.keys()
                                                         ):
-                                                            wolf_targets[mn] = True
+                                                            wolf_targets[
+                                                                mn
+                                                            ] = True
                                                         break
 
                                             elif wolf_roles[wm] == 3:
                                                 i = 0
                                                 for mn in wolf_members:
-                                                    if mn == last_defend or wm == mn:
+                                                    if (
+                                                        mn == last_defend
+                                                        or wm == mn
+                                                    ):
                                                         continue
                                                     i += 1
                                                     if int(msg.content) == i:
@@ -931,26 +1050,36 @@ class FunCog(commands.Cog):
                                                     int(msg.content) - 1
                                                 ]
                                                 e3 = discord.Embed(
-                                                    title=get_txt(guild.id, "ww")[
-                                                        "day"
-                                                    ].format(day)
+                                                    title=get_txt(
+                                                        guild.id, "ww"
+                                                    )["day"].format(day)
                                                     + " - "
-                                                    + get_txt(guild.id, "ww")["night"]
+                                                    + get_txt(guild.id, "ww")[
+                                                        "night"
+                                                    ]
                                                     + " - "
                                                     + get_txt(guild.id, "ww")[
                                                         "night_txt"
                                                     ][wolf_roles[wm]][0],
-                                                    description=get_txt(guild.id, "ww")[
-                                                        "night_txt"
-                                                    ][wolf_roles[wm]][3].format(
+                                                    description=get_txt(
+                                                        guild.id, "ww"
+                                                    )["night_txt"][
+                                                        wolf_roles[wm]
+                                                    ][
+                                                        3
+                                                    ].format(
                                                         target.display_name,
-                                                        get_txt(guild.id, "ww")["team"][
+                                                        get_txt(guild.id, "ww")[
+                                                            "team"
+                                                        ][
                                                             Texts[
                                                                 Guild_settings[
                                                                     guild.id
                                                                 ]["lang"]
                                                             ]["ww"]["roles"][
-                                                                wolf_roles[target]
+                                                                wolf_roles[
+                                                                    target
+                                                                ]
                                                             ][
                                                                 2
                                                             ]
@@ -967,14 +1096,16 @@ class FunCog(commands.Cog):
                                                     "day"
                                                 ].format(day)
                                                 + " - "
-                                                + get_txt(guild.id, "ww")["night"]
+                                                + get_txt(guild.id, "ww")[
+                                                    "night"
+                                                ]
                                                 + " - "
-                                                + get_txt(guild.id, "ww")["night_txt"][
-                                                    wolf_roles[wm]
-                                                ][0],
-                                                description=get_txt(guild.id, "ww")[
-                                                    "vote_received"
-                                                ],
+                                                + get_txt(guild.id, "ww")[
+                                                    "night_txt"
+                                                ][wolf_roles[wm]][0],
+                                                description=get_txt(
+                                                    guild.id, "ww"
+                                                )["vote_received"],
                                                 color=Gaming,
                                             )
                                             await msg.channel.send(embed=e3)
@@ -986,48 +1117,52 @@ class FunCog(commands.Cog):
                                         if wolf_roles[wm] == 1:
                                             for mn in wolf_members:
                                                 i += 1
-                                                more += (
-                                                    f"`{i}` : __{mn.display_name}__\n"
-                                                )
+                                                more += f"`{i}` : __{mn.display_name}__\n"
                                         elif wolf_roles[wm] == 3:
                                             i = 0
                                             for mn in wolf_members:
-                                                if mn == last_defend or wm == mn:
+                                                if (
+                                                    mn == last_defend
+                                                    or wm == mn
+                                                ):
                                                     continue
                                                 i += 1
-                                                more += (
-                                                    f"`{i}` : __{mn.display_name}__\n"
-                                                )
+                                                more += f"`{i}` : __{mn.display_name}__\n"
                                         elif wolf_roles[wm] == 4:
                                             i = 0
                                             for mn in wolf_members:
                                                 if wolf_roles[mn] == 4:
                                                     continue
                                                 i += 1
-                                                more += (
-                                                    f"`{i}` : __{mn.display_name}__\n"
-                                                )
+                                                more += f"`{i}` : __{mn.display_name}__\n"
                                         else:
                                             pass
                                         e = discord.Embed(
-                                            title=get_txt(guild.id, "ww")["day"].format(
-                                                day
-                                            )
+                                            title=get_txt(guild.id, "ww")[
+                                                "day"
+                                            ].format(day)
                                             + " - "
                                             + get_txt(guild.id, "ww")["night"]
                                             + " - "
-                                            + Texts[Guild_settings[guild.id]["lang"]][
-                                                "ww"
-                                            ]["night_txt"][wolf_roles[wm]][0],
+                                            + Texts[
+                                                Guild_settings[guild.id]["lang"]
+                                            ]["ww"]["night_txt"][
+                                                wolf_roles[wm]
+                                            ][
+                                                0
+                                            ],
                                             description=(
-                                                get_txt(guild.id, "ww")["night_txt"][
-                                                    wolf_roles[wm]
-                                                ][1]
-                                                if wolf_roles[wm] != 2 or day == 1
+                                                get_txt(guild.id, "ww")[
+                                                    "night_txt"
+                                                ][wolf_roles[wm]][1]
+                                                if wolf_roles[wm] != 2
+                                                or day == 1
                                                 else get_txt(guild.id, "ww")[
                                                     "night_txt"
                                                 ][wolf_roles[wm]][3].format(
-                                                    get_txt(guild.id, "ww")["team"][
+                                                    get_txt(guild.id, "ww")[
+                                                        "team"
+                                                    ][
                                                         get_txt(guild.id, "ww")[
                                                             "roles"
                                                         ][died_role[-2]][2]
@@ -1041,7 +1176,10 @@ class FunCog(commands.Cog):
                                         if i != 0:
                                             ga.append(
                                                 single_wait2(
-                                                    e, wm.id, more.count("\n"), wm
+                                                    e,
+                                                    wm.id,
+                                                    more.count("\n"),
+                                                    wm,
                                                 )
                                             )
                                         else:
@@ -1049,7 +1187,9 @@ class FunCog(commands.Cog):
                                     await asyncio.gather(*ga)
                                     died = ""
                                     e = discord.Embed(
-                                        title=get_txt(guild.id, "ww")["day"].format(day)
+                                        title=get_txt(guild.id, "ww")[
+                                            "day"
+                                        ].format(day)
                                         + " - "
                                         + get_txt(guild.id, "ww")["died"],
                                         description=(
@@ -1060,49 +1200,53 @@ class FunCog(commands.Cog):
                                     for wt, wtm in wolf_targets.items():
                                         if wtm:
                                             if guild.get_role(
-                                                Guild_settings[guild.id]["ww_role"][
-                                                    "alive"
-                                                ]
+                                                Guild_settings[guild.id][
+                                                    "ww_role"
+                                                ]["alive"]
                                             ):
                                                 await wt.remove_roles(
                                                     guild.get_role(
-                                                        Guild_settings[guild.id][
-                                                            "ww_role"
-                                                        ]["alive"]
+                                                        Guild_settings[
+                                                            guild.id
+                                                        ]["ww_role"]["alive"]
                                                     )
                                                 )
                                             if guild.get_role(
-                                                Guild_settings[guild.id]["ww_role"][
-                                                    "dead"
-                                                ]
+                                                Guild_settings[guild.id][
+                                                    "ww_role"
+                                                ]["dead"]
                                             ):
                                                 await wt.add_roles(
                                                     guild.get_role(
-                                                        Guild_settings[guild.id][
-                                                            "ww_role"
-                                                        ]["dead"]
+                                                        Guild_settings[
+                                                            guild.id
+                                                        ]["ww_role"]["dead"]
                                                     )
                                                 )
                                             wolf_members.remove(wt)
                                             died += wt.mention + "\n"
                                             await wt.send(embed=e)
                                     e = discord.Embed(
-                                        title=get_txt(guild.id, "ww")["day"].format(day)
+                                        title=get_txt(guild.id, "ww")[
+                                            "day"
+                                        ].format(day)
                                         + " - "
                                         + get_txt(guild.id, "ww")["died"],
                                         description=(
-                                            get_txt(guild.id, "ww")["died_desc"].format(
-                                                died
-                                            )
+                                            get_txt(guild.id, "ww")[
+                                                "died_desc"
+                                            ].format(died)
                                             if died != ""
-                                            else get_txt(guild.id, "ww")["died_fail"]
+                                            else get_txt(guild.id, "ww")[
+                                                "died_fail"
+                                            ]
                                         ),
                                         color=Gaming,
                                     )
                                     e.set_footer(
-                                        text=get_txt(guild.id, "ww")["remain"].format(
-                                            len(wolf_members)
-                                        )
+                                        text=get_txt(guild.id, "ww")[
+                                            "remain"
+                                        ].format(len(wolf_members))
                                     )
                                     await channel.send(embed=e)
 
@@ -1118,23 +1262,27 @@ class FunCog(commands.Cog):
                                 for k, v in wolf_roles.items():
                                     everyone_roles += f'__{k.mention}__ - {get_txt(guild.id,"ww")["roles"][v][0]}'
                                     if guild.get_role(
-                                        Guild_settings[guild.id]["ww_role"]["alive"]
+                                        Guild_settings[guild.id]["ww_role"][
+                                            "alive"
+                                        ]
                                     ):
                                         await k.remove_roles(
                                             guild.get_role(
-                                                Guild_settings[guild.id]["ww_role"][
-                                                    "alive"
-                                                ]
+                                                Guild_settings[guild.id][
+                                                    "ww_role"
+                                                ]["alive"]
                                             )
                                         )
                                     if guild.get_role(
-                                        Guild_settings[guild.id]["ww_role"]["dead"]
+                                        Guild_settings[guild.id]["ww_role"][
+                                            "dead"
+                                        ]
                                     ):
                                         await k.remove_roles(
                                             guild.get_role(
-                                                Guild_settings[guild.id]["ww_role"][
-                                                    "dead"
-                                                ]
+                                                Guild_settings[guild.id][
+                                                    "ww_role"
+                                                ]["dead"]
                                             )
                                         )
                                     if k not in wolf_members:
@@ -1144,9 +1292,9 @@ class FunCog(commands.Cog):
                                     everyone_roles += "\n"
                                 if wc * 2 == len(wolf_members):
                                     e = discord.Embed(
-                                        title=get_txt(guild.id, "ww")["title"].format(
-                                            day
-                                        )
+                                        title=get_txt(guild.id, "ww")[
+                                            "title"
+                                        ].format(day)
                                         + " - "
                                         + get_txt(guild.id, "ww")["result"],
                                         description=get_txt(guild.id, "ww")[
@@ -1156,9 +1304,9 @@ class FunCog(commands.Cog):
                                     )
                                 else:
                                     e = discord.Embed(
-                                        title=get_txt(guild.id, "ww")["title"].format(
-                                            day
-                                        )
+                                        title=get_txt(guild.id, "ww")[
+                                            "title"
+                                        ].format(day)
                                         + " - "
                                         + get_txt(guild.id, "ww")["result"],
                                         description=get_txt(guild.id, "ww")[
@@ -1174,7 +1322,9 @@ class FunCog(commands.Cog):
                                 name=get_txt(guild.id, "ww")["players"].format(
                                     len(Wolf_join[message.id])
                                 ),
-                                value="\n".join(str(w) for w in Wolf_join[message.id]),
+                                value="\n".join(
+                                    str(w) for w in Wolf_join[message.id]
+                                ),
                             )
                             await message.edit(embed=m0)
                     elif pl.emoji.name == "check6":
@@ -1202,7 +1352,11 @@ class FunCog(commands.Cog):
                                     len(Wolf_join[message.id])
                                 ),
                                 value="\n".join(
-                                    (w.mention if isinstance(w, discord.Member) else w)
+                                    (
+                                        w.mention
+                                        if isinstance(w, discord.Member)
+                                        else w
+                                    )
                                     for w in Wolf_join[message.id]
                                 ),
                             )
@@ -1219,9 +1373,9 @@ class FunCog(commands.Cog):
             title=get_txt(ctx.guild.id, "big-number")["title"]
             + " - "
             + get_txt(ctx.guild.id, "big-number")["waiting"],
-            description=get_txt(ctx.guild.id, "big-number")["waiting_desc"].format(
-                Official_emojis["check5"], Official_emojis["check6"]
-            ),
+            description=get_txt(ctx.guild.id, "big-number")[
+                "waiting_desc"
+            ].format(Official_emojis["check5"], Official_emojis["check6"]),
             color=Gaming,
         )
         e.add_field(
@@ -1233,7 +1387,9 @@ class FunCog(commands.Cog):
         await msg.add_reaction(Official_emojis["check5"])
         await msg.add_reaction(Official_emojis["check6"])
 
-    @commands.group(name="werewolf", invoke_without_command=True, aliases=["ww"])
+    @commands.group(
+        name="werewolf", invoke_without_command=True, aliases=["ww"]
+    )
     async def ww(self, ctx):
         e = discord.Embed(
             title=get_txt(ctx.guild.id, "ww")["title"]
@@ -1275,7 +1431,8 @@ class FunCog(commands.Cog):
             and ctx.author.id != ctx.guild.owner_id
         ):
             e = discord.Embed(
-                title=get_txt(ctx.guild.id, "role_link")["no_role_perm"], color=Error
+                title=get_txt(ctx.guild.id, "role_link")["no_role_perm"],
+                color=Error,
             )
             return await ctx.reply(embed=e)
         Guild_settings[ctx.guild.id]["ww_role"][rtype.lower()] = role.id
@@ -1306,10 +1463,14 @@ class FunCog(commands.Cog):
             turns.reverse()
         index = 0
         if target.bot:
-            e = discord.Embed(title=get_txt(ctx.guild.id, "ox_bot"), color=Error)
+            e = discord.Embed(
+                title=get_txt(ctx.guild.id, "ox_bot"), color=Error
+            )
             return await ctx.reply(embed=e)
         elif target.id == ctx.author.id:
-            e = discord.Embed(title=get_txt(ctx.guild.id, "ox_self"), color=Error)
+            e = discord.Embed(
+                title=get_txt(ctx.guild.id, "ox_self"), color=Error
+            )
             return await ctx.reply(embed=e)
         base_im = Image.new("RGBA", (480, 480), rgb_tuple(0x36393F))
         try:
@@ -1325,7 +1486,8 @@ class FunCog(commands.Cog):
                         f2 = io.BytesIO(await r.read())
         except asyncio.TimeoutError:
             e = discord.Embed(
-                title=get_txt(ctx.guild.id, "ox_connection_timeout"), color=Error
+                title=get_txt(ctx.guild.id, "ox_connection_timeout"),
+                color=Error,
             )
             return await ctx.reply(embed=e)
         size = (640, 640)
@@ -1353,7 +1515,9 @@ class FunCog(commands.Cog):
                     file=discord.File(sendio, filename="result.png")
                 )
         except asyncio.TimeoutError:
-            e = discord.Embed(title=get_txt(ctx.guild.id, "ox_timeout"), color=Error)
+            e = discord.Embed(
+                title=get_txt(ctx.guild.id, "ox_timeout"), color=Error
+            )
             return await ctx.reply(embed=e)
         sendio.close()
         draw = ImageDraw.Draw(base_im)
@@ -1399,7 +1563,10 @@ class FunCog(commands.Cog):
 
                     w, h = text_draw.textsize(str(i + 1), fnt)
                     text_draw.text(
-                        (80 - w / 2 + 160 * (i % 3), i // 3 * 160 + 80 - h / 2 - 4),
+                        (
+                            80 - w / 2 + 160 * (i % 3),
+                            i // 3 * 160 + 80 - h / 2 - 4,
+                        ),
                         str(i + 1),
                         font=fnt,
                         fill=(255, 255, 255, 128),
@@ -1417,10 +1584,18 @@ class FunCog(commands.Cog):
                     )
                     draw.ellipse(
                         (
-                            80 - (Simbol_size - Circle_width) / 2 + 160 * (i % 3),
-                            80 - (Simbol_size - Circle_width) / 2 + 160 * (i // 3),
-                            80 + (Simbol_size - Circle_width) / 2 + 160 * (i % 3),
-                            80 + (Simbol_size - Circle_width) / 2 + 160 * (i // 3),
+                            80
+                            - (Simbol_size - Circle_width) / 2
+                            + 160 * (i % 3),
+                            80
+                            - (Simbol_size - Circle_width) / 2
+                            + 160 * (i // 3),
+                            80
+                            + (Simbol_size - Circle_width) / 2
+                            + 160 * (i % 3),
+                            80
+                            + (Simbol_size - Circle_width) / 2
+                            + 160 * (i // 3),
                         ),
                         rgb_tuple(0x36393F),
                     )
@@ -1488,7 +1663,9 @@ class FunCog(commands.Cog):
                     embed=e,
                 )
             try:
-                r, u = await self.bot.wait_for("reaction_add", check=check, timeout=60)
+                r, u = await self.bot.wait_for(
+                    "reaction_add", check=check, timeout=60
+                )
             except asyncio.TimeoutError:
                 e = discord.Embed(
                     title=get_txt(ctx.guild.id, "ox_user_timeout"), color=Error
@@ -1501,7 +1678,8 @@ class FunCog(commands.Cog):
             e.description = get_txt(ctx.guild.id, "ox_draw")
         else:
             e.description = get_txt(ctx.guild.id, "ox_win").format(
-                str(Official_emojis["ox" + str(2 - index % 2)]) + turns[win - 1].mention
+                str(Official_emojis["ox" + str(2 - index % 2)])
+                + turns[win - 1].mention
             )
         await msg.clear_reactions()
         await msg.edit(content="", embed=e)
@@ -1510,18 +1688,21 @@ class FunCog(commands.Cog):
     async def on_message_parse(self, message):
         if message.author.bot:
             return
-        elif message.channel.id not in Guild_settings[message.guild.id]["auto_parse"]:
+        elif (
+            message.channel.id
+            not in Guild_settings[message.guild.id]["auto_parse"]
+        ):
             return
         elif is_command(message):
             return
         brq = []
         ignore = ""
         res = ""
-        for l in message.content.splitlines():
-            if l.startswith(("//", "#")):
-                res += l + "\n"
+        for lang in message.content.splitlines():
+            if lang.startswith(("//", "#")):
+                res += lang + "\n"
                 continue
-            for c in l:
+            for c in lang:
                 if c in ('"', "'") and not ignore:
                     ignore = c
                     res += c
@@ -1569,14 +1750,19 @@ class FunCog(commands.Cog):
             if res + ignore:
                 wm = await webhook.send(
                     content=res + ignore,  # content.replace("@", "@​")
-                    username=message.author.display_name + f"({message.author})",
+                    username=message.author.display_name
+                    + f"({message.author})",
                     allowed_mentions=discord.AllowedMentions.none(),
-                    avatar_url=message.author.avatar.url_as(static_format="png"),
+                    avatar_url=message.author.avatar.url_as(
+                        static_format="png"
+                    ),
                     files=[await a.to_file() for a in message.attachments],
                     wait=True,
                 )
         if "".join(reversed(brq)).translate(BRACKET_TRANS):
-            await (wm or message).reply("".join(reversed(brq)).translate(BRACKET_TRANS))
+            await (wm or message).reply(
+                "".join(reversed(brq)).translate(BRACKET_TRANS)
+            )
 
     @commands.command(name="loop_trans", aliases=["ltrans"])
     @commands.cooldown(1, 10)
@@ -1589,8 +1775,8 @@ class FunCog(commands.Cog):
             Guild_settings[ctx.guild.id]["lang"]
         ]
         ltxt = ""
-        for l in langs:
-            ltxt += get_txt(ctx.guild.id, "lang_name")[l] + "→"
+        for lang in langs:
+            ltxt += get_txt(ctx.guild.id, "lang_name")[lang] + "→"
 
         ltxt = ltxt.rstrip("→")
         se = SEmbed(
@@ -1627,7 +1813,8 @@ class FunCog(commands.Cog):
                 e.set_image(url=res["message"])
                 e.set_footer(
                     text="Powered by NekoBot API",
-                    icon_url="https://images.discordapp.net/avatars/310039170792030211/237b80900f1dc974efcd1758701b594d.png",
+                    icon_url="https://images.discordapp.net/avatars/"
+                    "310039170792030211/237b80900f1dc974efcd1758701b594d.png",
                 )
                 await ctx.reply(embed=e)
 
@@ -1643,7 +1830,8 @@ class FunCog(commands.Cog):
                 e.set_image(url=res["message"])
                 e.set_footer(
                     text="Powered by NekoBot API",
-                    icon_url="https://images.discordapp.net/avatars/310039170792030211/237b80900f1dc974efcd1758701b594d.png",
+                    icon_url="https://images.discordapp.net/avatars/"
+                    "310039170792030211/237b80900f1dc974efcd1758701b594d.png",
                 )
                 await ctx.reply(embed=e)
 
@@ -1659,7 +1847,8 @@ class FunCog(commands.Cog):
                 e.set_image(url=res["message"])
                 e.set_footer(
                     text="Powered by NekoBot API",
-                    icon_url="https://images.discordapp.net/avatars/310039170792030211/237b80900f1dc974efcd1758701b594d.png",
+                    icon_url="https://images.discordapp.net/avatars/"
+                    "310039170792030211/237b80900f1dc974efcd1758701b594d.png",
                 )
                 await ctx.reply(embed=e)
 
@@ -1668,7 +1857,8 @@ class FunCog(commands.Cog):
     async def _image_5000(self, ctx, top, bottom):
         e = SEmbed(
             color=0xFF0000,
-            image_url=f"https://gsapi.cyberrex.ml/image?top={urllib.parse.quote(top)}&bottom={urllib.parse.quote(bottom)}",
+            image_url="https://gsapi.cyberrex.ml/image?"
+            f"top={urllib.parse.quote(top)}&bottom={urllib.parse.quote(bottom)}",
             footer="Powered by 5000choyen-api",
         )
         await ctx.reply(embed=e)
@@ -1679,7 +1869,8 @@ class FunCog(commands.Cog):
         e = discord.Embed(color=0xD0383E)
         e.set_image(url=f"https://http.cat/{num}")
         e.set_footer(
-            text="Powered by HTTP Cats", icon_url="https://i.imgur.com/fEXdAAB.png"
+            text="Powered by HTTP Cats",
+            icon_url="https://i.imgur.com/fEXdAAB.png",
         )
         await ctx.reply(embed=e)
 
@@ -1692,9 +1883,9 @@ class FunCog(commands.Cog):
         Base_hashed = hashlib.md5(Base.encode()).hexdigest()
         draw = ImageDraw.Draw(im)
         h = int(Base_hashed[-7:-4], 16) / 4096
-        l = int(Base_hashed[-4:-2], 16) / 256
+        lu = int(Base_hashed[-4:-2], 16) / 256
         s = int(Base_hashed[-2:], 16) / 256
-        Color = colorsys.hls_to_rgb(h, l, s)
+        Color = colorsys.hls_to_rgb(h, lu, s)
         Color = tuple(map(lambda x: math.floor(x * 256), list(Color)))
         for i in range(15):
             if int(Base_hashed[i], 16) % 2 == 0:
@@ -1718,7 +1909,11 @@ class FunCog(commands.Cog):
                             Size * 2 - Size * (i // 5) + Size / 2,
                             Size * (i % 5) + Size / 2,
                             (
-                                Size * 2 - Size * (i // 5) + Size - 1 + Size / 2,
+                                Size * 2
+                                - Size * (i // 5)
+                                + Size
+                                - 1
+                                + Size / 2,
                                 Size * (i % 5) + Size - 1 + Size / 2,
                             ),
                         )
@@ -1836,11 +2031,17 @@ class FunCog(commands.Cog):
 
         switch_mask.paste(
             switch_mask_base,
-            box=(-int(Switch_width / 2 - w / 2), -int(Switch_height / 2 - h / 2)),
+            box=(
+                -int(Switch_width / 2 - w / 2),
+                -int(Switch_height / 2 - h / 2),
+            ),
         )
         switch_mask2.paste(
             switch_mask_base,
-            box=(-int(Switch_width / 2 - w2 / 2), -int(Switch_height / 2 - h2 / 2)),
+            box=(
+                -int(Switch_width / 2 - w2 / 2),
+                -int(Switch_height / 2 - h2 / 2),
+            ),
         )
         switch_base.paste(
             im.resize((w2, h2)).filter(ImageFilter.GaussianBlur(10)),
@@ -1916,7 +2117,9 @@ class FunCog(commands.Cog):
                     e = SEmbed(res.split("~")[1], color=Info)
                     for r in res.split("~")[2].split(",")[1:]:
                         e.fields.append(
-                            SField(r.split("@")[0], r.split("@")[1], inline=False)
+                            SField(
+                                r.split("@")[0], r.split("@")[1], inline=False
+                            )
                         )
 
                     m = await ctx.reply(embed=e)

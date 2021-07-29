@@ -39,15 +39,15 @@ class ServerStatCog(commands.Cog):
         cat = None
         if not stats:
             e = discord.Embed(
-                title=f"統計が指定されていません。",
+                title="統計が指定されていません。",
                 description="`sb#help server_stat`で確認してください。",
                 color=Error,
             )
             return await ctx.reply(embed=e)
-        for l in stats:
-            if l not in Stat_dict.keys():
+        for stat in stats:
+            if stat not in Stat_dict.keys():
                 e = discord.Embed(
-                    title=f"統計{l}が見付かりませんでした。",
+                    title=f"統計{stat}が見付かりませんでした。",
                     description="`sb#help server_stat`で確認してください。",
                     color=Error,
                 )
@@ -62,14 +62,16 @@ class ServerStatCog(commands.Cog):
                     await c.delete()
         else:
             overwrites = {
-                ctx.guild.default_role: discord.PermissionOverwrite(connect=False)
+                ctx.guild.default_role: discord.PermissionOverwrite(
+                    connect=False
+                )
             }
             cat = await ctx.guild.create_category("統計", overwrites=overwrites)
-        for l in stats:
+        for stat in stats:
             n = await ctx.guild.create_voice_channel(
-                f"{Stat_dict[l]}： --", category=cat
+                f"{Stat_dict[stat]}： --", category=cat
             )
-            Guild_settings[ctx.guild.id]["stat_channels"][l] = n.id
+            Guild_settings[ctx.guild.id]["stat_channels"][stat] = n.id
         Guild_settings[ctx.guild.id]["stat_channels"]["category"] = cat.id
         Guild_settings[ctx.guild.id]["do_stat_channels"] = True
         e = discord.Embed(
@@ -102,7 +104,9 @@ class ServerStatCog(commands.Cog):
         for g in self.bot.guilds:
             try:
                 if Guild_settings[g.id]["do_stat_channels"]:
-                    for sck, scv in Guild_settings[g.id]["stat_channels"].items():
+                    for sck, scv in Guild_settings[g.id][
+                        "stat_channels"
+                    ].items():
                         if sck == "category":
                             continue
                         s = self.bot.get_channel(scv)
@@ -113,14 +117,18 @@ class ServerStatCog(commands.Cog):
                         if sck == "members":
                             val = g.member_count
                         elif sck == "humans":
-                            val = len(list(filter(lambda m: not m.bot, g.members)))
+                            val = len(
+                                list(filter(lambda m: not m.bot, g.members))
+                            )
                         elif sck == "bots":
                             val = len(list(filter(lambda m: m.bot, g.members)))
                         elif sck == "channels":
                             val = (
                                 len(g.text_channels)
                                 + len(g.voice_channels)
-                                - len(Guild_settings[g.id]["stat_channels"].keys())
+                                - len(
+                                    Guild_settings[g.id]["stat_channels"].keys()
+                                )
                                 + 1
                             )
                         elif sck == "text_channels":
@@ -128,7 +136,9 @@ class ServerStatCog(commands.Cog):
                         elif sck == "voice_channels":
                             val = (
                                 len(g.voice_channels)
-                                - len(Guild_settings[g.id]["stat_channels"].keys())
+                                - len(
+                                    Guild_settings[g.id]["stat_channels"].keys()
+                                )
                                 + 1
                             )
                         elif sck == "roles":

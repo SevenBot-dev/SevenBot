@@ -5,6 +5,7 @@ import time
 
 import discord
 from discord.ext import commands, components
+from discord.ext.commands.converter import TextChannelConverter
 import re2 as re
 from texttable import Texttable
 
@@ -43,20 +44,22 @@ class AutoreplyCog(commands.Cog):
                     for c in ch:
                         try:
                             fake_ctx = await self.bot.get_context(message)
-                            channel = (
-                                await commands.converter.TextChannelConverter().convert(
-                                    fake_ctx, c
-                                )
+                            channel = await TextChannelConverter().convert(
+                                fake_ctx, c
                             )
                         except commands.errors.BadArgument:
                             pass
                         else:
                             if message.channel == channel:
                                 ar[0] = m2.group(2)
-                                return await self.do_reply(ar, message, content)
+                                return await self.do_reply(
+                                    ar, message, content
+                                )
             elif cmd == "has-image":
                 if message.attachments and [
-                    a for a in message.attachments if a.content_type.startswith("image")
+                    a
+                    for a in message.attachments
+                    if a.content_type.startswith("image")
                 ]:
                     ar[0] = cnt
                     return await self.do_reply(ar, message, content)
@@ -79,7 +82,8 @@ class AutoreplyCog(commands.Cog):
             return
         if (
             message.author.bot
-            or message.channel.id in Guild_settings[message.guild.id]["lainan_talk"]
+            or message.channel.id
+            in Guild_settings[message.guild.id]["lainan_talk"]
         ):
             return
         if message.author.id in SB_Bans.keys() and is_command(message):
@@ -102,7 +106,9 @@ class AutoreplyCog(commands.Cog):
                         try:
                             await message.add_reaction(cnt)
                         except discord.errors.BadRequest:
-                            await message.add_reaction(Official_emojis["check2"])
+                            await message.add_reaction(
+                                Official_emojis["check2"]
+                            )
                     elif cmd == "random":
                         random_tmp.append(cnt)
                     else:
@@ -115,9 +121,9 @@ class AutoreplyCog(commands.Cog):
         ga = []
         if arp is not None:
             for ar in arp.values():
-                if await self.do_reply(ar, message, message.content) and not is_command(
-                    message
-                ):
+                if await self.do_reply(
+                    ar, message, message.content
+                ) and not is_command(message):
                     ga.append(ar_send(message.channel, ar[1]))
         await asyncio.gather(*ga)
         if random_tmp:
@@ -141,7 +147,8 @@ class AutoreplyCog(commands.Cog):
         Guild_settings[ctx.guild.id]["autoreply"][rid] = [base, reply]
         e = discord.Embed(
             title=f"自動返信に`{base}`を追加しました。",
-            description=f"戻すには`sb#autoreply remove {base}`または`sb#autoreply remove {rid}`を使用してください",
+            description=f"戻すには`sb#autoreply remove {base}`または"
+            "`sb#autoreply remove {rid}`を使用してください",
             color=Success,
         )
         await ctx.reply(embed=e)
@@ -161,7 +168,9 @@ class AutoreplyCog(commands.Cog):
         count = 0
         new = {}
         if txt in Guild_settings[ctx.guild.id]["autoreply"].keys():
-            res += "`" + Guild_settings[ctx.guild.id]["autoreply"][txt][1] + "`\n"
+            res += (
+                "`" + Guild_settings[ctx.guild.id]["autoreply"][txt][1] + "`\n"
+            )
             for ark, ar in Guild_settings[ctx.guild.id]["autoreply"].items():
                 if ark != txt:
                     new[ark] = ar
@@ -217,8 +226,12 @@ class AutoreplyCog(commands.Cog):
                 table.add_row(
                     [
                         k,
-                        v[0].replace("\n", get_txt(ctx.guild.id, "ar_list_br")),
-                        v[1].replace("\n", get_txt(ctx.guild.id, "ar_list_br")),
+                        v[0].replace(
+                            "\n", get_txt(ctx.guild.id, "ar_list_br")
+                        ),
+                        v[1].replace(
+                            "\n", get_txt(ctx.guild.id, "ar_list_br")
+                        ),
                     ]
                 )
                 if len(table.draw()) > 2000:
@@ -227,8 +240,12 @@ class AutoreplyCog(commands.Cog):
                     table.add_row(
                         [
                             k,
-                            v[0].replace("\n", get_txt(ctx.guild.id, "ar_list_br")),
-                            v[1].replace("\n", get_txt(ctx.guild.id, "ar_list_br")),
+                            v[0].replace(
+                                "\n", get_txt(ctx.guild.id, "ar_list_br")
+                            ),
+                            v[1].replace(
+                                "\n", get_txt(ctx.guild.id, "ar_list_br")
+                            ),
                         ]
                     )
             res.append(table.draw())

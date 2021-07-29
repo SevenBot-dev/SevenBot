@@ -20,6 +20,8 @@ st = ""
 for ek, ev in Stat_dict.items():
     st += f"{ek} - {ev}\n"
 with open(
-    os.path.dirname(__file__) + "/../translations/ja/main.json", "r", encoding="utf8"
+    os.path.dirname(__file__) + "/../translations/ja/main.json",
+    "r",
+    encoding="utf8",
 ) as f:
     JA_TEXTS = json.load(f)

@@ -46,7 +46,9 @@ class PanelCog(commands.Cog):
         dt = discord.utils.utcnow()
         g = ctx.guild
         dt += time
-        e = discord.Embed(title=get_txt(g.id, "voting")[0], color=Widget, timestamp=dt)
+        e = discord.Embed(
+            title=get_txt(g.id, "voting")[0], color=Widget, timestamp=dt
+        )
         e.add_field(
             name=Texts[Guild_settings[g.id]["lang"]]["voting"][1],
             value=title,
@@ -66,7 +68,9 @@ class PanelCog(commands.Cog):
             em = Official_emojis["b" + str(sfi + 1)]
             s += f":black_small_square:｜{em}：{sf}\n"
         e.add_field(
-            name=Texts[Guild_settings[g.id]["lang"]]["voting"][4], value=s, inline=False
+            name=Texts[Guild_settings[g.id]["lang"]]["voting"][4],
+            value=s,
+            inline=False,
         )
         e.set_author(
             name=f"{ctx.author.display_name}(ID:{ctx.author.id})",
@@ -78,7 +82,9 @@ class PanelCog(commands.Cog):
             await m.add_reaction(Number_emojis[sfi + 1])
 
     @commands.command(aliases=["recruit", "apply"])
-    async def party(self, ctx, title, time: Optional[convert_timedelta], max: int):
+    async def party(
+        self, ctx, title, time: Optional[convert_timedelta], max: int
+    ):
         if time is None:
             time = datetime.timedelta(hours=1)
         dt = discord.utils.utcnow()
@@ -88,7 +94,8 @@ class PanelCog(commands.Cog):
         e.add_field(name="最大人数", value=f"{max}人", inline=False)
         e.add_field(name="参加者(現在0人)", value="現在参加者はいません", inline=False)
         e.set_author(
-            name=f"{ctx.author}(ID:{ctx.author.id})", icon_url=ctx.author.avatar.url
+            name=f"{ctx.author}(ID:{ctx.author.id})",
+            icon_url=ctx.author.avatar.url,
         )
         e.set_footer(text=get_txt(ctx.guild.id, "voting")[5])
         m = await ctx.reply(embed=e)
@@ -102,14 +109,18 @@ class PanelCog(commands.Cog):
         if lang_to not in Texts.keys():
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "change_lang")[0][0],
-                description=get_txt(ctx.guild.id, "change_lang")[0][1].format(lang_to),
+                description=get_txt(ctx.guild.id, "change_lang")[0][1].format(
+                    lang_to
+                ),
                 color=Error,
             )
             return await ctx.reply(embed=e)
         Guild_settings[ctx.guild.id]["lang"] = lang_to
         e = discord.Embed(
             title=get_txt(ctx.guild.id, "change_lang")[1][0],
-            description=get_txt(ctx.guild.id, "change_lang")[1][1].format(lang_to),
+            description=get_txt(ctx.guild.id, "change_lang")[1][1].format(
+                lang_to
+            ),
             color=Success,
         )
         return await ctx.reply(embed=e)

@@ -7,7 +7,12 @@ from texttable import Texttable
 
 import _pathmagic  # type: ignore # noqa
 from common_resources.consts import Info, Success, Error
-from common_resources.tools import convert_timedelta, to_lts, remove_emoji, chrsize_len
+from common_resources.tools import (
+    convert_timedelta,
+    to_lts,
+    remove_emoji,
+    chrsize_len,
+)
 
 
 class TimedRoleCog(commands.Cog):
@@ -46,7 +51,9 @@ class TimedRoleCog(commands.Cog):
     @commands.has_guild_permissions(manage_messages=True)
     async def tr_add(self, ctx, role: discord.Role, limit: convert_timedelta):
         global Guild_settings
-        Guild_settings[ctx.guild.id]["timed_role"][role.id] = limit.total_seconds()
+        Guild_settings[ctx.guild.id]["timed_role"][
+            role.id
+        ] = limit.total_seconds()
         e = discord.Embed(
             title=f"時間つきロールに`@{role.name}`を追加しました。",
             description=f"戻すには`sb#timed_role remove @{role.name}`を使用してください。",
@@ -91,7 +98,12 @@ class TimedRoleCog(commands.Cog):
                 table.set_deco(Texttable.HEADER)
                 table.set_cols_width(
                     [
-                        max([chrsize_len(str(c)) for c in gs["timed_role"].keys()]),
+                        max(
+                            [
+                                chrsize_len(str(c))
+                                for c in gs["timed_role"].keys()
+                            ]
+                        ),
                         max(
                             [
                                 chrsize_len(str(to_lts(c)))
@@ -120,8 +132,12 @@ class TimedRoleCog(commands.Cog):
                     table.add_row(
                         [
                             k,
-                            v[0].replace("\n", get_txt(ctx.guild.id, "tr_list_br")),
-                            v[1].replace("\n", get_txt(ctx.guild.id, "tr_list_br")),
+                            v[0].replace(
+                                "\n", get_txt(ctx.guild.id, "tr_list_br")
+                            ),
+                            v[1].replace(
+                                "\n", get_txt(ctx.guild.id, "tr_list_br")
+                            ),
                         ]
                     )
             res.append(table.draw())

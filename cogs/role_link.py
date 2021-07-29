@@ -26,7 +26,9 @@ class RoleLinkCog(commands.Cog):
             if r.id in Guild_settings[after.guild.id]["role_link"].keys():
                 for rl in Guild_settings[after.guild.id]["role_link"][r.id]:
                     try:
-                        await self.bot.get_guild(rl[0]).get_member(after.id).add_roles(
+                        await self.bot.get_guild(rl[0]).get_member(
+                            after.id
+                        ).add_roles(
                             self.bot.get_guild(rl[0]).get_role(rl[1]),
                             reason=get_txt(after.guild.id, "role_link")[
                                 "reason"
@@ -52,11 +54,14 @@ class RoleLinkCog(commands.Cog):
         target = bot.get_guild(target)
         if not target:
             e = discord.Embed(
-                title=get_txt(ctx.guild.id, "role_link")["unknown_server"], color=Error
+                title=get_txt(ctx.guild.id, "role_link")["unknown_server"],
+                color=Error,
             )
             return await ctx.reply(embed=e)
         if target.get_member(ctx.author.id):
-            if not target.get_member(ctx.author.id).guild_permissions.manage_roles:
+            if not target.get_member(
+                ctx.author.id
+            ).guild_permissions.manage_roles:
                 e = discord.Embed(
                     title=get_txt(ctx.guild.id, "role_link")["no_role_perm"],
                     color=Error,
@@ -64,21 +69,25 @@ class RoleLinkCog(commands.Cog):
                 return await ctx.reply(embed=e)
         else:
             e = discord.Embed(
-                title=get_txt(ctx.guild.id, "role_link")["not_in_server"], color=Error
+                title=get_txt(ctx.guild.id, "role_link")["not_in_server"],
+                color=Error,
             )
             return await ctx.reply(embed=e)
         target_role = target.get_role(target_role)
         if not target_role:
             e = discord.Embed(
-                title=get_txt(ctx.guild.id, "role_link")["unknown_role"], color=Error
+                title=get_txt(ctx.guild.id, "role_link")["unknown_role"],
+                color=Error,
             )
             return await ctx.reply(embed=e)
         elif (
-            target.get_member(ctx.author.id).top_role.position <= target_role.position
+            target.get_member(ctx.author.id).top_role.position
+            <= target_role.position
             and not target.owner_id == ctx.author.id
         ):
             e = discord.Embed(
-                title=get_txt(ctx.guild.id, "role_link")["no_role_perm"], color=Error
+                title=get_txt(ctx.guild.id, "role_link")["no_role_perm"],
+                color=Error,
             )
             return await ctx.reply(embed=e)
         if role.id not in Guild_settings[ctx.guild.id]["role_link"].keys():
@@ -94,7 +103,10 @@ class RoleLinkCog(commands.Cog):
         e = discord.Embed(
             title=get_txt(ctx.guild.id, "role_link")["add"].format(role.name),
             description=get_txt(ctx.guild.id, "role_link")["add_desc"].format(
-                ctx.guild.name, role.mention, target.name, "@" + target_role.name
+                ctx.guild.name,
+                role.mention,
+                target.name,
+                "@" + target_role.name,
             ),
             color=Success,
         )
@@ -112,7 +124,8 @@ class RoleLinkCog(commands.Cog):
                 g = rl[0]
         if g == 0:
             e = discord.Embed(
-                title=get_txt(ctx.guild.id, "role_link")["remove_fail"], color=Error
+                title=get_txt(ctx.guild.id, "role_link")["remove_fail"],
+                color=Error,
             )
             return
         Guild_settings[ctx.guild.id]["role_link"][role.id] = res.copy()
@@ -124,7 +137,9 @@ class RoleLinkCog(commands.Cog):
                 g = rl[0]
         Guild_settings[g]["role_link"][role.id] = res.copy()
         e = discord.Embed(
-            title=get_txt(ctx.guild.id, "role_link")["remove"].format(role.name),
+            title=get_txt(ctx.guild.id, "role_link")["remove"].format(
+                role.name
+            ),
             color=Success,
         )
         return await ctx.reply(embed=e)
@@ -136,13 +151,17 @@ class RoleLinkCog(commands.Cog):
                 if r.id in Guild_settings[m.guild.id]["role_link"].keys():
                     for rl in Guild_settings[m.guild.id]["role_link"][r.id]:
                         try:
-                            await self.bot.get_guild(rl[0]).get_member(m.id).add_roles(
+                            await self.bot.get_guild(rl[0]).get_member(
+                                m.id
+                            ).add_roles(
                                 self.bot.get_guild(rl[0]).get_role(rl[1]),
                                 reason=get_txt(m.guild.id, "role_link")[
                                     "reason"
                                 ].format(
                                     self.bot.get_guild(rl[0]).name,
-                                    self.bot.get_guild(rl[0]).get_role(rl[1]).name,
+                                    self.bot.get_guild(rl[0])
+                                    .get_role(rl[1])
+                                    .name,
                                 ),
                             )
                         except (NotFound, AttributeError):

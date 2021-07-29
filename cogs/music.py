@@ -43,7 +43,9 @@ YTDL_OPTIONS = {
 ffmpeg_options = {
     "options": "-vn -af volume=-15dB",
     "executable": (
-        r"c:/tools/ffmpeg/bin/ffmpeg.exe" if sys.platform == "win32" else r"ffmpeg"
+        r"c:/tools/ffmpeg/bin/ffmpeg.exe"
+        if sys.platform == "win32"
+        else r"ffmpeg"
     ),
     "before_options": "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 -loglevel quiet",
 }
@@ -126,15 +128,6 @@ class MusicCog(commands.Cog):
         )
         await m.edit(embed=e)
 
-    # https://www.music.com/results?search_query=%EF%BD%91
-
-    #     @music.group(name="search_play", aliases=["sp", "search"])
-    #     async def music_search_play(self, ctx):
-    #         if ctx.invoked_subcommand is None:
-    #             e = discord.Embed(title=get_txt(ctx.guild.id,"how_to_use"),
-    #                               description="```\nmusic search_play youtube|yt\nmusic search_play niconico|nicovideo|nico```", color=Info)
-    #
-    #             await ctx.reply(embed=e)
     @music.command(name="search_play", aliases=["sp"])
     async def mus_yt_search_play(self, ctx, *, query):
         search_response = (
@@ -150,8 +143,11 @@ class MusicCog(commands.Cog):
             i2 = i + 2
             f = rf["snippet"]
             #             print(rf)
-            ms.append([unescape(f["title"]), unescape(f["channelTitle"]), get_url(rf)])
-            r += f'{Number_emojis[i+1]}:```\n{unescape(f["title"])} - {unescape(f["channelTitle"])} - {get_url(rf)}```\n'
+            ms.append(
+                [unescape(f["title"]), unescape(f["channelTitle"]), get_url(rf)]
+            )
+            r += f'{Number_emojis[i+1]}:```\n'
+            f'{unescape(f["title"])} - {unescape(f["channelTitle"])} - {get_url(rf)}```\n'
         if i2 == 0:
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "yt_no_matches"),
@@ -161,7 +157,9 @@ class MusicCog(commands.Cog):
             await ctx.reply(embed=e)
             return
         e = discord.Embed(
-            title=Texts[Guild_settings[ctx.guild.id]["lang"]]["yt_search_result"],
+            title=Texts[Guild_settings[ctx.guild.id]["lang"]][
+                "yt_search_result"
+            ],
             description=f"{r}",
             color=Process,
         )
@@ -204,7 +202,12 @@ class MusicCog(commands.Cog):
                 )
                 await m.edit(embed=e)
                 await self.mus_play(
-                    {"message": m, "channel": ctx.channel, "guild": gu, "author": u},
+                    {
+                        "message": m,
+                        "channel": ctx.channel,
+                        "guild": gu,
+                        "author": u,
+                    },
                     tms[2],
                 )
             elif r.emoji.name == "check6":
@@ -230,94 +233,6 @@ class MusicCog(commands.Cog):
             )
             await m.edit(embed=e)
 
-    # http://flapi.nicovideo.jp/api/getflv?v=
-    #     @music_search_play.command(name="niconico",aliases=["nicovideo","nico"])
-    #     async def mus_nico_search_play(self, ctx, *, query):
-    #         p={
-    #             "q":query,
-    #             "targets":"title,description,tags",
-    #             "_sort":"-viewCounter",
-    #             "_context":"SevenBot#1769",
-    #             "_limit":5,
-    #             "fields":["contentId"]
-    #         }
-    #
-    #         ua = "SevenBot#1769's niconico searching system"
-    #         header = {'User-Agent': ua}
-    #         req=requests.get("https://api.search.nicovideo.jp/api/v2/video/contents/search",params=p,headers=header).json()
-    #
-    #         if req["meta"]["status"] != 200:
-    #             if req["meta"]["status"] == 400:
-    #                 type="nico_wrong_query"
-    #             else:
-    #                 type="nico_api_die"
-    #             e = discord.Embed(title=get_txt(ctx.guild.id,"nico_failed"),
-    #                               description=get_txt(ctx.guild.id,type), color=Error)
-    #             await ctx.reply(embed=e)
-    #             return
-    #         ms=[]
-    #         for rr in req["data"]:
-    #             req2=xmltodict.parse(requests.get(f"https://ext.nicovideo.jp/api/getthumbinfo/{rr['contentId']}").text)["nicovideo_thumb_response"]["thumb"]
-    #             ms.append({"title":req2["title"],"channelTitle":req2["user_nickname"],"url":f"nico.ms/{rr['contentId']}"})
-    #
-    #         r = ""
-    #         i2 = 0
-    #
-    #         gu=ctx.guild
-    #         for i, rf in enumerate(ms):
-    #             i2 = i + 2
-    #             f = rf
-    #             r += f'{Number_emojis[i+1]}:```\n{unescape(f["title"])} - {unescape(f["channelTitle"])} - {rf["url"]}```\n'
-    # #         if i2 == 0:
-    # #             e = discord.Embed(title=get_txt(ctx.guild.id,"yt_no_matches"),
-    # #                               description=get_txt(ctx.guild.id,"yt_search_try_again"), color=Error)
-    # #             await ctx.reply(embed=e)
-    # #             return
-    #         e = discord.Embed(title=Texts[Guild_settings[ctx.guild.id]["lang"]]
-    #                           ["yt_search_result"], description=f"{r}", color=Process)
-    #         ta=Number_emojis[1:i2]
-    #         ta.append(Official_emojis["check6"])
-    #         m = await send_reaction(ctx, ta, {"embed": e})
-    #         def check(r,u):
-    #             return u.id == ctx.author.id and (r.emoji in Number_emojis or r.emoji.name == "check6")
-    #         try:
-    #             r,u = await self.bot.wait_for("reaction_add",check=check)
-    #             if r.emoji in Number_emojis:
-    #                 for mr in m.reactions:
-    #                     if mr.emoji != r.emoji:
-    #                         continue
-    #                     if mr.count == 1:
-    #                         try:
-    #                             ic(await m.remove_reaction)(r.emoji, u)
-    #                         except Forbidden:
-    #                             pass
-    #                         return
-    #                 try:
-    #                     await m.clear_reactions()
-    #                 except Forbidden:
-    #                     pass
-    #                 # escape
-    #                 tms=ms[Number_emojis.index(r.emoji) - 1]
-    #                 e = discord.Embed(title=get_txt(gu.id,"yt_search_result"), description="```\n" + tms["title"] + " - " + tms["channelTitle"] + "```\n" + get_txt(gu.id,"selected"), color=Success)
-    #                 await m.edit(embed=e)
-    #                 await self.mus_play({"message": m, "channel": ctx.channel, "guild": gu, "author": u}, tms["url"])
-    #             elif r.emoji.name == "check6":
-    #                 e = discord.Embed(title=get_txt(gu.id,"yt_search_result"),
-    #                                   description=get_txt(gu.id,"canceled"), color=Success)
-    #
-    #                 try:
-    #                     await m.clear_reactions()
-    #                 except Forbidden:
-    #                     pass
-    #                 await m.edit(embed=e)
-    #             else:
-    #                 ic(await m.remove_reaction)(r.emoji, u)
-    #         except asyncio.TimeoutError:
-    #             await m.clear_reactions()
-    #             e = discord.Embed(title=get_txt(gu.id,"yt_search_result"),
-    #                   description=get_txt(gu.id,"canceled"), color=Success)
-    #             await m.edit(embed=e)
-
     def make_favorite_description(self, musics):
         r = ""
         for i, music in enumerate(musics):
@@ -329,7 +244,8 @@ class MusicCog(commands.Cog):
         loop = asyncio.get_event_loop()
         try:
             info = await loop.run_in_executor(
-                None, partial(ytdl.extract_info, url, download=False, process=False)
+                None,
+                partial(ytdl.extract_info, url, download=False, process=False),
             )
             info["url"] = url
             info["time"] = time.time() + 60 * 60 * 24 * 7
@@ -363,7 +279,9 @@ class MusicCog(commands.Cog):
                 components.SelectMenu(
                     "favorite_page",
                     [
-                        components.SelectOption(f"ページ{n+1}", f"favorite_page_{n}")
+                        components.SelectOption(
+                            f"ページ{n+1}", f"favorite_page_{n}"
+                        )
                         for n in range(math.ceil(len(res) / 10))
                     ],
                     placeholder="ページ",
@@ -371,10 +289,14 @@ class MusicCog(commands.Cog):
             ],
             [
                 components.Button(
-                    "再生", custom_id="favorite_play", style=components.ButtonType.blurple
+                    "再生",
+                    custom_id="favorite_play",
+                    style=components.ButtonType.blurple,
                 ),
                 components.Button(
-                    "削除", custom_id="favorite_delete", style=components.ButtonType.green
+                    "削除",
+                    custom_id="favorite_delete",
+                    style=components.ButtonType.green,
                 ),
                 components.Button(
                     "キャンセル",
@@ -389,7 +311,6 @@ class MusicCog(commands.Cog):
         for rf in res:
             ga.append(self.get_music_info(rf))
         music_infos = list(filter(lambda m: m, await asyncio.gather(*ga)))
-        #             r += f'{Number_emojis[i+1]}:```\n{unescape(f["title"])} - {unescape(f["uploader"])} - {get_url(rf)}```\n'
         e = SEmbed(
             title=Texts[Guild_settings[ctx.guild.id]["lang"]]["favorite"],
             description=self.make_favorite_description(music_infos[:10]),
@@ -404,12 +325,14 @@ class MusicCog(commands.Cog):
                     {
                         loop.create_task(
                             self.bot.wait_for(
-                                "button_click", check=lambda com: com.message == msg
+                                "button_click",
+                                check=lambda com: com.message == msg,
                             )
                         ),
                         loop.create_task(
                             self.bot.wait_for(
-                                "menu_select", check=lambda com: com.message == msg
+                                "menu_select",
+                                check=lambda com: com.message == msg,
                             )
                         ),
                     },
@@ -436,7 +359,9 @@ class MusicCog(commands.Cog):
                     ):
                         options.append(
                             components.SelectOption(
-                                textwrap.shorten(info["title"], 25, placeholder="..."),
+                                textwrap.shorten(
+                                    info["title"], 25, placeholder="..."
+                                ),
                                 f"favorite_music_select_{i}",
                                 textwrap.shorten(
                                     f'{info["uploader"]} - {info["url"]}',
@@ -468,7 +393,9 @@ class MusicCog(commands.Cog):
                     await select_com.defer_update()
                     numbers = list(
                         map(
-                            lambda v: int(v.removeprefix("favorite_music_select_")),
+                            lambda v: int(
+                                v.removeprefix("favorite_music_select_")
+                            ),
                             select_com.values,
                         )
                     )
@@ -557,7 +484,8 @@ class MusicCog(commands.Cog):
                 us = await self.bot.db.user_settings.find_one({"uid": user.id})
             us["favorite_musics"].append(url)
             await self.bot.db.user_settings.update_one(
-                {"uid": user.id}, {"$set": {"favorite_musics": us["favorite_musics"]}}
+                {"uid": user.id},
+                {"$set": {"favorite_musics": us["favorite_musics"]}},
             )
             await com.send("お気に入りに追加しました。")
             return
@@ -621,13 +549,19 @@ class MusicCog(commands.Cog):
             ):
 
                 while True:
-                    u = Queues[voice.channel.id][0][Queues[voice.channel.id][1]][0]
+                    u = Queues[voice.channel.id][0][
+                        Queues[voice.channel.id][1]
+                    ][0]
                     u_req = g.get_member(
-                        Queues[voice.channel.id][0][Queues[voice.channel.id][1]][1]
+                        Queues[voice.channel.id][0][
+                            Queues[voice.channel.id][1]
+                        ][1]
                     )
                     if not u_req:
                         u_req = self.bot.get_user(
-                            Queues[voice.channel.id][0][Queues[voice.channel.id][1]][1]
+                            Queues[voice.channel.id][0][
+                                Queues[voice.channel.id][1]
+                            ][1]
                         )
                     c += 1
                     Queues[voice.channel.id][1] = c
@@ -667,27 +601,21 @@ class MusicCog(commands.Cog):
                     local_option = ffmpeg_options.copy()
                     vol = (Queues[voice.channel.id][6] - 1) * 30
                     local_option["options"] = f"-vn -af volume={vol}dB"
-                    # print(1)
-                    # async with aiohttp.ClientSession(headers={'Connection': 'keep-alive'}) as s:
-                    #     async with s.get() as r:
-                    #         print(r.status)
-                    #         tio = io.BytesIO(await r.read())
-                    #         print(3)
-                    # print(2)
-                    # msg = (await self.bot.get_channel(765528694500360212).send(file=discord.File(tio,filename="temp"))).attachments[0].url
-                    # print(msg)
                     voice.play(
                         discord.FFmpegOpusAudio(
-                            unescape(ru), bitrate=b, stderr=sys.stdout, **local_option
+                            unescape(ru),
+                            bitrate=b,
+                            stderr=sys.stdout,
+                            **local_option,
                         )
                     )
                     e = discord.Embed(
                         title=f"`{info['title']}`" + get_txt(g.id, "yt_played"),
                         url=get_url(info),
                         description="\n".join(
-                            info.get("description", get_txt(g.id, "no_desc")).split(
-                                "\n"
-                            )[:8]
+                            info.get(
+                                "description", get_txt(g.id, "no_desc")
+                            ).split("\n")[:8]
                         ),
                         color=Success,
                     )
@@ -703,7 +631,9 @@ class MusicCog(commands.Cog):
                     )
                     add_fav_component.enabled = True
                     loop.create_task(
-                        components.edit(msg, embed=e, components=[add_fav_component])
+                        components.edit(
+                            msg, embed=e, components=[add_fav_component]
+                        )
                     )
                     loop.create_task(
                         self.wait_favorite_add(msg, add_fav_component, au, u)
@@ -751,14 +681,15 @@ class MusicCog(commands.Cog):
                     title=f"`{info['title']}`" + get_txt(g.id, "yt_queued"),
                     url=get_url(info),
                     description="\n".join(
-                        info.get("description", get_txt(g.id, "no_desc")).split("\n")[
-                            :8
-                        ]
+                        info.get("description", get_txt(g.id, "no_desc")).split(
+                            "\n"
+                        )[:8]
                     ),
                     color=Success,
                 )
                 e.set_author(
-                    name=f"{au.display_name}(ID:{au.id})", icon_url=au.avatar.url
+                    name=f"{au.display_name}(ID:{au.id})",
+                    icon_url=au.avatar.url,
                 )
                 e.set_footer(
                     text=get_txt(g.id, "yt_queued_footer").format(
@@ -772,7 +703,9 @@ class MusicCog(commands.Cog):
                     style=components.ButtonType.blurple,
                     enabled=True,
                 )
-                msg = await components.send(cn, embed=e, components=[add_fav_component])
+                msg = await components.send(
+                    cn, embed=e, components=[add_fav_component]
+                )
                 loop.create_task(
                     self.wait_favorite_add(msg, add_fav_component, au, url)
                 )
@@ -825,7 +758,10 @@ class MusicCog(commands.Cog):
             res = ""
             for ei, eq in enumerate(q):
                 info = await loop.run_in_executor(
-                    None, partial(ytdl.extract_info, eq, download=False, process=False)
+                    None,
+                    partial(
+                        ytdl.extract_info, eq, download=False, process=False
+                    ),
                 )
                 rf = info
                 if Queues[voice.channel.id][1] == ei + 1:
@@ -886,11 +822,14 @@ class MusicCog(commands.Cog):
             )
             msg = await ctx.reply(embed=e)
             info = await loop.run_in_executor(
-                None, partial(ytdl.extract_info, eq, download=False, process=False)
+                None,
+                partial(ytdl.extract_info, eq, download=False, process=False),
             )
             rf = info
 
-            e = discord.Embed(title=get_txt(g.id, "yt_current_song"), color=Success)
+            e = discord.Embed(
+                title=get_txt(g.id, "yt_current_song"), color=Success
+            )
             e.add_field(
                 name=Texts[Guild_settings[g.id]["lang"]]["yt_now_playing"][0],
                 value=rf["title"],
@@ -995,7 +934,9 @@ class MusicCog(commands.Cog):
             await ctx.reply(embed=e)
             return
         if volume <= 0 or volume > 200:
-            e = discord.Embed(title=get_txt(g.id, "yt_volume_range"), color=Error)
+            e = discord.Embed(
+                title=get_txt(g.id, "yt_volume_range"), color=Error
+            )
             await ctx.reply(embed=e)
             return
         Queues[voice.channel.id][6] = volume / 100.0

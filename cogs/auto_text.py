@@ -36,7 +36,9 @@ class AutoTextCog(commands.Cog):
     async def auto_text_activate(self, ctx, channel: discord.VoiceChannel):
         if channel.category is None:
             return await ctx.reply(
-                embed=SEmbed("VCが条件を満たしていません。", "VCはカテゴリに入っている必要があります。", color=Error)
+                embed=SEmbed(
+                    "VCが条件を満たしていません。", "VCはカテゴリに入っている必要があります。", color=Error
+                )
             )
         elif channel.id in Guild_settings[ctx.guild.id]["auto_text"]:
             return await ctx.reply(
@@ -76,7 +78,11 @@ class AutoTextCog(commands.Cog):
 
     @commands.Cog.listener()
     async def on_voice_channel_update(self, member, before, after):
-        if before is not None and (not before.members) and before in Auto_text_channels:
+        if (
+            before is not None
+            and (not before.members)
+            and before in Auto_text_channels
+        ):
             try:
                 await Auto_text_channels[before].delete()
             except discord.errors.NotFound:
@@ -88,13 +94,16 @@ class AutoTextCog(commands.Cog):
             and after not in Auto_text_channels
         ):
             ntc = await after.category.create_text_channel(
-                after.name, topic=f"このチャンネルは{after.mention}に誰もいなくなったら自動的に消去されます。"
+                after.name,
+                topic=f"このチャンネルは{after.mention}に誰もいなくなったら自動的に消去されます。",
             )
             Auto_text_channels[after] = ntc
             await ntc.send(
                 member.mention,
                 embed=SEmbed(
-                    "", f"このチャンネルは{after.mention}に誰もいなくなったら自動的に消去されます。", color=Info
+                    "",
+                    f"このチャンネルは{after.mention}に誰もいなくなったら自動的に消去されます。",
+                    color=Info,
                 ),
             )
 

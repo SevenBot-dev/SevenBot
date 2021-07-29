@@ -64,9 +64,12 @@ class GlobalCog(commands.Cog):
         return SEmbed(
             f"`{channel}`のルール",
             fields=[
-                SField(*r, False) for r in Private_chat_info[channel]["rule"].items()
+                SField(*r, False)
+                for r in Private_chat_info[channel]["rule"].items()
             ],
-            author=SAuthor(str(owner) + f"(ID:{owner.id})", str(owner.avatar.url)),
+            author=SAuthor(
+                str(owner) + f"(ID:{owner.id})", str(owner.avatar.url)
+            ),
             color=Info,
         )
 
@@ -110,7 +113,9 @@ class GlobalCog(commands.Cog):
                     if message.author.id == Owner_ID:
                         un = "[👑]" + un
                     elif (
-                        bot.get_guild(Official_discord_id).get_member(message.author.id)
+                        bot.get_guild(Official_discord_id).get_member(
+                            message.author.id
+                        )
                         is not None
                     ):
                         m = bot.get_guild(Official_discord_id).get_member(
@@ -141,13 +146,17 @@ class GlobalCog(commands.Cog):
                             async with s.get(u) as r:
                                 fio.write(await r.read())
                             fio.seek(0)
-                            files.append(discord.File(fio, filename=u.split("/")[-1]))
+                            files.append(
+                                discord.File(fio, filename=u.split("/")[-1])
+                            )
                             fio.close()
                     return await webhook.send(
                         content=data["content"],  # content.replace("@", "@​")
                         username=un,
                         allowed_mentions=discord.AllowedMentions.none(),
-                        avatar_url=f"https://media.discordapp.net/avatars/{data['userId']}/{data['userAvatar']}.{'gif' if data['userAvatar'].startswith('a_') else 'png'}?size=1024",
+                        avatar_url="https://media.discordapp.net/avatars/"
+                        f"{data['userId']}/{data['userAvatar']}."
+                        "{'gif' if data['userAvatar'].startswith('a_') else 'png'}?size=1024",
                         files=files,
                         wait=True,
                     )
@@ -171,9 +180,13 @@ class GlobalCog(commands.Cog):
                         list(self.bot.consts["gcm"]["sgc"].keys())[0]
                     ]
                 loop.create_task(
-                    message.remove_reaction(Official_emojis["network"], self.bot.user)
+                    message.remove_reaction(
+                        Official_emojis["network"], self.bot.user
+                    )
                 )
-                loop.create_task(message.add_reaction(Official_emojis["check8"]))
+                loop.create_task(
+                    message.add_reaction(Official_emojis["check8"])
+                )
             elif data.get("type", "message") == "edit":
                 ga = []
                 for m in self.bot.consts["gcm"].get(data["messageId"], []):
@@ -205,7 +218,11 @@ class GlobalCog(commands.Cog):
                     if data["guildIcon"]:
                         e.thumbnail_url = (
                             f"https://cdn.discordapp.com/icons/{data['guildId']}/{data['guildIcon']}."
-                            + ("gif" if data["guildIcon"].startswith("a_") else "png")
+                            + (
+                                "gif"
+                                if data["guildIcon"].startswith("a_")
+                                else "png"
+                            )
                         )
                     return await webhook.send(
                         embed=e,  # content.replace("@", "@​")
@@ -226,7 +243,9 @@ class GlobalCog(commands.Cog):
                         if cn.permissions_for(cn.guild.me).manage_webhooks:
                             if not c == message.channel.id:
                                 ga.append(single_send(cn))
-                loop.create_task(message.add_reaction(Official_emojis["check8"]))
+                loop.create_task(
+                    message.add_reaction(Official_emojis["check8"])
+                )
             return
 
     async def send_mute(self, message):
@@ -236,15 +255,17 @@ class GlobalCog(commands.Cog):
 
     async def send_messages(self, message, *, username=None, embed=None):
         e = discord.Embed(
-            description=message.content, timestamp=message.created_at, color=Chat
+            description=message.content,
+            timestamp=message.created_at,
+            color=Chat,
         )
         if message.attachments != []:
             u = message.attachments[0].url
             if (
                 "".join(
-                    os.path.splitext(os.path.basename(message.attachments[0].filename))[
-                        1:
-                    ]
+                    os.path.splitext(
+                        os.path.basename(message.attachments[0].filename)
+                    )[1:]
                 )[1:]
                 not in Image_exts
             ):
@@ -301,7 +322,9 @@ class GlobalCog(commands.Cog):
                     if cn.permissions_for(cn.guild.me).manage_webhooks:
                         if not c == message.channel.id:
                             ch_webhooks = await cn.webhooks()
-                            webhook = discord.utils.get(ch_webhooks, name=whname)
+                            webhook = discord.utils.get(
+                                ch_webhooks, name=whname
+                            )
                             if webhook is None:
                                 g = self.bot.get_guild(Official_discord_id)
                                 a = g.icon
@@ -316,9 +339,9 @@ class GlobalCog(commands.Cog):
                                 if message.author.id == Owner_ID:
                                     un_prefix = "[👑]"
                                 elif (
-                                    self.bot.get_guild(Official_discord_id).get_member(
-                                        message.author.id
-                                    )
+                                    self.bot.get_guild(
+                                        Official_discord_id
+                                    ).get_member(message.author.id)
                                     is not None
                                 ):
                                     m = self.bot.get_guild(
@@ -346,10 +369,10 @@ class GlobalCog(commands.Cog):
                                 un_suffix += ")"
                                 un = un_prefix + str(message.author) + un_suffix
                                 if len(un) > 80:
-                                    l = 80 - len(un_prefix + un_suffix) - 5
+                                    length = 80 - len(un_prefix + un_suffix) - 5
                                     un = (
                                         un_prefix
-                                        + message.author.name[:l]
+                                        + message.author.name[:length]
                                         + "#"
                                         + message.author.discriminator
                                         + un_suffix
@@ -397,7 +420,9 @@ class GlobalCog(commands.Cog):
                             u = a.url
                             if (
                                 "".join(
-                                    os.path.splitext(os.path.basename(a.filename))[1:]
+                                    os.path.splitext(
+                                        os.path.basename(a.filename)
+                                    )[1:]
                                 )[1:]
                                 not in Image_exts
                             ):
@@ -406,7 +431,9 @@ class GlobalCog(commands.Cog):
                             await cn.send(embed=e3)
                 except discord.HTTPException:
                     pass
-        if not message.channel.permissions_for(message.guild.me).manage_webhooks:
+        if not message.channel.permissions_for(
+            message.guild.me
+        ).manage_webhooks:
             await message.delete()
         for d in deletes:
             each.remove(d)
@@ -443,23 +470,33 @@ class GlobalCog(commands.Cog):
         if message.author.id == Owner_ID:
             rjson["sb-tag"] = {"type": "admin", "emoji": "👑"}
         elif (
-            self.bot.get_guild(Official_discord_id).get_member(message.author.id)
+            self.bot.get_guild(Official_discord_id).get_member(
+                message.author.id
+            )
             is not None
         ):
-            m = self.bot.get_guild(Official_discord_id).get_member(message.author.id)
+            m = self.bot.get_guild(Official_discord_id).get_member(
+                message.author.id
+            )
             if (
-                self.bot.get_guild(Official_discord_id).get_role(741837982012538910)
+                self.bot.get_guild(Official_discord_id).get_role(
+                    741837982012538910
+                )
                 in m.roles
             ):
                 rjson["sb-tag"] = {"type": "moderator", "emoji": "🛠️"}
             elif self.bot.is_premium(message.author):
                 rjson["sb-tag"] = {"type": "premium", "emoji": "💎"}
             elif (
-                self.bot.get_guild(Official_discord_id).get_role(747555900092580030)
+                self.bot.get_guild(Official_discord_id).get_role(
+                    747555900092580030
+                )
                 in m.roles
             ):
                 rjson["sb-tag"] = {"type": "special", "emoji": "✔️"}
-        await self.bot.get_channel(SGC_ID).send(json.dumps(rjson, ensure_ascii=False))
+        await self.bot.get_channel(SGC_ID).send(
+            json.dumps(rjson, ensure_ascii=False)
+        )
 
     @commands.Cog.listener("on_message")
     async def on_message_global(self, message):
@@ -488,7 +525,8 @@ class GlobalCog(commands.Cog):
                                 break
                     if (
                         message.author.id in Gc_last_users.keys()
-                        and time.time() - Gc_last_users[message.author.id] < slow
+                        and time.time() - Gc_last_users[message.author.id]
+                        < slow
                     ):
                         await message.add_reaction(Official_emojis["queue"])
                         await asyncio.sleep(slow)
@@ -503,7 +541,9 @@ class GlobalCog(commands.Cog):
                             await message.remove_reaction(
                                 Official_emojis["network"], message.guild.me
                             )
-                            await message.add_reaction(Official_emojis["check8"])
+                            await message.add_reaction(
+                                Official_emojis["check8"]
+                            )
                             await asyncio.sleep(2)
                             await message.remove_reaction(
                                 Official_emojis["check8"], message.guild.me
@@ -532,7 +572,8 @@ class GlobalCog(commands.Cog):
             if e == "sgc":
                 await self.bot.get_channel(SGC_ID2).send(
                     json.dumps(
-                        {"type": "delete", "messageId": message.id}, ensure_ascii=False
+                        {"type": "delete", "messageId": message.id},
+                        ensure_ascii=False,
                     )
                 )
             for ml in self.bot.consts["gcm"][e].get(message.id, []):
@@ -606,14 +647,18 @@ class GlobalCog(commands.Cog):
         else:
             pass
 
-    @gchat.command(name="activate", aliases=Activate_aliases + ["join", "connect"])
+    @gchat.command(
+        name="activate", aliases=Activate_aliases + ["join", "connect"]
+    )
     @commands.has_permissions(manage_channels=True)
     async def activate_global(self, ctx, channel=None):
         if ctx.channel.id in Global_chat or ctx.channel.id in flatten(
             [c["channels"] for c in Private_chat_info.values()]
         ):
             e = discord.Embed(
-                title="既に有効です。", description="グローバルチャットではないチャンネルで使用してください。", color=Error
+                title="既に有効です。",
+                description="グローバルチャットではないチャンネルで使用してください。",
+                color=Error,
             )
             await ctx.reply(embed=e)
         else:
@@ -650,7 +695,8 @@ class GlobalCog(commands.Cog):
                             g = self.bot.get_guild(Official_discord_id)
                             a = g.icon
                             webhook = await cn.create_webhook(
-                                name="sevenbot-global-webhook", avatar=await a.read()
+                                name="sevenbot-global-webhook",
+                                avatar=await a.read(),
                             )
                         fl = []
                         un = "SevenBot Global"
@@ -665,13 +711,17 @@ class GlobalCog(commands.Cog):
                         )
                         # https://i.imgur.com/eaXHbTe.png
                 e = discord.Embed(
-                    title="グローバルチャット参加", description="グローバルチャットに参加しました。", color=Success
+                    title="グローバルチャット参加",
+                    description="グローバルチャットに参加しました。",
+                    color=Success,
                 )
                 await ctx.reply(embed=e)
                 e3 = discord.Embed(title="グローバルチャットのルールについて", color=Info)
                 e3.add_field(name="宣伝禁止", value="宣伝はしないで下さい。", inline=False)
                 e3.add_field(
-                    name="暴言・エロ画像など、不快に感じる行為禁止", value="不快に感じる行為はしないで下さい。", inline=False
+                    name="暴言・エロ画像など、不快に感じる行為禁止",
+                    value="不快に感じる行為はしないで下さい。",
+                    inline=False,
                 )
                 e3.add_field(
                     name="ルール違反を発見した場合",
@@ -684,7 +734,10 @@ class GlobalCog(commands.Cog):
             else:
 
                 def check(c):
-                    return c.channel.id == ctx.author.dm_channel.id and not c.author.bot
+                    return (
+                        c.channel.id == ctx.author.dm_channel.id
+                        and not c.author.bot
+                    )
 
                 if channel in list(Private_chat_info.keys()):
                     if Private_chat_info[channel]["pass"] == "":
@@ -694,7 +747,9 @@ class GlobalCog(commands.Cog):
                             color=Success,
                         )
                         e4.set_footer(text=f"チャンネルID: {ctx.channel.id}")
-                        Private_chat_info[channel]["channels"].append(ctx.channel.id)
+                        Private_chat_info[channel]["channels"].append(
+                            ctx.channel.id
+                        )
                         await ctx.reply(embed=e4)
                         if channel == "sgc":
                             await self.bot.get_channel(SGC_ID2).send(
@@ -731,7 +786,9 @@ class GlobalCog(commands.Cog):
                             )
                             if (
                                 Private_chat_info[channel]["pass"]
-                                == hashlib.sha256(msg.content.encode()).hexdigest()
+                                == hashlib.sha256(
+                                    msg.content.encode()
+                                ).hexdigest()
                             ):
                                 e4 = discord.Embed(
                                     title=f"個人グローバルチャット参加 - `{channel}`",
@@ -787,7 +844,8 @@ class GlobalCog(commands.Cog):
                             except Forbidden:
                                 continue
                             webhook = discord.utils.get(
-                                ch_webhooks, name="sevenbot-private-webhook-" + channel
+                                ch_webhooks,
+                                name="sevenbot-private-webhook-" + channel,
                             )
                             if webhook is None:
                                 g = self.bot.get_guild(Official_discord_id)
@@ -821,7 +879,9 @@ class GlobalCog(commands.Cog):
                     e3.set_footer(text=f"チャンネルID: {ctx.channel.id}")
                     buttons = [
                         components.Button(
-                            "パスワード無し", "no_pass", components.ButtonType.secondary
+                            "パスワード無し",
+                            "no_pass",
+                            components.ButtonType.secondary,
                         ),
                         components.Button(
                             "キャンセル", "cancel", components.ButtonType.danger
@@ -851,7 +911,8 @@ class GlobalCog(commands.Cog):
                             name="wait_button",
                         )
                         done_tasks, pending_tasks = await asyncio.wait(
-                            {wait_msg, wait_button}, return_when=asyncio.FIRST_COMPLETED
+                            {wait_msg, wait_button},
+                            return_when=asyncio.FIRST_COMPLETED,
                         )
                         done_task = done_tasks.pop()
                         for task in pending_tasks:
@@ -871,7 +932,9 @@ class GlobalCog(commands.Cog):
                                 e4.set_footer(text=f"チャンネルID: {ctx.channel.id}")
                                 for b in buttons:
                                     b.enabled = False
-                                await components.edit(msg, embed=e4, components=buttons)
+                                await components.edit(
+                                    msg, embed=e4, components=buttons
+                                )
                                 await fm.edit(embed=e4)
                                 return
                             else:
@@ -914,7 +977,9 @@ class GlobalCog(commands.Cog):
         if ctx.channel.id in Global_chat:
             Global_chat.remove(ctx.channel.id)
             e = discord.Embed(
-                title="グローバルチャット退出", description="グローバルチャットから退出しました。", color=Success
+                title="グローバルチャット退出",
+                description="グローバルチャットから退出しました。",
+                color=Success,
             )
             await ctx.reply(embed=e)
             e2 = discord.Embed(
@@ -942,7 +1007,8 @@ class GlobalCog(commands.Cog):
                         g = self.bot.get_guild(Official_discord_id)
                         a = g.icon
                         webhook = await cn.create_webhook(
-                            name="sevenbot-global-webhook", avatar=await a.read()
+                            name="sevenbot-global-webhook",
+                            avatar=await a.read(),
                         )
                     fl = []
                     un = "SevenBot Global"
@@ -980,7 +1046,9 @@ class GlobalCog(commands.Cog):
                 color=Chat,
             )
             e2.set_thumbnail(url=ctx.guild.icon.url)
-            e2.set_footer(text=f"現在のチャンネル数：{len(Private_chat_info[pk]['channels'])}")
+            e2.set_footer(
+                text=f"現在のチャンネル数：{len(Private_chat_info[pk]['channels'])}"
+            )
             if pk == "sgc":
                 await self.bot.get_channel(SGC_ID2).send(
                     json.dumps(
@@ -1012,7 +1080,8 @@ class GlobalCog(commands.Cog):
                         g = self.bot.get_guild(Official_discord_id)
                         a = g.icon
                         webhook = await cn.create_webhook(
-                            name="sevenbot-private-webhook-" + pk, avatar=await a.read()
+                            name="sevenbot-private-webhook-" + pk,
+                            avatar=await a.read(),
                         )
                     fl = []
                     un = "SevenBot Personal Global"
@@ -1033,7 +1102,9 @@ class GlobalCog(commands.Cog):
             )
             await ctx.reply(embed=e)
 
-    @gchat.group(name="private", aliases=["p", "pr"], invoke_without_command=True)
+    @gchat.group(
+        name="private", aliases=["p", "pr"], invoke_without_command=True
+    )
     async def private_global(self, ctx):
         await self.bot.send_subcommands(ctx)
 
@@ -1042,7 +1113,9 @@ class GlobalCog(commands.Cog):
         if await self.only_owner(ctx, channel, "パスワード編集"):
             return
         e2 = discord.Embed(
-            title=f"パスワード編集 - `{channel}`", description="DMを確認してください。", color=Process
+            title=f"パスワード編集 - `{channel}`",
+            description="DMを確認してください。",
+            color=Process,
         )
         fm = await ctx.reply(embed=e2)
         e3 = discord.Embed(
@@ -1053,7 +1126,9 @@ class GlobalCog(commands.Cog):
         e3.set_footer(text=f"チャンネルID: {ctx.channel.id}")
 
         buttons = [
-            components.Button("パスワード無し", "no_pass", components.ButtonType.secondary),
+            components.Button(
+                "パスワード無し", "no_pass", components.ButtonType.secondary
+            ),
             components.Button("キャンセル", "cancel", components.ButtonType.danger),
         ]
         msg = await components.send(ctx.author, embed=e3, components=buttons)
@@ -1062,7 +1137,8 @@ class GlobalCog(commands.Cog):
             wait_msg = loop.create_task(
                 self.bot.wait_for(
                     "message",
-                    check=lambda m: m.channel == msg.channel and not m.author.bot,
+                    check=lambda m: m.channel == msg.channel
+                    and not m.author.bot,
                     timeout=30,
                 ),
                 name="wait_pass",
@@ -1070,7 +1146,8 @@ class GlobalCog(commands.Cog):
             wait_button = loop.create_task(
                 self.bot.wait_for(
                     "button_click",
-                    check=lambda c: c.channel == msg.channel and c.message == msg,
+                    check=lambda c: c.channel == msg.channel
+                    and c.message == msg,
                     timeout=30,
                 ),
                 name="wait_button",
@@ -1113,7 +1190,9 @@ class GlobalCog(commands.Cog):
             await fm.edit(embed=e4)
         except asyncio.TimeoutError:
             e4 = discord.Embed(
-                title=f"パスワード編集 - `{channel}`", description="タイムアウトしました。", color=Error
+                title=f"パスワード編集 - `{channel}`",
+                description="タイムアウトしました。",
+                color=Error,
             )
             e4.set_footer(text=f"チャンネルID: {ctx.channel.id}")
             await components.edit(msg, embed=e4, components=buttons)
@@ -1137,7 +1216,9 @@ class GlobalCog(commands.Cog):
         )
         await ctx.reply(embed=e4)
 
-    @private_global.group(name="rule", aliases=["r"], invoke_without_command=True)
+    @private_global.group(
+        name="rule", aliases=["r"], invoke_without_command=True
+    )
     async def rule_private_global(self, ctx):
         await self.bot.send_subcommands(ctx)
 
@@ -1155,34 +1236,46 @@ class GlobalCog(commands.Cog):
                 return await ctx.reply(embed=e)
             Private_chat_info[channel]["rule"][name] = value
             e = discord.Embed(
-                title=f"ルール設定 - `{channel}`", description="ルールを追加しました。", color=Success
+                title=f"ルール設定 - `{channel}`",
+                description="ルールを追加しました。",
+                color=Success,
             )
         else:
             Private_chat_info[channel]["rule"][name] = value
             e = discord.Embed(
-                title=f"ルール設定 - `{channel}`", description="ルールを設定しました。", color=Success
+                title=f"ルール設定 - `{channel}`",
+                description="ルールを設定しました。",
+                color=Success,
             )
         await ctx.reply(embed=e)
         await ctx.send("プレビュー", embed=self.make_rule_embed(channel))
 
-    @rule_private_global.command(name="remove", aliases=["del", "delete", "rem"])
+    @rule_private_global.command(
+        name="remove", aliases=["del", "delete", "rem"]
+    )
     async def remove_rule_private_global(self, ctx, channel, name):
         if await self.only_owner(ctx, channel, "ルール設定"):
             return
         if Private_chat_info[channel]["rule"].get(name):
             del Private_chat_info[channel]["rule"][name]
             e = discord.Embed(
-                title=f"ルール設定 - `{channel}`", description="ルールを削除しました。", color=Success
+                title=f"ルール設定 - `{channel}`",
+                description="ルールを削除しました。",
+                color=Success,
             )
             await ctx.reply(embed=e)
             await ctx.send("プレビュー", embed=self.make_rule_embed(channel))
         else:
             e = discord.Embed(
-                title=f"ルール設定 - `{channel}`", description="ルールが見付かりませんでした。", color=Error
+                title=f"ルール設定 - `{channel}`",
+                description="ルールが見付かりませんでした。",
+                color=Error,
             )
             await ctx.reply(embed=e)
 
-    @rule_private_global.command(name="view", aliases=["show", "preview", "check"])
+    @rule_private_global.command(
+        name="view", aliases=["show", "preview", "check"]
+    )
     async def view_rule_private_global(self, ctx, channel):
         await ctx.send(
             f"`{channel}`のルール",
@@ -1207,7 +1300,9 @@ class GlobalCog(commands.Cog):
                 return False
 
         try:
-            r, _ = await self.bot.wait_for("reaction_add", check=check, timeout=10)
+            r, _ = await self.bot.wait_for(
+                "reaction_add", check=check, timeout=10
+            )
             if r.emoji.name == "check5":
                 Private_chat_info[channel]["mute"].append(uid)
                 e = discord.Embed(
@@ -1217,7 +1312,9 @@ class GlobalCog(commands.Cog):
                 )
                 msg = await msg.edit(embed=e)
             else:
-                e = discord.Embed(title="キャンセルしました。", description="", color=Success)
+                e = discord.Embed(
+                    title="キャンセルしました。", description="", color=Success
+                )
                 msg = await msg.edit(embed=e)
 
         except asyncio.TimeoutError:
@@ -1229,7 +1326,9 @@ class GlobalCog(commands.Cog):
         if await self.only_owner(ctx, channel, "キック"):
             return
         e2 = discord.Embed(
-            title=f"キック - `{channel}`", description="DMを確認してください。", color=Process
+            title=f"キック - `{channel}`",
+            description="DMを確認してください。",
+            color=Process,
         )
         fm = await ctx.reply(embed=e2)
         e3 = discord.Embed(
@@ -1244,7 +1343,9 @@ class GlobalCog(commands.Cog):
             if self.bot.get_channel(c):
                 index += 1
                 tdesc = desc + ""
-                tdesc += f"`{index}`: " + self.bot.get_channel(c).guild.name + "\n"
+                tdesc += (
+                    f"`{index}`: " + self.bot.get_channel(c).guild.name + "\n"
+                )
                 if len(tdesc) > 2000:
                     await ctx.author.send(embed=SEmbed("", desc, color=Process))
                     desc = ""
@@ -1259,7 +1360,9 @@ class GlobalCog(commands.Cog):
             msg = await self.bot.wait_for("message", check=check, timeout=30)
             if msg.content.lower() == "cancel":
                 return await ctx.author.send(
-                    embed=SEmbed(f"キック - `{channel}`", "キャンセルしました。", color=Success)
+                    embed=SEmbed(
+                        f"キック - `{channel}`", "キャンセルしました。", color=Success
+                    )
                 )
             else:
                 dl = set()
@@ -1281,7 +1384,9 @@ class GlobalCog(commands.Cog):
             await fm.edit(embed=e4)
         except asyncio.TimeoutError:
             e4 = discord.Embed(
-                title=f"キック - `{channel}`", description="タイムアウトしました。", color=Error
+                title=f"キック - `{channel}`",
+                description="タイムアウトしました。",
+                color=Error,
             )
             e4.set_footer(text=f"チャンネルID: {ctx.channel.id}")
             await m.edit(embed=e4)
@@ -1290,7 +1395,9 @@ class GlobalCog(commands.Cog):
     async def sgc(self, ctx):
         res = ""
         for m in (
-            self.bot.get_guild(706905953320304772).get_role(773868241713627167).members
+            self.bot.get_guild(706905953320304772)
+            .get_role(773868241713627167)
+            .members
         ):
             if m.status == discord.Status.offline:
                 res += str(Official_emojis["offline"])
@@ -1310,7 +1417,9 @@ class GlobalCog(commands.Cog):
     async def only_owner(self, ctx, channel, name):
         if not Private_chat_info.get(channel):
             e2 = discord.Embed(
-                title=f"{name} - `{channel}`", description="不明なチャンネルIDです。", color=Error
+                title=f"{name} - `{channel}`",
+                description="不明なチャンネルIDです。",
+                color=Error,
             )
             await ctx.reply(embed=e2)
             return True

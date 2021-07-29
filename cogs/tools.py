@@ -20,7 +20,10 @@ from sembed import SEmbed
 
 import _pathmagic  # type: ignore # noqa: F401
 from common_resources.consts import Deactivate_aliases, Info, Process, Success
-from common_resources.tokens import twitter_consumer_key, twitter_consumer_secret
+from common_resources.tokens import (
+    twitter_consumer_key,
+    twitter_consumer_secret,
+)
 
 
 def hmac_sha1(input_str, key):
@@ -66,7 +69,9 @@ class ToolCog(commands.Cog):
         if [j for j in js if j["uid"] == message.author.id]:
 
             await self.bot.db.afks.delete_one({"uid": message.author.id})
-            d = Texts[Guild_settings[message.guild.id]["lang"]]["afk_off_desc"].format(
+            d = Texts[Guild_settings[message.guild.id]["lang"]][
+                "afk_off_desc"
+            ].format(
                 len([j for j in js if j["uid"] == message.author.id][0]["urls"])
             )
             a = [j for j in js if j["uid"] == message.author.id][0]
@@ -74,7 +79,9 @@ class ToolCog(commands.Cog):
                 rids = re.match(Message_url_re, ac)
                 ids = [int(i) for i in [rids[1], rids[2], rids[3]]]
                 c = self.bot.get_channel(ids[1])
-                t_txt = Texts[Guild_settings[message.guild.id]["lang"]]["afk_off"]
+                t_txt = Texts[Guild_settings[message.guild.id]["lang"]][
+                    "afk_off"
+                ]
                 if c is None:
                     tt = (
                         "\n"
@@ -83,7 +90,9 @@ class ToolCog(commands.Cog):
                         ]
                     )
                     if len(d) + len(tt) > 2048:
-                        e = discord.Embed(title=t_txt, description=d, color=Info)
+                        e = discord.Embed(
+                            title=t_txt, description=d, color=Info
+                        )
                         t_txt = ""
                         msgs.append(await message.reply(embed=e))
                         d = ""
@@ -92,7 +101,9 @@ class ToolCog(commands.Cog):
                 try:
                     tt = f"\n[{c.guild.name} - #{c.name}]({ac})"
                     if len(d) + len(tt) > 2048:
-                        e = discord.Embed(title=t_txt, description=d, color=Info)
+                        e = discord.Embed(
+                            title=t_txt, description=d, color=Info
+                        )
                         t_txt = ""
                         msgs.append(await message.reply(embed=e))
                         d = ""
@@ -102,21 +113,38 @@ class ToolCog(commands.Cog):
                     pass
 
             e = discord.Embed(
-                title=get_txt(message.guild.id, "afk_off"), description=d, color=Info
+                title=get_txt(message.guild.id, "afk_off"),
+                description=d,
+                color=Info,
             )
-            if len([j for j in js if j["uid"] == message.author.id][0]["urls"]) == 0:
-                e.set_footer(text=get_txt(message.guild.id, "message_delete").format(5))
+            if (
+                len([j for j in js if j["uid"] == message.author.id][0]["urls"])
+                == 0
+            ):
+                e.set_footer(
+                    text=get_txt(message.guild.id, "message_delete").format(5)
+                )
             msgs.append(await message.reply(embed=e))
-            if len([j for j in js if j["uid"] == message.author.id][0]["urls"]) == 0:
+            if (
+                len([j for j in js if j["uid"] == message.author.id][0]["urls"])
+                == 0
+            ):
                 for m in msgs:
                     await m.delete(delay=5)
 
             self.bot.consts["afk"] = list(
-                filter(lambda a: a["uid"] != message.author.id, self.bot.consts["afk"])
+                filter(
+                    lambda a: a["uid"] != message.author.id,
+                    self.bot.consts["afk"],
+                )
             )
             # ----Twitter----
-            t = await self.bot.db.twitter_keys.find_one({"uid": message.author.id})
-            t2 = await self.bot.db.afk_twitter_text.find_one({"uid": message.author.id})
+            t = await self.bot.db.twitter_keys.find_one(
+                {"uid": message.author.id}
+            )
+            t2 = await self.bot.db.afk_twitter_text.find_one(
+                {"uid": message.author.id}
+            )
             if t is not None:
                 txt = t2["deactivate"].replace("!user", "@" + t["name"])
                 client = AsyncOAuth1Client(
@@ -165,7 +193,9 @@ class ToolCog(commands.Cog):
                         color=Info,
                     )
                     e.set_footer(
-                        text=get_txt(message.guild.id, "message_delete").format(5)
+                        text=get_txt(message.guild.id, "message_delete").format(
+                            5
+                        )
                     )
                     # print(3)
                     msg = await message.reply(embed=e)
@@ -188,17 +218,23 @@ class ToolCog(commands.Cog):
 
         # ----Twitter----
         t = await self.bot.db.twitter_keys.find_one({"uid": ctx.author.id})
-        texts = await self.bot.db.afk_twitter_text.find_one({"uid": ctx.author.id})
+        texts = await self.bot.db.afk_twitter_text.find_one(
+            {"uid": ctx.author.id}
+        )
         if t is not None:
             txt = (
                 texts["activate"]
                 .replace(
-                    "!reason", (reason or get_txt(ctx.guild.id, "afk_reason_none"))
+                    "!reason",
+                    (reason or get_txt(ctx.guild.id, "afk_reason_none")),
                 )
                 .replace("!user", "@" + t["name"])
             )
             client = AsyncOAuth1Client(
-                twitter_consumer_key, twitter_consumer_secret, t["token"], t["secret"]
+                twitter_consumer_key,
+                twitter_consumer_secret,
+                t["token"],
+                t["secret"],
             )
             await client.post(
                 "https://api.twitter.com/1.1/statuses/update.json",
@@ -207,7 +243,9 @@ class ToolCog(commands.Cog):
 
     @_afk.command(name="key", aliases=["api", "apikey"])
     async def afk_key(self, ctx):
-        await self.bot.db.afk_keys.delete_one({"uid": ctx.author.id, "oauth": False})
+        await self.bot.db.afk_keys.delete_one(
+            {"uid": ctx.author.id, "oauth": False}
+        )
         key = gen_random_str(16)
         await self.bot.db.afk_keys.insert_one(
             {"uid": ctx.author.id, "hash": key, "oauth": False}
@@ -235,7 +273,9 @@ class ToolCog(commands.Cog):
             "https://api.twitter.com/oauth/authorize?oauth_token="
             + token["oauth_token"]
         )
-        msg = await ctx.author.send(url + "\n" + get_txt(ctx.guild.id, "afk_twitter"))
+        msg = await ctx.author.send(
+            url + "\n" + get_txt(ctx.guild.id, "afk_twitter")
+        )
         try:
             pin = await self.bot.wait_for(
                 "message",
@@ -245,9 +285,12 @@ class ToolCog(commands.Cog):
             )
             try:
                 t = await client.fetch_access_token(
-                    "https://api.twitter.com/oauth/access_token", verifier=pin.content
+                    "https://api.twitter.com/oauth/access_token",
+                    verifier=pin.content,
                 )
-                await self.bot.db.twitter_keys.delete_one({"uid": ctx.author.id})
+                await self.bot.db.twitter_keys.delete_one(
+                    {"uid": ctx.author.id}
+                )
                 await self.bot.db.twitter_keys.insert_one(
                     {
                         "uid": ctx.author.id,
@@ -257,12 +300,18 @@ class ToolCog(commands.Cog):
                         "name": t["screen_name"],
                     }
                 )
-                await self.bot.db.afk_twitter_text.delete_one({"uid": ctx.author.id})
+                await self.bot.db.afk_twitter_text.delete_one(
+                    {"uid": ctx.author.id}
+                )
                 await self.bot.db.afk_twitter_text.insert_one(
                     {
                         "uid": ctx.author.id,
-                        "activate": get_txt(ctx.guild.id, "afk_twitter_content"),
-                        "deactivate": get_txt(ctx.guild.id, "afk_twitter_content2"),
+                        "activate": get_txt(
+                            ctx.guild.id, "afk_twitter_content"
+                        ),
+                        "deactivate": get_txt(
+                            ctx.guild.id, "afk_twitter_content2"
+                        ),
                     }
                 )
                 await ctx.author.send(
@@ -290,14 +339,14 @@ class ToolCog(commands.Cog):
 
     @commands.command(aliases=["el"])
     async def emoji_list(self, ctx):
-        l = [[]]
+        li = [[]]
         for e in ctx.guild.emojis:
 
-            l[-1].append(e)
-            if len(l[-1]) >= 20:
-                l.append([])
+            li[-1].append(e)
+            if len(li[-1]) >= 20:
+                li.append([])
         loop = asyncio.get_event_loop()
-        for li in l:
+        for li in li:
             if li:
                 m = await ctx.reply("".join(map(str, li)))
                 for e in li:
@@ -308,7 +357,11 @@ class ToolCog(commands.Cog):
         async with aiohttp.ClientSession() as session:
             async with session.post(
                 "https://7bot.ml/api",
-                json=({"url": url, "shortId": shortid} if shortid else {"url": url}),
+                json=(
+                    {"url": url, "shortId": shortid}
+                    if shortid
+                    else {"url": url}
+                ),
             ) as r:
                 r.raise_for_status()
                 e = discord.Embed(
@@ -339,7 +392,9 @@ class ToolCog(commands.Cog):
                             Official_emojis["down"], self.bot.user
                         )
                 except asyncio.TimeoutError:
-                    await msg.remove_reaction(Official_emojis["down"], self.bot.user)
+                    await msg.remove_reaction(
+                        Official_emojis["down"], self.bot.user
+                    )
 
     @tasks.loop(minutes=10)
     async def sync_afk(self):
@@ -376,7 +431,8 @@ class ToolCog(commands.Cog):
                         .replace("discord.discord.", "discord.")
                         .replace("discord.ext.", ""),
                         filter(
-                            lambda n: "class" in n.parent.get("class", []), raw_attrs
+                            lambda n: "class" in n.parent.get("class", []),
+                            raw_attrs,
                         ),
                     )
                 )
@@ -386,7 +442,8 @@ class ToolCog(commands.Cog):
                         .replace("discord.discord.", "discord.")
                         .replace("discord.ext.", ""),
                         filter(
-                            lambda n: "method" in n.parent.get("class", []), raw_attrs
+                            lambda n: "method" in n.parent.get("class", []),
+                            raw_attrs,
                         ),
                     )
                 )
@@ -467,7 +524,9 @@ class ToolCog(commands.Cog):
 
         await ctx.reply(res)
 
-    @develop_tool.group(name="rtfm", aliases=["rtfd"], invoke_without_command=True)
+    @develop_tool.group(
+        name="rtfm", aliases=["rtfd"], invoke_without_command=True
+    )
     async def rtfm(self, ctx):
         await self.bot.send_subcommands(ctx)
 
@@ -508,7 +567,9 @@ class ToolCog(commands.Cog):
                     pres += f"[{da.split('.',1)[1]}]({base_url}ext/commands/api.html#discord.ext.{da})\n"
                 elif da.startswith("tasks."):
                     pres += f"[{da.split('.',1)[1]}]({base_url}ext/tasks/api.html#discord.ext.{da})\n"
-        e = discord.Embed(title=get_txt(ctx.guild.id, "dpy_title"), color=Python_color)
+        e = discord.Embed(
+            title=get_txt(ctx.guild.id, "dpy_title"), color=Python_color
+        )
         if not cres:
             val = get_txt(ctx.guild.id, "dpy_fail")
         else:
@@ -587,20 +648,22 @@ class ToolCog(commands.Cog):
         for di, tda in enumerate(lower_classes):
             if query.lower() in tda:
                 da = Djs_classes[di]
-                cres += (
-                    f"[{da}](https://discord.js.org/#/docs/main/master/class/{da})\n"
-                )
+                cres += f"[{da}](https://discord.js.org/#/docs/main/master/class/{da})\n"
         lower_attrs = [da.lower() for da in Djs_attrs]
         for di, tda in enumerate(lower_attrs):
             if query.lower() in tda:
                 da = Djs_attrs[di]
-                res += f"[{da}](https://discord.js.org/#/docs/main/master/class/{da.split('.', 1)[0]}?scrollTo={da.split('.', 1)[1]})\n"
+                res += f"[{da}](https://discord.js.org/#/docs/main/master/class/{da.split('.', 1)[0]}?"
+                f"scrollTo={da.split('.', 1)[1]})\n"
         lower_props = [da.lower() for da in Djs_methods]
         for di, tda in enumerate(lower_props):
             if query.lower() in tda:
                 da = Djs_methods[di]
-                pres += f"[{da}](https://discord.js.org/#/docs/main/master/class/{da.split('.', 1)[0]}?scrollTo={da.split('.', 1)[1]})\n"
-        e = discord.Embed(title=get_txt(ctx.guild.id, "djs_title"), color=DJS_COLOR)
+                pres += f"[{da}](https://discord.js.org/#/docs/main/master/class/{da.split('.', 1)[0]}?"
+                f"scrollTo={da.split('.', 1)[1]})\n"
+        e = discord.Embed(
+            title=get_txt(ctx.guild.id, "djs_title"), color=DJS_COLOR
+        )
         if not cres:
             val = get_txt(ctx.guild.id, "djs_fail")
         else:
@@ -697,7 +760,9 @@ class ToolCog(commands.Cog):
                 json={"password": self.bot.web_pass, "url": url},
             ) as r:
                 temp = await self.bot.get_channel(765528694500360212).send(
-                    file=discord.File(io.BytesIO(await r.read()), filename="result.png")
+                    file=discord.File(
+                        io.BytesIO(await r.read()), filename="result.png"
+                    )
                 )
         title = f"`{url}`のスクリーンショット"
         if len(title) > 256:

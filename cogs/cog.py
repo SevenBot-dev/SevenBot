@@ -78,7 +78,14 @@ Categories = {
         "reencode",
     ],
     "serverpanel": ["auth", "role", "ticket", "free_channel"],
-    "moderation": ["clear_channel", "mute", "fatal", "lockdown", "archive", "warn"],
+    "moderation": [
+        "clear_channel",
+        "mute",
+        "fatal",
+        "lockdown",
+        "archive",
+        "warn",
+    ],
     "global": ["gchat", "sevennet", "sgc"],
     "settings": [
         "ww_role",
@@ -237,7 +244,8 @@ translator = AsyncTranslator()
 
 class MainCog(commands.Cog):
     def __init__(self, bot):
-        global Guild_settings, Official_emojis, Texts, Global_chat, Command_counter, Global_mute, GBan, Sevennet_channels, Sevennet_posts, Blacklists
+        global Guild_settings, Official_emojis, Texts, Global_chat, Command_counter, Global_mute, GBan
+        global Sevennet_channels, Sevennet_posts, Blacklists
         global get_txt, is_command
         self.bot: commands.Bot = bot
         if not self.bot.consts.get("gcm"):
@@ -297,35 +305,6 @@ class MainCog(commands.Cog):
         await self.bot.save()
         Guild_settings[g.id]["lang"] = lang
 
-    @commands.Cog.listener("on_message")
-    async def on_message_spam(self, message):
-        if message.guild is None:
-            return
-        if is_command(message):
-            try:
-                await self.bot.wait_for(
-                    "message",
-                    check=lambda m: m.guild == message.guild and is_command(m),
-                    timeout=5,
-                )
-                await self.bot.wait_for(
-                    "message",
-                    check=lambda m: m.guild == message.guild and is_command(m),
-                    timeout=5,
-                )
-            except asyncio.TimeoutError:
-                pass
-            else:
-                async with aiohttp.ClientSession() as s:
-                    async with s.post(
-                        "https://discord.com/api/webhooks/820630742387785729/Kl8gcxyZOhepGnrch9KfFITDn9zZAWlZNjIZGLlw2WAso71Dw0Ahk21VL8WdkWr7KJJI",
-                        json={
-                            "content": f"Guild:{message.guild.name} {message.guild.id}\nUser:{message.author} {message.author.id}\nContent:\n```{message.content}\n```",
-                            "allowed_mentions": {"parse": []},
-                        },
-                    ):
-                        pass
-
     @commands.Cog.listener()
     async def on_member_join(self, member):
         if not Guild_settings.get(member.guild.id):
@@ -384,15 +363,20 @@ class MainCog(commands.Cog):
         if message.author.id in GBan.keys():
             return
         if (
-            message.channel.id in Guild_settings[message.guild.id]["deactivate_command"]
-        ) and not message.channel.permissions_for(message.author).manage_channels:
+            message.channel.id
+            in Guild_settings[message.guild.id]["deactivate_command"]
+        ) and not message.channel.permissions_for(
+            message.author
+        ).manage_channels:
             if is_command(message):
                 e = discord.Embed(
                     title="このチャンネルではコマンドを使用できません。",
                     description="ここでコマンドを実行するには`チャンネルを管理`が必要です。",
                     color=Error,
                 )
-                e.set_footer(text=get_txt(message.guild.id, "message_delete").format(5))
+                e.set_footer(
+                    text=get_txt(message.guild.id, "message_delete").format(5)
+                )
                 msg = await message.channel.send(embed=e)
                 await msg.delete(delay=5)
         else:
@@ -428,7 +412,9 @@ class MainCog(commands.Cog):
                     description=f"<t:{int(mtr)}:R>にミュートが解除されます。",
                     color=Alert,
                 )
-                e.set_footer(text=get_txt(message.guild.id, "message_delete").format(5))
+                e.set_footer(
+                    text=get_txt(message.guild.id, "message_delete").format(5)
+                )
                 msg = await message.channel.send(embed=e)
                 await message.delete()
                 await msg.delete(delay=5)
@@ -452,16 +438,22 @@ class MainCog(commands.Cog):
                 g = self.bot.get_guild(gs)
                 fc = g.text_channels[0]
                 if Guild_settings[g.id]["announce_channel"]:
-                    fc = self.bot.get_channel(Guild_settings[g.id]["announce_channel"])
+                    fc = self.bot.get_channel(
+                        Guild_settings[g.id]["announce_channel"]
+                    )
                 elif g.system_channel is not None:
                     fc = g.system_channel
                 try:
-                    await fc.send(f"**__SevenBot公式鯖より:__**\n```{message.content}```")
+                    await fc.send(
+                        f"**__SevenBot公式鯖より:__**\n```{message.content}```"
+                    )
                 except Forbidden:
                     pass
             return
         gs = Guild_settings.get(message.guild.id)
-        if (message.channel.id in Sevennet_channels) and not is_command(message):
+        if (message.channel.id in Sevennet_channels) and not is_command(
+            message
+        ):
             if message.author.id in Global_mute:
                 await message.delete()
                 e2 = discord.Embed(title="あなたはミュートされています。", info=Error)
@@ -475,7 +467,9 @@ class MainCog(commands.Cog):
                     if rdt > dt:
                         flag = False
                         if message.attachments != []:
-                            e2 = discord.Embed(title="返信には画像を添付できません。", info=Error)
+                            e2 = discord.Embed(
+                                title="返信には画像を添付できません。", info=Error
+                            )
                             m = await message.author.send(embed=e2)
                             await message.delete()
                             return
@@ -519,7 +513,9 @@ class MainCog(commands.Cog):
                         if (
                             "".join(
                                 os.path.splitext(
-                                    os.path.basename(message.attachments[0].filename)
+                                    os.path.basename(
+                                        message.attachments[0].filename
+                                    )
                                 )[1:]
                             )[1:]
                             not in Image_exts
@@ -530,9 +526,9 @@ class MainCog(commands.Cog):
                             m = await message.author.send(embed=e2)
                             await message.delete()
                             return
-                        amsg = await self.bot.get_channel(765528694500360212).send(
-                            file=(await message.attachments[0].to_file())
-                        )
+                        amsg = await self.bot.get_channel(
+                            765528694500360212
+                        ).send(file=(await message.attachments[0].to_file()))
                         e.set_image(url=amsg.attachments[0].url)
                     mid = hashlib.md5(str(message.id).encode()).hexdigest()[0:8]
                     e.set_author(
@@ -609,7 +605,9 @@ class MainCog(commands.Cog):
                     if len(hs) >= int(r[2:]):
                         res = res.replace(r, f"[{r}]({hs[-1].jump_url} )")
             ch_webhooks = await message.channel.webhooks()
-            webhook = discord.utils.get(ch_webhooks, name="sevenbot-2ch-link-webhook")
+            webhook = discord.utils.get(
+                ch_webhooks, name="sevenbot-2ch-link-webhook"
+            )
             if webhook is None:
                 g = self.bot.get_guild(Official_discord_id)
                 a = g.icon.url
@@ -638,7 +636,9 @@ class MainCog(commands.Cog):
     async def getid(self, ctx, un=None):
         if un is None:
             e = discord.Embed(
-                title=get_txt(ctx.guild.id, "getid_self")[0].format(ctx.author.id),
+                title=get_txt(ctx.guild.id, "getid_self")[0].format(
+                    ctx.author.id
+                ),
                 description=get_txt(ctx.guild.id, "getid_self")[1],
                 color=Info,
             )
@@ -660,26 +660,37 @@ class MainCog(commands.Cog):
                     icf = True
                     inc += f"{gm.mention} - `{gm.id}` - `{gm}`\n"
             e = discord.Embed(
-                title=get_txt(ctx.guild.id, "getid_search")[0].format(un), color=Info
+                title=get_txt(ctx.guild.id, "getid_search")[0].format(un),
+                color=Info,
             )
             e.add_field(
-                name=get_txt(ctx.guild.id, "getid_search")[1], inline=False, value=per
+                name=get_txt(ctx.guild.id, "getid_search")[1],
+                inline=False,
+                value=per,
             )
             e.add_field(
-                name=get_txt(ctx.guild.id, "getid_search")[2], inline=False, value=inc
+                name=get_txt(ctx.guild.id, "getid_search")[2],
+                inline=False,
+                value=inc,
             )
             return await ctx.reply(embed=e)
 
     @commands.command(name="tos")
     async def _tos(self, ctx):
-        tos = await self.bot.get_channel(736707812905975829).history(limit=9).flatten()
+        tos = (
+            await self.bot.get_channel(736707812905975829)
+            .history(limit=9)
+            .flatten()
+        )
         tos.reverse()
         ts = ""
         for t in tos:
             ts += t.content
         embed = discord.Embed(
             title="利用規約",
-            description="この利用規約（以下、「本規約」といいます。）は、SevenBot運営チーム（以下、「当グループ」といいます。）が提供するDiscord Bot 「SevenBot」によるサービス（以下、「本サービス」といいます。）の利用条件を定めるものです。ユーザーの皆さま（以下、「利用者」といいます。）には、本規約に従って、本サービスをご利用いただきます。",
+            description="この利用規約（以下、「本規約」といいます。）は、SevenBot運営チーム（以下、「当グループ」といいます。）が提供する"
+            "Discord Bot 「SevenBot」によるサービス（以下、「本サービス」といいます。）の利用条件を定めるものです。"
+            "ユーザーの皆さま（以下、「利用者」といいます。）には、本規約に従って、本サービスをご利用いただきます。",
             color=Bot_info,
             url="https://sevenbot.jp/tos",
         )
@@ -704,7 +715,9 @@ class MainCog(commands.Cog):
             tid = random.choice(list(get_txt(ctx.guild.id, "tips").keys()))
         desc = get_txt(ctx.guild.id, "tips")[tid]
         e = discord.Embed(
-            title=get_txt(ctx.guild.id, "tips_title"), description=desc, color=Bot_info
+            title=get_txt(ctx.guild.id, "tips_title"),
+            description=desc,
+            color=Bot_info,
         )
         e.set_footer(text="ID: " + tid)
         return await ctx.reply(embed=e)
@@ -734,7 +747,10 @@ class MainCog(commands.Cog):
         adc = self.bot.get_channel(800628621010141224)
         tad = []
         async for ad in adc.history(limit=1000):
-            if len(urllib.parse.urlparse(ad.content).scheme) == 0 or not ad.attachments:
+            if (
+                len(urllib.parse.urlparse(ad.content).scheme) == 0
+                or not ad.attachments
+            ):
                 await ad.delete()
                 continue
             tad.append([ad.content, ad.attachments[0].url, str(ad.author)])
@@ -779,7 +795,9 @@ class MainCog(commands.Cog):
         elif detail == "uses":
             desc = ""
             for cni, (cnk, cnv) in enumerate(
-                sorted(Command_counter.items(), key=lambda x: x[1], reverse=True)[0:10]
+                sorted(
+                    Command_counter.items(), key=lambda x: x[1], reverse=True
+                )[0:10]
             ):
                 c = self.bot.get_command(cnk)
                 if c:
@@ -788,7 +806,9 @@ class MainCog(commands.Cog):
                         + (
                             get_txt(ctx.guild.id, "help_detail").get(
                                 str(c),
-                                "_" + get_txt(ctx.guild.id, "help_detail_none") + "_",
+                                "_"
+                                + get_txt(ctx.guild.id, "help_detail_none")
+                                + "_",
                             )
                         ).split("\n")[0]
                         + "\n"
@@ -814,13 +834,17 @@ class MainCog(commands.Cog):
                         + (
                             get_txt(ctx.guild.id, "help_detail").get(
                                 str(c),
-                                "_" + get_txt(ctx.guild.id, "help_detail_none") + "_",
+                                "_"
+                                + get_txt(ctx.guild.id, "help_detail_none")
+                                + "_",
                             )
                         ).split("\n")[0]
                         + "\n"
                     )
             e = discord.Embed(
-                title=get_txt(ctx.guild.id, "help_categories")[2].format(detail),
+                title=get_txt(ctx.guild.id, "help_categories")[2].format(
+                    detail
+                ),
                 description=desc,
                 color=Bot_info,
                 url="https://sevenbot.jp/commands#category-" + detail,
@@ -837,7 +861,9 @@ class MainCog(commands.Cog):
                 c = self.bot.get_command(detail)
                 if c.hidden:
                     e = SEmbed(
-                        title=get_txt(ctx.guild.id, "help_title") + " - " + str(c),
+                        title=get_txt(ctx.guild.id, "help_title")
+                        + " - "
+                        + str(c),
                         description=get_txt(ctx.guild.id, "help_hidden"),
                         color=Bot_info,
                         author=SAuthor(
@@ -854,7 +880,8 @@ class MainCog(commands.Cog):
                 e = discord.Embed(
                     title=get_txt(ctx.guild.id, "help_title") + " - " + str(c),
                     color=Bot_info,
-                    url="https://sevenbot.jp/commands#" + str(c).replace(" ", "-"),
+                    url="https://sevenbot.jp/commands#"
+                    + str(c).replace(" ", "-"),
                 )
                 if (
                     (not isinstance(c, commands.Group))
@@ -863,14 +890,18 @@ class MainCog(commands.Cog):
                         and len(inspect.signature(c.callback).parameters) > 2
                     )
                     or (
-                        get_txt(ctx.guild.id, "help_detail").get(str(c), "").count("\n")
+                        get_txt(ctx.guild.id, "help_detail")
+                        .get(str(c), "")
+                        .count("\n")
                         > 1
                     )
                 ):
                     if desc_txt != get_txt(ctx.guild.id, "help_detail_none"):
                         txt = syntaxer.Syntax(c, desc_txt)
                         e.add_field(
-                            name=get_txt(ctx.guild.id, "help_detail_syntax_name"),
+                            name=get_txt(
+                                ctx.guild.id, "help_detail_syntax_name"
+                            ),
                             value="```apache\n{}\n```".format(str(txt)),
                         )
                     e.description = desc_txt
@@ -932,15 +963,21 @@ class MainCog(commands.Cog):
         global Guild_settings
         before = Guild_settings[ctx.guild.id]["prefix"]
         if before is None:
-            before = Texts[Guild_settings[ctx.guild.id]["lang"]]["prefix_changed"][2]
+            before = Texts[Guild_settings[ctx.guild.id]["lang"]][
+                "prefix_changed"
+            ][2]
         Guild_settings[ctx.guild.id]["prefix"] = txt.lstrip(" ")
         after = txt
         pre = txt
         if after is None:
-            after = Texts[Guild_settings[ctx.guild.id]["lang"]]["prefix_changed"][2]
+            after = Texts[Guild_settings[ctx.guild.id]["lang"]][
+                "prefix_changed"
+            ][2]
             pre = "sb#"
         e = discord.Embed(
-            title=get_txt(ctx.guild.id, "prefix_changed")[0].format(before, after),
+            title=get_txt(ctx.guild.id, "prefix_changed")[0].format(
+                before, after
+            ),
             description=get_txt(ctx.guild.id, "prefix_changed")[1].format(pre),
             color=Success,
         )
@@ -950,7 +987,9 @@ class MainCog(commands.Cog):
     async def invite(self, ctx):
         e = discord.Embed(
             title="招待URL",
-            description="[https://sevenbot.jp/invite](https://discord.com/oauth2/authorize?client_id=718760319207473152&scope=bot&permissions=808840532&response_type=code&redirect_uri=https%3A%2F%2Fsevenbot.jp%2Fthanks)",
+            description="[https://sevenbot.jp/invite](https://discord.com/oauth2/authorize?"
+            "client_id=718760319207473152&scope=bot&permissions=808840532&"
+            "response_type=code&redirect_uri=https%3A%2F%2Fsevenbot.jp%2Fthanks)",
             color=Bot_info,
         )
         return await ctx.reply(embed=e)
@@ -976,19 +1015,25 @@ class MainCog(commands.Cog):
         )
         e.add_field(
             name=get_txt(ctx.guild.id, "abouts")[4],
-            value=f"{len(self.bot.guilds)}" + get_txt(ctx.guild.id, "abouts")[-2],
+            value=f"{len(self.bot.guilds)}"
+            + get_txt(ctx.guild.id, "abouts")[-2],
         )
         e.add_field(
             name=get_txt(ctx.guild.id, "abouts")[5],
-            value=f"{len(self.bot.users)}" + get_txt(ctx.guild.id, "abouts")[-1],
+            value=f"{len(self.bot.users)}"
+            + get_txt(ctx.guild.id, "abouts")[-1],
         )
         e.add_field(
             name=get_txt(ctx.guild.id, "abouts")[6],
-            value=f'{len(Global_chat)}{get_txt(ctx.guild.id,"abouts")[-2]}({round(len(Global_chat)/len(list(Guild_settings.keys()))*100)}%)',
+            value=f'{len(Global_chat)}'
+            f'{get_txt(ctx.guild.id,"abouts")[-2]}'
+            f'({round(len(Global_chat)/len(list(Guild_settings.keys()))*100)}%)',
         )
         e.add_field(
             name=get_txt(ctx.guild.id, "abouts")[7],
-            value=f'{len(Sevennet_channels)}{get_txt(ctx.guild.id,"abouts")[-2]}({round(len(Sevennet_channels)/len(list(Guild_settings.keys()))*100)}%)',
+            value=f'{len(Sevennet_channels)}'
+            f'{get_txt(ctx.guild.id,"abouts")[-2]}'
+            f'({round(len(Sevennet_channels)/len(list(Guild_settings.keys()))*100)}%)',
         )
         inf = await self.bot.DBL_client.get_bot_info()
         e.add_field(
@@ -1014,13 +1059,16 @@ class MainCog(commands.Cog):
             return
         elif isinstance(error, commands.errors.MissingRequiredArgument):
             synt = syntaxer.Syntax(
-                ctx.command, get_txt(ctx.guild.id, "help_detail")[str(ctx.command)]
+                ctx.command,
+                get_txt(ctx.guild.id, "help_detail")[str(ctx.command)],
             )
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "missing_argument").format(
                     discord.utils.get(synt.args, param=error.param).name
                 ),
-                description=get_txt(ctx.guild.id, "missing_argument_desc").format(synt),
+                description=get_txt(
+                    ctx.guild.id, "missing_argument_desc"
+                ).format(synt),
                 color=Error,
             )
             return await components.reply(
@@ -1038,7 +1086,8 @@ class MainCog(commands.Cog):
         elif isinstance(error, BadArgument):
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "bad_arg"),
-                description=get_txt(ctx.guild.id, "see_help") + f"\n```\n{error}```",
+                description=get_txt(ctx.guild.id, "see_help")
+                + f"\n```\n{error}```",
                 color=Error,
             )
             return await ctx.reply(embed=e)
@@ -1046,12 +1095,20 @@ class MainCog(commands.Cog):
             res = ""
             for p in error.missing_perms:
                 try:
-                    res += get_txt(ctx.guild.id, "permissions_text")[0][p] + "\n"
+                    res += (
+                        get_txt(ctx.guild.id, "permissions_text")[0][p] + "\n"
+                    )
                 except KeyError:
                     try:
-                        res += get_txt(ctx.guild.id, "permissions_text")[1][p] + "\n"
+                        res += (
+                            get_txt(ctx.guild.id, "permissions_text")[1][p]
+                            + "\n"
+                        )
                     except KeyError:
-                        res += get_txt(ctx.guild.id, "permissions_text")[2][p] + "\n"
+                        res += (
+                            get_txt(ctx.guild.id, "permissions_text")[2][p]
+                            + "\n"
+                        )
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "missing_permissions")[0],
                 description=get_txt(ctx.guild.id, "missing_permissions")[1]
@@ -1060,7 +1117,9 @@ class MainCog(commands.Cog):
             )
             return await ctx.reply(embed=e)
         elif isinstance(error, commands.errors.NotOwner):
-            e = discord.Embed(title=get_txt(ctx.guild.id, "only_admin"), color=Error)
+            e = discord.Embed(
+                title=get_txt(ctx.guild.id, "only_admin"), color=Error
+            )
             return await ctx.reply(embed=e)
         elif isinstance(error, commands.errors.CommandOnCooldown):
             e = discord.Embed(
@@ -1072,10 +1131,14 @@ class MainCog(commands.Cog):
             )
             return await ctx.reply(embed=e)
         elif isinstance(error, commands.errors.DisabledCommand):
-            e = discord.Embed(title=get_txt(ctx.guild.id, "disabled"), color=Error)
+            e = discord.Embed(
+                title=get_txt(ctx.guild.id, "disabled"), color=Error
+            )
             return await ctx.reply(embed=e)
         elif isinstance(error, commands.errors.NSFWChannelRequired):
-            e = discord.Embed(title=get_txt(ctx.guild.id, "not_nsfw"), color=Error)
+            e = discord.Embed(
+                title=get_txt(ctx.guild.id, "not_nsfw"), color=Error
+            )
             return await ctx.reply(embed=e)
         else:
             e = discord.Embed(
@@ -1091,7 +1154,9 @@ class MainCog(commands.Cog):
                 )
                 await bot.wait_for(
                     "reaction_add",
-                    check=lambda reaction, user: (not isinstance(reaction.emoji, str))
+                    check=lambda reaction, user: (
+                        not isinstance(reaction.emoji, str)
+                    )
                     and reaction.emoji.name == "down"
                     and reaction.message.id == msg.id
                     and reaction.count == 2,
@@ -1124,7 +1189,9 @@ class MainCog(commands.Cog):
         else:
             e.fields.append(
                 SField(
-                    name=get_txt(ctx.guild.id, "suggest"), value="```\n", inline=False
+                    name=get_txt(ctx.guild.id, "suggest"),
+                    value="```\n",
+                    inline=False,
                 )
             )
             for s in suggested_commands:
@@ -1231,7 +1298,8 @@ class MainCog(commands.Cog):
                     try:
                         em = await cn.fetch_message(channel[1])
                         if (
-                            em.embeds[0].author.name == str(user) + f"(ID:{user.id})"
+                            em.embeds[0].author.name
+                            == str(user) + f"(ID:{user.id})"
                             or user.id == Owner_ID
                         ):
                             await em.delete()
@@ -1281,15 +1349,19 @@ class MainCog(commands.Cog):
                 m0.title == get_txt(guild.id, "free_channel_title")
                 and pl.emoji.name == "add"
             ):
-                loop.create_task(message.remove_reaction(Official_emojis["add"], user))
+                loop.create_task(
+                    message.remove_reaction(Official_emojis["add"], user)
+                )
                 e = discord.Embed(
-                    description=get_txt(guild.id, "free_channel_ask"), color=Widget
+                    description=get_txt(guild.id, "free_channel_ask"),
+                    color=Widget,
                 )
                 msg = await channel.send(embed=e)
                 try:
                     message = await self.bot.wait_for(
                         "message",
-                        check=lambda m2: m2.channel == channel and m2.author == user,
+                        check=lambda m2: m2.channel == channel
+                        and m2.author == user,
                         timeout=30,
                     )
                     if channel.category is None:
@@ -1315,7 +1387,9 @@ class MainCog(commands.Cog):
                         ).format(nt.mention),
                         color=Widget,
                     )
-                    e.set_footer(text=get_txt(guild.id, "message_delete").format(5))
+                    e.set_footer(
+                        text=get_txt(guild.id, "message_delete").format(5)
+                    )
                     msg2 = await channel.send(embed=e)
                     await asyncio.sleep(5)
                     loop.create_task(message.delete())
@@ -1325,7 +1399,9 @@ class MainCog(commands.Cog):
                     e = discord.Embed(
                         description=get_txt(guild.id, "timeout"), color=Error
                     )
-                    e.set_footer(text=get_txt(guild.id, "message_delete").format(5))
+                    e.set_footer(
+                        text=get_txt(guild.id, "message_delete").format(5)
+                    )
                     await msg.edit(embed=e)
                     await msg.delete(delay=5)
             elif message.embeds[0].title == "募集":
@@ -1347,15 +1423,22 @@ class MainCog(commands.Cog):
                         if cm == ["現在参加者はいません"]:
                             cm = []
                         cm.append(user.name + f"(ID:{user.id})")
-                        m0.set_field_at(2, name=f"参加者(現在{cn+1}人)", value="\n".join(cm))
+                        m0.set_field_at(
+                            2, name=f"参加者(現在{cn+1}人)", value="\n".join(cm)
+                        )
                         await message.edit(embed=m0)
-                elif pl.emoji.name == "check6" and user.name + f"(ID:{user.id})" in cm:
+                elif (
+                    pl.emoji.name == "check6"
+                    and user.name + f"(ID:{user.id})" in cm
+                ):
                     cm.remove(user.name + f"(ID:{user.id})")
                     cn = len(cm)
                     if cm == []:
                         cm = ["現在参加者はいません"]
                         cn = 0
-                    m0.set_field_at(2, name=f"参加者(現在{cn}人)", value="\n".join(cm))
+                    m0.set_field_at(
+                        2, name=f"参加者(現在{cn}人)", value="\n".join(cm)
+                    )
                     await message.edit(embed=m0)
                 await message.remove_reaction(pl.emoji, user)
             elif message.id in Guild_settings[guild.id]["ticket_message"]:
@@ -1379,7 +1462,9 @@ class MainCog(commands.Cog):
                 await message.remove_reaction(pl.emoji, user)
                 if pl.emoji.name == "add":
                     dt = datetime.datetime.utcnow()
-                    if user.id in list(Guild_settings[guild.id]["ticket_time"].keys()):
+                    if user.id in list(
+                        Guild_settings[guild.id]["ticket_time"].keys()
+                    ):
                         ldt = datetime.datetime.strptime(
                             Guild_settings[guild.id]["ticket_time"][user.id],
                             Time_format,
@@ -1387,9 +1472,9 @@ class MainCog(commands.Cog):
                         if ldt > dt:
                             return
                     dt += datetime.timedelta(hours=1)
-                    Guild_settings[guild.id]["ticket_time"][user.id] = dt.strftime(
-                        Time_format
-                    )
+                    Guild_settings[guild.id]["ticket_time"][
+                        user.id
+                    ] = dt.strftime(Time_format)
                     cat = self.bot.get_channel(
                         Guild_settings[guild.id]["ticket_category"]
                     )
@@ -1418,11 +1503,15 @@ class MainCog(commands.Cog):
                     )
                     em = Official_emojis["lock"]
                     s = Guild_settings[guild.id]["ticket_subject"][message.id]
-                    e = discord.Embed(title=s[0], description=s[1], color=Widget)
+                    e = discord.Embed(
+                        title=s[0], description=s[1], color=Widget
+                    )
                     e.set_footer(text="下の南京錠ボタンを押して終了")
                     message = await tc.send(user.mention, embed=e)
                     await message.add_reaction(Official_emojis["lock"])
-                    Guild_settings[guild.id]["ticket_message"].append(message.id)
+                    Guild_settings[guild.id]["ticket_message"].append(
+                        message.id
+                    )
             elif message.embeds[0].title == get_txt(guild.id, "voting")[0]:
                 ft = message.embeds[0].footer.text
                 mt = message.embeds[0].timestamp
@@ -1434,7 +1523,10 @@ class MainCog(commands.Cog):
                 loop = asyncio.get_event_loop()
                 if pl.emoji in Number_emojis[1:]:
                     me = message.embeds[0]
-                    if not me.fields[1].value == get_txt(guild.id, "voting")[3][0]:
+                    if (
+                        not me.fields[1].value
+                        == get_txt(guild.id, "voting")[3][0]
+                    ):
                         user = self.bot.get_user(pl.user_id)
                         for nemi, nem in enumerate(Number_emojis):
                             if nemi == 0:
@@ -1444,7 +1536,8 @@ class MainCog(commands.Cog):
                             if nem != pl.emoji:
                                 try:
                                     if filter(
-                                        lambda r: r.emoji == nem, message.reactions
+                                        lambda r: r.emoji == nem,
+                                        message.reactions,
                                     ):
                                         loop.create_task(
                                             message.remove_reaction(nem, user)
@@ -1466,7 +1559,11 @@ class MainCog(commands.Cog):
                         mdh = []
                         for md in mda:
                             r = guild.get_role(
-                                int([s for s in re.split("(: |：)", md) if s][2][3:-1])
+                                int(
+                                    [s for s in re.split("(: |：)", md) if s][2][
+                                        3:-1
+                                    ]
+                                )
                             )
                             mdh.append(r)
                             if m0.title == "ロールパネル（複数選択不可）" and r in user.roles:
@@ -1476,12 +1573,17 @@ class MainCog(commands.Cog):
                             await user.add_roles(rl)
                         else:
                             await user.remove_roles(rl)
-                    elif pl.emoji.name == "🛠️" and user.guild_permissions.manage_roles:
+                    elif (
+                        pl.emoji.name == "🛠️"
+                        and user.guild_permissions.manage_roles
+                    ):
                         asyncio.new_event_loop()
                         mda = m0.description.split("\n")
                         mdh = []
                         for md in mda:
-                            mdh.append(guild.get_role(int(md.split("：", 1)[-1][3:-1])))
+                            mdh.append(
+                                guild.get_role(int(md.split("：", 1)[-1][3:-1]))
+                            )
                         while True:
                             e = discord.Embed(
                                 description="編集したい番号でリアクションして下さい。", color=Widget
@@ -1502,7 +1604,8 @@ class MainCog(commands.Cog):
                                     r.count >= 2
                                     and r.emoji
                                     in Number_emojis[
-                                        1 : len(mdh) + (2 if len(mdh) < 10 else 1)
+                                        1 : len(mdh)
+                                        + (2 if len(mdh) < 10 else 1)
                                     ]
                                     + [Official_emojis["check6"]]
                                     and ru.id == user.id
@@ -1510,7 +1613,9 @@ class MainCog(commands.Cog):
                                 ):
                                     return True
 
-                            r, _ = await self.bot.wait_for("reaction_add", check=check)
+                            r, _ = await self.bot.wait_for(
+                                "reaction_add", check=check
+                            )
                             if r.emoji == Official_emojis["check6"]:
                                 await message.remove_reaction(
                                     pl.emoji, self.bot.get_user(pl.user_id)
@@ -1536,7 +1641,9 @@ class MainCog(commands.Cog):
                                     and message.channel.id == channel.id
                                 )
 
-                            m2 = await self.bot.wait_for("message", check=check2)
+                            m2 = await self.bot.wait_for(
+                                "message", check=check2
+                            )
                             if m2.content != "!none":
                                 ctx = await self.bot.get_context(m2)
                                 try:
@@ -1548,9 +1655,9 @@ class MainCog(commands.Cog):
                                         description="不明なロールです。", color=Widget
                                     )
                                     e.set_footer(
-                                        text=get_txt(guild.id, "message_delete").format(
-                                            5
-                                        )
+                                        text=get_txt(
+                                            guild.id, "message_delete"
+                                        ).format(5)
                                     )
                                     await msg2.edit(embed=e)
                                     await msg2.delete(delay=5)
@@ -1562,15 +1669,15 @@ class MainCog(commands.Cog):
                                     and not guild.owner_id == user.id
                                 ) or r.position > guild.me.top_role.position:
                                     e = discord.Embed(
-                                        title=get_txt(guild.id, "no_role_perm").format(
-                                            r.name
-                                        ),
+                                        title=get_txt(
+                                            guild.id, "no_role_perm"
+                                        ).format(r.name),
                                         color=Widget,
                                     )
                                     e.set_footer(
-                                        text=get_txt(guild.id, "message_delete").format(
-                                            5
-                                        )
+                                        text=get_txt(
+                                            guild.id, "message_delete"
+                                        ).format(5)
                                     )
                                     await msg2.edit(embed=e)
                                     await msg2.delete(delay=5)
@@ -1664,7 +1771,9 @@ class MainCog(commands.Cog):
             inline=False,
         )
         res = await translator.translate(txt, lang_tgt=t)
-        e.add_field(name=get_txt(ctx.guild.id, "trans_after"), value=res, inline=False)
+        e.add_field(
+            name=get_txt(ctx.guild.id, "trans_after"), value=res, inline=False
+        )
         e.set_footer(
             text="Powered by async_google_trans_new",
             icon_url="https://i.imgur.com/zPOogXx.png",
@@ -1711,13 +1820,16 @@ class MainCog(commands.Cog):
             d = "メッセージが送られなくなりました。"
             Guild_settings[ctx.guild.id][etype] = False
         else:
-            d = f"**メッセージ内容：**\n```{message}```\n**サンプル：**\n>>> " + message.replace(
-                "!name", "SevenBot"
-            ).replace("!count", str(len(ctx.guild.members))).replace(
-                "!mention", ctx.guild.me.mention
+            d = (
+                f"**メッセージ内容：**\n```{message}```\n**サンプル：**\n>>> "
+                + message.replace("!name", "SevenBot")
+                .replace("!count", str(len(ctx.guild.members)))
+                .replace("!mention", ctx.guild.me.mention)
             )
         e = discord.Embed(
-            title=f"{Event_dict[etype]}のメッセージを変更しました。", description=d, color=Success
+            title=f"{Event_dict[etype]}のメッセージを変更しました。",
+            description=d,
+            color=Success,
         )
         return await ctx.reply(embed=e)
 
@@ -1796,10 +1908,15 @@ class MainCog(commands.Cog):
                 if r2.is_default():
                     continue
                 ow.update(
-                    {k: v for k, v in iter(channel.overwrites_for(r2)) if v is not None}
+                    {
+                        k: v
+                        for k, v in iter(channel.overwrites_for(r2))
+                        if v is not None
+                    }
                 )
         em = discord.Embed(
-            title=get_txt(ctx.guild.id, "permission_title").format(n), color=Info
+            title=get_txt(ctx.guild.id, "permission_title").format(n),
+            color=Info,
         )
         if channel:
             em.title = get_txt(ctx.guild.id, "permission_title_channel").format(
@@ -1883,36 +2000,14 @@ class MainCog(commands.Cog):
                 if show_bot:
                     r += f"({ui.mention} : {mci}{Texts[Guild_settings[ctx.guild.id]['lang']]['rc_people']})\n"
             else:
-                per = round(len(ui.members) / float(len(ctx.guild.members)) * 100)
+                per = round(
+                    len(ui.members) / float(len(ctx.guild.members)) * 100
+                )
                 r += f"{ui.mention} : {mci}{Texts[Guild_settings[ctx.guild.id]['lang']]['rc_people']} - {per}%\n"
         e = discord.Embed(
             title=get_txt(ctx.guild.id, "rc_title"), description=r, color=Info
         )
         return await ctx.reply(embed=e)
-
-    # @commands.command(aliases=["cu"])
-    # @commands.cooldown(10, 10)
-    # async def check_url(self, ctx, *, url):
-    #     if not (url.startswith("http://") or url.startswith("https://")):
-    #         url = "http://" + url
-    #     async with aiohttp.ClientSession() as session:
-    #         async with session.get(f'https://safeweb.norton.com/report/show?url={url}') as r:
-    #             if r.status == 200:
-    #                 get_url_info = await r.text()
-    #     b4o = bs4.BeautifulSoup(get_url_info, 'lxml')
-    #     if b4o.select(".icoUntested") != []:
-    #         ind = 0
-    #     elif b4o.select('.icoSafe') != []:
-    #         ind = 1
-    #     elif b4o.select(".icoCaution") != []:
-    #         ind = 2
-    #     elif b4o.select(".icoWarning") != []:
-    #         ind = 3
-    #     e = discord.Embed(title=get_txt(ctx.guild.id, "norton_res").format(get_txt(ctx.guild.id, "norton_desc")[ind][0]),
-    #                       description=get_txt(ctx.guild.id, "norton_desc")[ind][1].format(url), color=0xffcd00)
-    #     e.set_footer(text="Powered by Norton Safeweb",
-    #                  icon_url="https://i.imgur.com/QUkiSHQ.png")
-    #     return await ctx.reply(embed=e)
 
     @commands.command(aliases=["user", "ui", "userinfo"])
     async def lookup(self, ctx, u: Union[discord.User, int] = None):
@@ -1932,7 +2027,8 @@ class MainCog(commands.Cog):
             if ctx.guild.get_member(u.id) is not None:
                 u = ctx.guild.get_member(u.id)
         e = discord.Embed(
-            title=get_txt(ctx.guild.id, "lookup")[0].format(u.display_name), color=Info
+            title=get_txt(ctx.guild.id, "lookup")[0].format(u.display_name),
+            color=Info,
         )
         if used_api:
             e.title += get_txt(ctx.guild.id, "lookup")[12]
@@ -1942,7 +2038,8 @@ class MainCog(commands.Cog):
             value=u.display_name,
         )
         e.add_field(
-            name=Texts[Guild_settings[ctx.guild.id]["lang"]]["lookup"][2], value=str(u)
+            name=Texts[Guild_settings[ctx.guild.id]["lang"]]["lookup"][2],
+            value=str(u),
         )
         e.add_field(
             name=get_txt(ctx.guild.id, "lookup")[3],
@@ -1955,28 +2052,47 @@ class MainCog(commands.Cog):
             else get_txt(ctx.guild.id, "lookup")[9],
         )
         e.add_field(
-            name="Bot", value=get_txt(ctx.guild.id, "lookup")[10][0 if u.bot else 1]
+            name="Bot",
+            value=get_txt(ctx.guild.id, "lookup")[10][0 if u.bot else 1],
         )
         if isinstance(u, discord.User):
-            st = str(Official_emojis["unknown"]) + get_txt(ctx.guild.id, "lookup")[5][0]
+            st = (
+                str(Official_emojis["unknown"])
+                + get_txt(ctx.guild.id, "lookup")[5][0]
+            )
         elif u.status == discord.Status.online:
-            st = str(Official_emojis["online"]) + get_txt(ctx.guild.id, "lookup")[5][1]
+            st = (
+                str(Official_emojis["online"])
+                + get_txt(ctx.guild.id, "lookup")[5][1]
+            )
         elif u.status == discord.Status.idle:
-            st = str(Official_emojis["idle"]) + get_txt(ctx.guild.id, "lookup")[5][2]
+            st = (
+                str(Official_emojis["idle"])
+                + get_txt(ctx.guild.id, "lookup")[5][2]
+            )
         elif u.status == discord.Status.dnd:
-            st = str(Official_emojis["dnd"]) + get_txt(ctx.guild.id, "lookup")[5][3]
+            st = (
+                str(Official_emojis["dnd"])
+                + get_txt(ctx.guild.id, "lookup")[5][3]
+            )
         elif u.status == discord.Status.offline:
-            st = str(Official_emojis["offline"]) + get_txt(ctx.guild.id, "lookup")[5][4]
+            st = (
+                str(Official_emojis["offline"])
+                + get_txt(ctx.guild.id, "lookup")[5][4]
+            )
         else:
             st = str(Official_emojis["unknown"]) + str(u.status)
         e.add_field(
-            name=Texts[Guild_settings[ctx.guild.id]["lang"]]["lookup"][5][5], value=st
+            name=Texts[Guild_settings[ctx.guild.id]["lang"]]["lookup"][5][5],
+            value=st,
         )
         rs = ""
         if isinstance(u, discord.Member):
             for r in reversed(u.roles):
                 rs += r.mention + ","
-            e.add_field(name=get_txt(ctx.guild.id, "lookup")[6], value=rs.rstrip(","))
+            e.add_field(
+                name=get_txt(ctx.guild.id, "lookup")[6], value=rs.rstrip(",")
+            )
             e.add_field(
                 name=Texts[Guild_settings[ctx.guild.id]["lang"]]["lookup"][7],
                 value=get_txt(ctx.guild.id, "lookup")[8].format(
@@ -1990,10 +2106,13 @@ class MainCog(commands.Cog):
         guild = guild or ctx.guild
         if guild is None:
             e = discord.Embed(
-                title=get_txt(ctx.guild.id, "serverinfo")["unknown"], color=Error
+                title=get_txt(ctx.guild.id, "serverinfo")["unknown"],
+                color=Error,
             )
             return await ctx.reply(embed=e)
-        if (not guild.get_member(ctx.author.id)) and not self.bot.is_owner(ctx.author):
+        if (not guild.get_member(ctx.author.id)) and not self.bot.is_owner(
+            ctx.author
+        ):
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "serverinfo")["noperm"], color=Error
             )
@@ -2032,7 +2151,9 @@ class MainCog(commands.Cog):
             + str(len(guild.voice_channels))
             + "\n"
         )
-        e.add_field(name=get_txt(ctx.guild.id, "serverinfo")["channels"][0], value=chs)
+        e.add_field(
+            name=get_txt(ctx.guild.id, "serverinfo")["channels"][0], value=chs
+        )
         e.add_field(
             name=get_txt(ctx.guild.id, "serverinfo")["members"][0],
             value=get_txt(ctx.guild.id, "serverinfo")["members"][1].format(
@@ -2097,7 +2218,9 @@ class MainCog(commands.Cog):
             e3 = discord.Embed(title="SevenNetチャンネルのルールについて", color=Info)
             e3.add_field(name="宣伝禁止", value="宣伝はしないで下さい。", inline=False)
             e3.add_field(
-                name="暴言・エロ画像など、不快に感じる行為禁止", value="不快に感じる行為はしないで下さい。", inline=False
+                name="暴言・エロ画像など、不快に感じる行為禁止",
+                value="不快に感じる行為はしないで下さい。",
+                inline=False,
             )
             f1 = Official_emojis["up"]
             f2 = Official_emojis["down"]
@@ -2162,13 +2285,18 @@ class MainCog(commands.Cog):
             cat = await ctx.guild.create_category("チケット", overwrites=overwrites)
             Guild_settings[ctx.guild.id]["ticket_category"] = cat.id
         else:
-            cat = self.bot.get_channel(Guild_settings[ctx.guild.id]["ticket_category"])
+            cat = self.bot.get_channel(
+                Guild_settings[ctx.guild.id]["ticket_category"]
+            )
         Official_emojis["add"]
         e = discord.Embed(title="チケット作成", description=subject, color=Widget)
         e.set_footer(text="下のボタンを押してチケットを作成（1時間に1回）")
         m = await ctx.send(embed=e)
         await m.add_reaction(Official_emojis["add"])
-        Guild_settings[ctx.guild.id]["ticket_subject"][m.id] = [subject, description]
+        Guild_settings[ctx.guild.id]["ticket_subject"][m.id] = [
+            subject,
+            description,
+        ]
 
     @commands.command(name="free_channel")
     @commands.has_guild_permissions(manage_guild=True, manage_channels=True)
@@ -2206,10 +2334,10 @@ class MainCog(commands.Cog):
         hs = await ctx.channel.history(limit=100).flatten()
         hs.reverse()
         for m in hs:
-            for l in m.content.split("\n"):
-                if l.startswith("#") or l.startswith("//"):
+            for line in m.content.split("\n"):
+                if line.startswith("#") or line.startswith("//"):
                     continue
-                for i, c in enumerate(l):
+                for i, c in enumerate(line):
                     if c == '"':
                         if not ignore:
                             ignore = '"'
@@ -2246,35 +2374,42 @@ class MainCog(commands.Cog):
         b1 = lb.count("(")
         b2 = lb.count("{")
         b3 = lb.count("[")
-        if not (b1 == 0 and lb1 == 0 and b2 == 0 and lb2 == 0 and b3 == 0 and lb3 == 0):
+        if not (
+            b1 == 0
+            and lb1 == 0
+            and b2 == 0
+            and lb2 == 0
+            and b3 == 0
+            and lb3 == 0
+        ):
             if b1 - lb1 != 0:
-                err += Texts[Guild_settings[ctx.guild.id]["lang"]]["parse"][2].format(
-                    ("(" if b1 - lb1 < 0 else ")"), abs(b1 - lb1)
-                )
+                err += Texts[Guild_settings[ctx.guild.id]["lang"]]["parse"][
+                    2
+                ].format(("(" if b1 - lb1 < 0 else ")"), abs(b1 - lb1))
             if lb1 != 0:
-                err += Texts[Guild_settings[ctx.guild.id]["lang"]]["parse"][3].format(
-                    ")", lb1
-                )
+                err += Texts[Guild_settings[ctx.guild.id]["lang"]]["parse"][
+                    3
+                ].format(")", lb1)
             if b2 - lb2 != 0:
-                err += Texts[Guild_settings[ctx.guild.id]["lang"]]["parse"][2].format(
-                    ("{" if b2 - lb2 < 0 else "}"), abs(b2 - lb2)
-                )
+                err += Texts[Guild_settings[ctx.guild.id]["lang"]]["parse"][
+                    2
+                ].format(("{" if b2 - lb2 < 0 else "}"), abs(b2 - lb2))
             if lb2 != 0:
-                err += Texts[Guild_settings[ctx.guild.id]["lang"]]["parse"][3].format(
-                    "}", lb2
-                )
+                err += Texts[Guild_settings[ctx.guild.id]["lang"]]["parse"][
+                    3
+                ].format("}", lb2)
             if b3 - lb3 != 0:
-                err += Texts[Guild_settings[ctx.guild.id]["lang"]]["parse"][2].format(
-                    ("[" if b3 - lb3 < 0 else "]"), abs(b3 - lb3)
-                )
+                err += Texts[Guild_settings[ctx.guild.id]["lang"]]["parse"][
+                    2
+                ].format(("[" if b3 - lb3 < 0 else "]"), abs(b3 - lb3))
             if lb3 != 0:
-                err += Texts[Guild_settings[ctx.guild.id]["lang"]]["parse"][3].format(
-                    "]", lb3
-                )
+                err += Texts[Guild_settings[ctx.guild.id]["lang"]]["parse"][
+                    3
+                ].format("]", lb3)
         if ignore:
-            err += Texts[Guild_settings[ctx.guild.id]["lang"]]["parse"][4].format(
-                ignore
-            )
+            err += Texts[Guild_settings[ctx.guild.id]["lang"]]["parse"][
+                4
+            ].format(ignore)
         if err == "":
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "parse")[0][0],
@@ -2283,7 +2418,9 @@ class MainCog(commands.Cog):
             )
         else:
             e = discord.Embed(
-                title=get_txt(ctx.guild.id, "parse")[1], description=err, color=Error
+                title=get_txt(ctx.guild.id, "parse")[1],
+                description=err,
+                color=Error,
             )
         return await ctx.reply(embed=e)
 
@@ -2308,7 +2445,10 @@ class MainCog(commands.Cog):
                     f"**`{pm}`** "
                     + (
                         get_txt(ctx.guild.id, "help_detail").get(
-                            pm, "_" + get_txt(ctx.guild.id, "help_detail_none") + "_"
+                            pm,
+                            "_"
+                            + get_txt(ctx.guild.id, "help_detail_none")
+                            + "_",
                         )
                     ).split("\n")[0]
                     + "\n"
@@ -2325,7 +2465,10 @@ class MainCog(commands.Cog):
                     f"**`{pm}`** "
                     + (
                         get_txt(ctx.guild.id, "help_detail").get(
-                            pm, "_" + get_txt(ctx.guild.id, "help_detail_none") + "_"
+                            pm,
+                            "_"
+                            + get_txt(ctx.guild.id, "help_detail_none")
+                            + "_",
                         )
                     ).split("\n")[0]
                     + "\n"
@@ -2336,12 +2479,18 @@ class MainCog(commands.Cog):
                     break
         else:
             part_res = get_txt(ctx.guild.id, "getid_search")[3]
-        e = discord.Embed(title=get_txt(ctx.guild.id, "command_search"), color=Bot_info)
-        e.add_field(
-            name=get_txt(ctx.guild.id, "getid_search")[1], value=perf_res, inline=False
+        e = discord.Embed(
+            title=get_txt(ctx.guild.id, "command_search"), color=Bot_info
         )
         e.add_field(
-            name=get_txt(ctx.guild.id, "getid_search")[2], value=part_res, inline=False
+            name=get_txt(ctx.guild.id, "getid_search")[1],
+            value=perf_res,
+            inline=False,
+        )
+        e.add_field(
+            name=get_txt(ctx.guild.id, "getid_search")[2],
+            value=part_res,
+            inline=False,
         )
         return await ctx.reply(embed=e)
 
@@ -2356,7 +2505,7 @@ class MainCog(commands.Cog):
         script = script.replace("```py", "").replace("```", "")
         exec(
             "async def __ex(self,_bot,_ctx,ctx): "
-            + "".join(f"\n {l}" for l in script.split("\n"))
+            + "".join(f"\n {line}" for line in script.split("\n"))
         )
         ret = await locals()["__ex"](self, self.bot, ctx, ctx)
         try:
@@ -2372,12 +2521,16 @@ class MainCog(commands.Cog):
 
     @follow.command("announce")
     async def follow_announce(self, ctx):
-        await self.bot.get_channel(738879378196267009).follow(destination=ctx.channel)
+        await self.bot.get_channel(738879378196267009).follow(
+            destination=ctx.channel
+        )
         await ctx.message.add_reaction(Official_emojis["check8"])
 
     @follow.command("updates")
     async def follow_updates(self, ctx):
-        await self.bot.get_channel(817751838719868950).follow(destination=ctx.channel)
+        await self.bot.get_channel(817751838719868950).follow(
+            destination=ctx.channel
+        )
         await ctx.message.add_reaction(Official_emojis["check8"])
 
     @commands.command(aliases=["vote_rank"])
@@ -2411,14 +2564,20 @@ class MainCog(commands.Cog):
                     break_flag = True
                     break
             i += 1
-            m = self.bot.get_user(int(tav[0])) or await self.bot.fetch_user(int(tav[0]))
+            m = self.bot.get_user(int(tav[0])) or await self.bot.fetch_user(
+                int(tav[0])
+            )
             if m == ctx.author:
                 show_author = False
             res.append([str(i) + ".", remove_emoji(str(m)), tav[1]])
         if show_author:
             try:
                 a = [
-                    ("-" if break_flag or rank[ctx.author.id] == 0 else str(i) + "."),
+                    (
+                        "-"
+                        if break_flag or rank[ctx.author.id] == 0
+                        else str(i) + "."
+                    ),
                     remove_emoji(str(ctx.author)),
                     rank[ctx.author.id],
                 ]
@@ -2471,7 +2630,9 @@ class MainCog(commands.Cog):
                                     "variable": bool(
                                         s.flag & syntaxer.ArgumentType.variable
                                     ),
-                                    "kwarg": bool(s.flag & syntaxer.ArgumentType.kwarg),
+                                    "kwarg": bool(
+                                        s.flag & syntaxer.ArgumentType.kwarg
+                                    ),
                                     "detail": s.description,
                                 }
                             )
@@ -2528,7 +2689,9 @@ class MainCog(commands.Cog):
             if fixed == {}:
                 await ctx.channel.send("キーは修復されませんでした。")
             else:
-                await ctx.channel.send(f"キー`{collections.Counter(fixed)}`を修復しました。")
+                await ctx.channel.send(
+                    f"キー`{collections.Counter(fixed)}`を修復しました。"
+                )
         except BaseException:
             pass
 
@@ -2545,15 +2708,6 @@ def setup(_bot):
         if str(ctx.command).split(" ")[0] not in Command_counter.keys():
             Command_counter[str(ctx.command).split(" ")[0]] = 0
         Command_counter[str(ctx.command).split(" ")[0]] += 1
-        async with aiohttp.ClientSession() as s:
-            async with s.post(
-                "https://discord.com/api/webhooks/835270097374674954/xQQVcW2IJT4Rhwm5q3u2CrvWJ3miCdY6TaXGTdrHT9AeE5aEWbbu5-JeHJhv35YqMPwO",
-                json={
-                    "content": ctx.message.content,
-                    "allowed_mentions": {"parse": []},
-                },
-            ):
-                pass
         return
 
     @bot.event
@@ -2596,7 +2750,9 @@ def setup(_bot):
                     e = discord.Embed(
                         title=get_txt(c.guild.id, "error"),
                         description="```"
-                        + "\n".join(traceback.format_exception_only(type(ex), ex))
+                        + "\n".join(
+                            traceback.format_exception_only(type(ex), ex)
+                        )
                         + "```",
                         color=Error,
                     )
