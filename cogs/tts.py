@@ -60,7 +60,7 @@ class TtsCog(commands.Cog):
         get_txt = bot.get_txt
         Official_emojis = bot.consts["oe"]
         Tts_channels = bot.consts["tc"]
-        Tts_settings = bot.raw_config["ts"]
+        Tts_settings = {}
         self.make_session()
 
     def make_session(self):
@@ -235,6 +235,7 @@ class TtsCog(commands.Cog):
         if not Tts_settings.get(ctx.author.id):
             Tts_settings[ctx.author.id] = {}
         Tts_settings[ctx.author.id]["speaker"] = "abcde".index(voice.lower())
+        await self.save_tts_setting(ctx.author)
         e = discord.Embed(
             title=get_txt(ctx.guild.id, "tts_voice_changed").format(voice.upper()),
             color=Success,
@@ -253,6 +254,7 @@ class TtsCog(commands.Cog):
         if not Tts_settings.get(ctx.author.id):
             Tts_settings[ctx.author.id] = {}
         Tts_settings[ctx.author.id]["speed"] = speed
+        await self.save_tts_setting(ctx.author)
         e = discord.Embed(
             title=get_txt(ctx.guild.id, "tts_speed_changed").format(speed),
             color=Success,
@@ -450,6 +452,19 @@ class TtsCog(commands.Cog):
                 raise e
         else:
             await message.add_reaction(Official_emojis["queue"])
+
+    async def cog_before_invoke(self, ctx):
+        await self.init_tts_setting(ctx.author)
+
+    async def init_tts_setting(self, member):
+        if member.id not in Tts_settings:
+            setting = await self.bot.db.find_one({"uid": member.id}, {"tts_settings": True})
+            if setting is None:
+                await self.bot.init_user_settings(member)
+            Tts_settings[member.id] = {}
+
+    async def save_tts_setting(self, member):
+        await self.bot.db.update_one({"uid": member.id}, {"$set": {"tts_settings": Tts_settings[member.id]}})
 
 
 def setup(_bot):
