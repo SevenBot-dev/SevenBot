@@ -460,7 +460,7 @@ class TtsCog(commands.Cog):
         if member.id not in Tts_settings:
             setting = await self.bot.db.user_settings.find_one({"uid": member.id}, {"tts_settings": True})
             if setting is None:
-                await self.bot.init_user_settings(member)
+                await self.bot.init_user_settings(member.id)
                 Tts_settings[member.id] = {}
             else:
                 Tts_settings[member.id] = setting["tts_settings"]
