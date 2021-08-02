@@ -2,6 +2,7 @@
     "help_title": "SevenBot help",
     "too_high": "Value is too high.",
     "help_closed": "{} to reopen the help",
+    "no_member": "メンバーが見付かりませんでした。",
     "premium": "Only SevenBot Premium users can execute this  command.",
     "premium_desc": "Boost official server to get it.",
     "serverinfo": {
@@ -308,8 +309,8 @@
         ],
         "rank_title": "Level ranking",
         "manage": {
-            "add": "{0} got {1}XP.",
-            "remove": "{0} lost {1}XP.",
+            "add": "{}人に{}XPを付与しました。",
+            "remove": "{}人から{}XPを剥奪しました。",
             "reset": "Levels were reset."
         },
         "roles": {
@@ -752,8 +753,8 @@
         "level_settings deactivate": "レベルシステムを無効にします。",
         "level_settings channel": "レベルアップ時のお知らせチャンネルを変更します。\nターゲット: レベルアップお知らせチャンネルの変更先（チャンネル、省略でリセット）",
         "level_settings manage": "メンバーのレベルを管理します。",
-        "level_settings manage add": "特定のメンバーにXPを与えます。\nターゲット: XPを与えるメンバー（メンバー）\nXP: 与えるXP（数値）",
-        "level_settings manage remove": "特定のメンバーからXPを剥奪します。\nターゲット: XPを剥奪するメンバー（メンバー）\nXP: 剥奪するXP（数値）",
+        "level_settings manage add": "特定のメンバーにXPを与えます。\nターゲット: XPを与える対象（メンバー、ロール、!everyone、!role）\nXP: 与えるXP（数値）",
+        "level_settings manage remove": "特定のメンバーからXPを剥奪します。\nターゲット: XPを剥奪するメンバー（メンバー、ロール、!everyone、!role）\nXP: 剥奪するXP（数値）",
         "level_settings manage reset": "全員のレベルをリセットします。",
         "archive": "チャンネルをアーカイブします。",
         "gchat": "グローバルチャット関連のコマンドです。",
