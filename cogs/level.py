@@ -351,7 +351,7 @@ class LevelCog(commands.Cog):
 
     @ls_manage.command(name="remove")
     async def ls_manage_remove(
-        self, ctx, *targets: Union[discord.Member, discord.Role, Literal["!everyone", "!here"]], xp: int
+        self, ctx, targets: Greedy[Union[discord.Member, discord.Role, Literal["!everyone", "!here"]]], xp: int
     ):
         if not Guild_settings[ctx.guild.id]["level_active"]:
             e = discord.Embed(
