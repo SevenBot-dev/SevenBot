@@ -37,35 +37,29 @@ class BumpCog(commands.Cog):
     @commands.Cog.listener("on_message")
     async def on_message_bumps(self, message):
 
-        if (
-            message.author.id == Bump_id
-            and Guild_settings[message.guild.id]["do_bump_alert"]
-        ):
+        if message.author.id == Bump_id and Guild_settings[message.guild.id]["do_bump_alert"]:
             try:
                 if message.embeds[0].image != discord.Embed().Empty:
-                    if "disboard.org/images/bot-command-image-bump.png" in str(
-                        message.embeds[0].image.url
-                    ):
+                    if "disboard.org/images/bot-command-image-bump.png" in str(message.embeds[0].image.url):
                         Bump_alerts[message.guild.id] = [
                             time.time() + 3600 * 2,
                             message.channel.id,
                         ]
                         e = discord.Embed(
                             title=get_txt(message.guild.id, "bump_detected"),
-                            description=get_txt(
-                                message.guild.id, "bump_detected_desc"
-                            ).format(int(time.time()) + 3600 * 2),
+                            description=get_txt(message.guild.id, "bump_detected_desc").format(
+                                int(time.time()) + 3600 * 2
+                            ),
                             color=Bump_color,
                         )
                         await message.channel.send(embed=e)
             except IndexError:
                 pass
-        elif (
-            message.author.id == Dissoku_id
-            and Guild_settings[message.guild.id]["do_dissoku_alert"]
-        ):
+        elif message.author.id == Dissoku_id and Guild_settings[message.guild.id]["do_dissoku_alert"]:
             try:
-                msg = await self.bot.wait_for("raw_message_edit", check=lambda u: u.message_id == message.id)
+                msg = await self.bot.wait_for(
+                    "raw_message_edit", check=lambda u: u.message_id == message.id, timeout=10
+                )
                 if msg.data["embeds"][0]["fields"]:
                     if message.guild.name in msg.data["embeds"][0]["fields"][0]["name"]:
                         Dissoku_alerts[message.guild.id] = [
@@ -73,12 +67,10 @@ class BumpCog(commands.Cog):
                             message.channel.id,
                         ]
                         e = discord.Embed(
-                            title=get_txt(
-                                message.guild.id, "dissoku_detected"
+                            title=get_txt(message.guild.id, "dissoku_detected"),
+                            description=get_txt(message.guild.id, "dissoku_detected_desc").format(
+                                int(time.time()) + 3600
                             ),
-                            description=get_txt(
-                                message.guild.id, "dissoku_detected_desc"
-                            ).format(int(time.time()) + 3600),
                             color=Dissoku_color,
                         )
                         await message.channel.send(embed=e)
@@ -99,18 +91,14 @@ class BumpCog(commands.Cog):
                 if c is not None:
                     m = ""
                     if Guild_settings[guild]["bump_role"]:
-                        r = c.guild.get_role(
-                            Guild_settings[guild]["bump_role"]
-                        )
+                        r = c.guild.get_role(Guild_settings[guild]["bump_role"])
                         if r:
                             m = r.mention
                     try:
                         await c.send(
                             content=m,
                             embed=e,
-                            allowed_mentions=discord.AllowedMentions(
-                                roles=True
-                            ),
+                            allowed_mentions=discord.AllowedMentions(roles=True),
                         )
                     except discord.errors.Forbidden:
                         pass
@@ -126,18 +114,14 @@ class BumpCog(commands.Cog):
                 if c is not None:
                     m = ""
                     if Guild_settings[guild]["dissoku_role"]:
-                        r = c.guild.get_role(
-                            Guild_settings[guild]["dissoku_role"]
-                        )
+                        r = c.guild.get_role(Guild_settings[guild]["dissoku_role"])
                         if r:
                             m = r.mention
                     try:
                         await c.send(
                             content=m,
                             embed=e,
-                            allowed_mentions=discord.AllowedMentions(
-                                roles=True
-                            ),
+                            allowed_mentions=discord.AllowedMentions(roles=True),
                         )
                     except discord.errors.Forbidden:
                         pass
@@ -154,9 +138,7 @@ class BumpCog(commands.Cog):
     async def bump_activate(self, ctx):
         global Guild_settings
         if Guild_settings[ctx.guild.id]["do_bump_alert"]:
-            e = discord.Embed(
-                title=get_txt(ctx.guild.id, "activate_fail"), color=Error
-            )
+            e = discord.Embed(title=get_txt(ctx.guild.id, "activate_fail"), color=Error)
             return await ctx.reply(embed=e)
         else:
             Guild_settings[ctx.guild.id]["do_bump_alert"] = True
@@ -171,9 +153,7 @@ class BumpCog(commands.Cog):
     async def bump_deactivate(self, ctx):
         global Guild_settings
         if not Guild_settings[ctx.guild.id]["do_bump_alert"]:
-            e = discord.Embed(
-                title=get_txt(ctx.guild.id, "deactivate_fail"), color=Error
-            )
+            e = discord.Embed(title=get_txt(ctx.guild.id, "deactivate_fail"), color=Error)
             return await ctx.reply(embed=e)
         else:
             Guild_settings[ctx.guild.id]["do_bump_alert"] = False
@@ -189,15 +169,10 @@ class BumpCog(commands.Cog):
         global Guild_settings
         if role:
             Guild_settings[ctx.guild.id]["bump_role"] = role.id
-            e = discord.Embed(
-                title=get_txt(ctx.guild.id, "bump_role_set"), color=Success
-            )
+            e = discord.Embed(title=get_txt(ctx.guild.id, "bump_role_set"), color=Success)
         else:
             Guild_settings[ctx.guild.id]["bump_role"] = None
-            e = discord.Embed(
-                title=get_txt(ctx.guild.id, "bump_role_set_none"),
-                color=Success
-            )
+            e = discord.Embed(title=get_txt(ctx.guild.id, "bump_role_set_none"), color=Success)
         return await ctx.reply(embed=e)
 
     @commands.group(invoke_without_command=True)
@@ -211,9 +186,7 @@ class BumpCog(commands.Cog):
     async def dissoku_activate(self, ctx):
         global Guild_settings
         if Guild_settings[ctx.guild.id]["do_dissoku_alert"]:
-            e = discord.Embed(
-                title=get_txt(ctx.guild.id, "activate_fail"), color=Error
-            )
+            e = discord.Embed(title=get_txt(ctx.guild.id, "activate_fail"), color=Error)
             return await ctx.reply(embed=e)
         else:
             Guild_settings[ctx.guild.id]["do_dissoku_alert"] = True
@@ -228,9 +201,7 @@ class BumpCog(commands.Cog):
     async def dissoku_deactivate(self, ctx):
         global Guild_settings
         if not Guild_settings[ctx.guild.id]["do_dissoku_alert"]:
-            e = discord.Embed(
-                title=get_txt(ctx.guild.id, "deactivate_fail"), color=Error
-            )
+            e = discord.Embed(title=get_txt(ctx.guild.id, "deactivate_fail"), color=Error)
             return await ctx.reply(embed=e)
         else:
             Guild_settings[ctx.guild.id]["do_dissoku_alert"] = False
@@ -246,9 +217,7 @@ class BumpCog(commands.Cog):
         global Guild_settings
         if role:
             Guild_settings[ctx.guild.id]["dissoku_role"] = role.id
-            e = discord.Embed(
-                title=get_txt(ctx.guild.id, "dissoku_role_set"), color=Success
-            )
+            e = discord.Embed(title=get_txt(ctx.guild.id, "dissoku_role_set"), color=Success)
         else:
             Guild_settings[ctx.guild.id]["dissoku_role"] = None
             e = discord.Embed(
