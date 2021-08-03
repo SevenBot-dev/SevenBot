@@ -1,4 +1,5 @@
 # -*- ignore_on_debug -*-
+import asyncio
 import time
 from typing import Optional
 
@@ -64,8 +65,9 @@ class BumpCog(commands.Cog):
             and Guild_settings[message.guild.id]["do_dissoku_alert"]
         ):
             try:
-                if message.embeds[0].fields:
-                    if message.guild.name in message.embeds[0].fields[0].name:
+                msg = await self.bot.wait_for("raw_message_edit", check=lambda u: u.message_id == message.id)
+                if msg.data["embeds"][0]["fields"]:
+                    if message.guild.name in msg.data["embeds"][0]["fields"][0]["name"]:
                         Dissoku_alerts[message.guild.id] = [
                             time.time() + 3600,
                             message.channel.id,
@@ -80,7 +82,7 @@ class BumpCog(commands.Cog):
                             color=Dissoku_color,
                         )
                         await message.channel.send(embed=e)
-            except IndexError:
+            except (IndexError, asyncio.TimeoutError):
                 pass
         return
 
