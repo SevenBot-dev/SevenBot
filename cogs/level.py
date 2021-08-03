@@ -321,7 +321,7 @@ class LevelCog(commands.Cog):
                     members.append(target)
                 elif isinstance(target, discord.Role):
                     members.extend(target.members)
-                elif isinstance(target, Literal):
+                elif isinstance(target, str):
                     if target.value == "!everyone":
                         members.extend(ctx.guild.members)
                     elif target.value == "!here":
@@ -367,7 +367,7 @@ class LevelCog(commands.Cog):
                     members.append(target)
                 elif isinstance(target, discord.Role):
                     members.extend(target.members)
-                elif isinstance(target, Literal):
+                elif isinstance(target, str):
                     if target.value == "!everyone":
                         members.extend(ctx.guild.members)
                     elif target.value == "!here":
