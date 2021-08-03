@@ -300,7 +300,7 @@ class LevelCog(commands.Cog):
         else:
             await self.bot.send_subcommands(ctx)
 
-    @ls_manage.group(name="add", aliases=["set"])
+    @ls_manage.command(name="add", aliases=["set"])
     async def ls_manage_add(
         self, ctx, targets: Greedy[Union[discord.Member, discord.Role, Literal["!everyone", "!here"]]], xp: int
     ):
@@ -326,6 +326,7 @@ class LevelCog(commands.Cog):
                         members.extend(ctx.guild.members)
                     elif target.value == "!here":
                         members.extend([m for m in ctx.guild.members if m.status != discord.Status.offline])
+            members = [m for m in members if not m.bot]
             if not members:
                 e = discord.Embed(title=get_txt(ctx.guild.id, "no_member"), color=Error)
                 return await ctx.reply(embed=e)
@@ -348,7 +349,7 @@ class LevelCog(commands.Cog):
             )
             return await ctx.reply(embed=e)
 
-    @ls_manage.group(name="remove")
+    @ls_manage.command(name="remove")
     async def ls_manage_remove(
         self, ctx, *targets: Union[discord.Member, discord.Role, Literal["!everyone", "!here"]], xp: int
     ):
@@ -371,6 +372,7 @@ class LevelCog(commands.Cog):
                         members.extend(ctx.guild.members)
                     elif target.value == "!here":
                         members.extend([m for m in ctx.guild.members if m.status != discord.Status.offline])
+            members = [m for m in members if not m.bot]
             if not members:
                 e = discord.Embed(title=get_txt(ctx.guild.id, "no_member"), color=Error)
                 return await ctx.reply(embed=e)
