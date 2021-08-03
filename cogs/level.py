@@ -331,10 +331,10 @@ class LevelCog(commands.Cog):
                 e = discord.Embed(title=get_txt(ctx.guild.id, "no_member"), color=Error)
                 return await ctx.reply(embed=e)
             for member in members:
-                Guild_settings[ctx.guild.id]["level_counts"][member.id] += xp
                 if member.id not in Guild_settings[ctx.guild.id]["level_counts"].keys():
                     Guild_settings[ctx.guild.id]["level_counts"][member.id] = 0
                     Guild_settings[ctx.guild.id]["levels"][member.id] = 0
+                Guild_settings[ctx.guild.id]["level_counts"][member.id] += xp
                 while (
                     Guild_settings[ctx.guild.id]["levels"][member.id] * 10
                     <= Guild_settings[ctx.guild.id]["level_counts"][member.id]
