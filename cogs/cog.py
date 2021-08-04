@@ -1093,7 +1093,7 @@ class MainCog(commands.Cog):
             return await ctx.reply(embed=e)
         elif isinstance(error, commands.MissingPermissions):
             res = ""
-            for p in error.missing_perms:
+            for p in error.missing_permissions:
                 try:
                     res += (
                         get_txt(ctx.guild.id, "permissions_text")[0][p] + "\n"
