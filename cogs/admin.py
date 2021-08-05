@@ -294,7 +294,7 @@ class AdminCog(commands.Cog):
                         ),
                         "async def __ex(self,_bot,_ctx,ctx,session,"
                         "print,get_msg):",
-                        [
+                        *[
                             f"    {line}"
                             for line in script.split("\n")
                         ],
