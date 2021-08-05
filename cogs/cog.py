@@ -988,8 +988,7 @@ class MainCog(commands.Cog):
         e = discord.Embed(
             title="招待URL",
             description="[https://sevenbot.jp/invite](https://discord.com/oauth2/authorize?"
-            "client_id=718760319207473152&scope=bot%20applications.commands&permissions=808840532&"
-            "response_type=code&redirect_uri=https%3A%2F%2Fsevenbot.jp%2Fthanks)",
+            "client_id=718760319207473152&scope=bot%20applications.commands&permissions=808840532)",
             color=Bot_info,
         )
         return await ctx.reply(embed=e)
