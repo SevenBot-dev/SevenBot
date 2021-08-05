@@ -622,7 +622,7 @@ class AdminCog(commands.Cog):
     async def reboot(self, ctx=None):
         msg = await components.send(
             ctx,
-            "再起動しますか？",
+            f"再起動しますか？\n現在のVC: {len(self.bot.voice_clients)}",
             components=[
                 components.Button(
                     "する",
