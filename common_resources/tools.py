@@ -32,7 +32,7 @@ def to_lts(s):
     if s > 3600:
         if s > 3600 * 24:
             res = (
-                str(s // 3600  24)
+                str(s // 3600 // 24)
                 + "d "
                 + str(s // 3600 % 24).zfill(2)
                 + ":"
