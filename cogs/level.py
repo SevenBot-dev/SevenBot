@@ -65,7 +65,7 @@ class LevelCog(commands.Cog):
                     res = True
                 e = discord.Embed(
                     title="通知設定",
-                    description="レベルアップ通知は" + ("OFF" if res else "ON") + "になりました。",
+                    description="レベルアップ通知は" + ("ON" if res else "OFF") + "になりました。",
                     color=Success,
                 )
                 await message.author.send(embed=e)
