@@ -148,7 +148,7 @@ class AutoreplyCog(commands.Cog):
         e = discord.Embed(
             title=f"自動返信に`{base}`を追加しました。",
             description=f"戻すには`sb#autoreply remove {base}`または"
-            "`sb#autoreply remove {rid}`を使用してください",
+            f"`sb#autoreply remove {rid}`を使用してください",
             color=Success,
         )
         await ctx.reply(embed=e)
