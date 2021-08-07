@@ -2009,7 +2009,7 @@ class MainCog(commands.Cog):
         return await ctx.reply(embed=e)
 
     @commands.command(aliases=["user", "ui", "userinfo"])
-    async def lookup(self, ctx, u: Union[discord.User, int] = None):
+    async def lookup(self, ctx, u: Union[discord.User, discord.Member, int] = None):
         used_api = False
         if u is None:
             u = ctx.author
