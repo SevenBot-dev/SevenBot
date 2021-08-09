@@ -156,7 +156,7 @@ class GlobalCog(commands.Cog):
                         allowed_mentions=discord.AllowedMentions.none(),
                         avatar_url="https://media.discordapp.net/avatars/"
                         f"{data['userId']}/{data['userAvatar']}."
-                        "{'gif' if data['userAvatar'].startswith('a_') else 'png'}?size=1024",
+                        f"{'gif' if data['userAvatar'].startswith('a_') else 'webp'}?size=1024",
                         files=files,
                         wait=True,
                     )
