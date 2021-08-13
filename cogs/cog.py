@@ -1866,7 +1866,7 @@ class MainCog(commands.Cog):
             await m.add_reaction(Number_emojis[sfi + 1])
         await ctx.message.delete()
 
-    @commands.command(aliases=["get_pm"])
+    @commands.command(aliases=["get_perm", "get_pm"])
     async def get_permissions(
         self,
         ctx,
