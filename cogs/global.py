@@ -110,33 +110,8 @@ class GlobalCog(commands.Cog):
                         fl.append(await at.to_file())
                     un = data["userName"] + "#" + data["userDiscriminator"]
                     un += "("
-                    if message.author.id == Owner_ID:
-                        un = "[👑]" + un
-                    elif (
-                        bot.get_guild(Official_discord_id).get_member(
-                            message.author.id
-                        )
-                        is not None
-                    ):
-                        m = bot.get_guild(Official_discord_id).get_member(
-                            message.author.id
-                        )
-                        if self.bot.is_premium(m):
-                            un = "[💎]" + un
-                        elif (
-                            bot.get_guild(Official_discord_id).get_role(
-                                741837982012538910
-                            )
-                            in m.roles
-                        ):
-                            un = "[🛠️]" + un  # 747555900092580030
-                        elif (
-                            bot.get_guild(Official_discord_id).get_role(
-                                747555900092580030
-                            )
-                            in m.roles
-                        ):
-                            un = "[✔️]" + un
+                    if data.get("sb-tag", {}).get("type"):
+                        un = "[" + data.get("sb-tag", {}).get("emoji") + "]" + un
                     un += f"ID:{data['userId']}, From:{message.author})"
                     files = []
                     async with aiohttp.ClientSession() as s:
