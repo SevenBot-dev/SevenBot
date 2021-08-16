@@ -156,7 +156,7 @@ class GlobalCog(commands.Cog):
                         allowed_mentions=discord.AllowedMentions.none(),
                         avatar_url="https://media.discordapp.net/avatars/"
                         f"{data['userId']}/{data['userAvatar']}."
-                        f"{'gif' if data['userAvatar'].startswith('a_') else 'webp'}?size=1024",
+                        "{'gif' if data['userAvatar'].startswith('a_') else 'png'}?size=1024",
                         files=files,
                         wait=True,
                     )
@@ -455,7 +455,7 @@ class GlobalCog(commands.Cog):
             "isBot": message.author.bot,
             "guildId": message.guild.id,
             "guildName": message.guild.name,
-            "guildIcon": message.guild.icon.key,
+            "guildIcon": message.guild.icon and message.guild.icon.key,
             "channelId": message.channel.id,
             "channelName": message.channel.name,
             "messageId": message.id,
