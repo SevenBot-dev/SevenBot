@@ -111,7 +111,7 @@ class GlobalCog(commands.Cog):
                     un = data["userName"] + "#" + data["userDiscriminator"]
                     un += "("
                     if data.get("sb-tag", {}).get("type"):
-                        un = "[" + data.get("sb-tag", {}).get("emoji") + "]" + un
+                        un = "[" + data.get("sb-tag", {}).get("emoji") + "]"
                     un += f"ID:{data['userId']}, From:{message.author})"
                     files = []
                     async with aiohttp.ClientSession() as s:
@@ -131,7 +131,7 @@ class GlobalCog(commands.Cog):
                         allowed_mentions=discord.AllowedMentions.none(),
                         avatar_url="https://media.discordapp.net/avatars/"
                         f"{data['userId']}/{data['userAvatar']}."
-                        "{'gif' if data['userAvatar'].startswith('a_') else 'png'}?size=1024",
+                        f"{'gif' if data['userAvatar'].startswith('a_') else 'webp'}?size=1024",
                         files=files,
                         wait=True,
                     )
