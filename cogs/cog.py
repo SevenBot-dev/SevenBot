@@ -1725,7 +1725,7 @@ class MainCog(commands.Cog):
         e = discord.Embed(
             title=get_txt(ctx.guild.id, "ping_title"),
             description=get_txt(ctx.guild.id, "ping_desc").format(
-                round(self.bot.latency * 1000), round(ping.microseconds / 1000)
+                round(self.bot.latency * 1000),
             ),
             color=Bot_info,
         )
