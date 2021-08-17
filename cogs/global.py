@@ -111,7 +111,7 @@ class GlobalCog(commands.Cog):
                     un = data["userName"] + "#" + data["userDiscriminator"]
                     un += "("
                     if data.get("sb-tag", {}).get("type"):
-                        un = "[" + data.get("sb-tag", {}).get("emoji") + "]"
+                        un = "[" + data.get("sb-tag", {}).get("emoji") + "]" + un
                     un += f"ID:{data['userId']}, From:{message.author})"
                     files = []
                     async with aiohttp.ClientSession() as s:
