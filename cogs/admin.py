@@ -1,5 +1,6 @@
 import asyncio
 import os
+import subprocess
 
 import aiohttp
 import discord
@@ -49,9 +50,7 @@ class AdminCog(commands.Cog):
     async def sl(self, ctx):
         global Guild_settings
         # Guild_settings[ctx.guild.id]
-        await ctx.send(
-            f"**SevenBotが使われているサーバー({len(list(Guild_settings.keys()))}個)：**"
-        )
+        await ctx.send(f"**SevenBotが使われているサーバー({len(list(Guild_settings.keys()))}個)：**")
         for gi, gid in enumerate(Guild_settings.keys()):
             g = self.bot.get_guild(gid)
             await ctx.send(f"`{gi+1}` : `{g.name}` - `{g.id}`")
@@ -79,9 +78,7 @@ class AdminCog(commands.Cog):
                 self.bot.get_guild(715540925081714788)
                 and discord.utils.found(
                     lambda r: r.name == "Moderator",
-                    self.bot.get_guild(715540925081714788).get_member(
-                        ctx.author.id
-                    ),
+                    self.bot.get_guild(715540925081714788).get_member(ctx.author.id),
                 )
             )
         ):
@@ -104,9 +101,7 @@ class AdminCog(commands.Cog):
                 return False
 
         try:
-            r, u = await self.bot.wait_for(
-                "reaction_add", check=check, timeout=10
-            )
+            r, u = await self.bot.wait_for("reaction_add", check=check, timeout=10)
             if r.emoji.name == "check5":
                 e = discord.Embed(
                     title="`{user}`をGMuteしました。",
@@ -121,27 +116,18 @@ class AdminCog(commands.Cog):
                     cn = self.bot.get_channel(c)
 
                     if cn is None:
-                        Private_chat_info["gban"]["channels"].remove(
-                            c
-                        )
+                        Private_chat_info["gban"]["channels"].remove(c)
                     else:
                         ch_webhooks = await cn.webhooks()
-                        webhook = discord.utils.get(
-                            ch_webhooks, name=whname
-                        )
+                        webhook = discord.utils.get(ch_webhooks, name=whname)
                         if webhook is None:
-                            g = self.bot.get_guild(
-                                Official_discord_id
-                            )
+                            g = self.bot.get_guild(Official_discord_id)
                             a = g.icon.url
-                            webhook = await cn.create_webhook(
-                                name=whname, avatar=await a.read()
-                            )
+                            webhook = await cn.create_webhook(name=whname, avatar=await a.read())
                         un = "SevenBot GMute System"
                         loop.create_task(
                             webhook.send(
-                                content=f"**`{str(user)}` をGMuteしました。**\n"
-                                f"理由：{reason}",
+                                content=f"**`{str(user)}` をGMuteしました。**\n" f"理由：{reason}",
                                 username=un,
                                 avatar_url="https://i.imgur.com/Ij3u1OX.png",
                             )
@@ -150,15 +136,11 @@ class AdminCog(commands.Cog):
                         # webhook.edit(avater_url="https://i.imgur.com/JffqEAl.png")
 
             else:
-                e = discord.Embed(
-                    title="キャンセルしました。", description="", color=Success
-                )
+                e = discord.Embed(title="キャンセルしました。", description="", color=Success)
                 msg = await msg.edit(embed=e)
 
         except asyncio.TimeoutError:
-            e = discord.Embed(
-                title="タイムアウトしました。", description="", color=Error
-            )
+            e = discord.Embed(title="タイムアウトしました。", description="", color=Error)
             msg = await msg.edit(embed=e)
 
     @commands.command(hidden=True)
@@ -205,9 +187,7 @@ class AdminCog(commands.Cog):
             )
             await ctx.send(embed=e)
             return
-        e = discord.Embed(
-            title=f"テキストチャンネル`{g.name}`の履歴({count}個)：", color=Info
-        )
+        e = discord.Embed(title=f"テキストチャンネル`{g.name}`の履歴({count}個)：", color=Info)
         await ctx.send(embed=e)
         li = await g.history(limit=count).flatten()
         li.reverse()
@@ -228,9 +208,7 @@ class AdminCog(commands.Cog):
                 )
                 await ctx.send(embed=e3)
             else:
-                await ctx.send(
-                    f"{message.author.name}:", embed=message.embeds[0]
-                )
+                await ctx.send(f"{message.author.name}:", embed=message.embeds[0])
 
     @commands.command(hidden=True)
     @commands.is_owner()
@@ -267,17 +245,13 @@ class AdminCog(commands.Cog):
     @commands.command(hidden=True, name="exec")
     @commands.is_owner()
     async def _exec(self, ctx, *, script):
-        script = (
-            script.removeprefix("```py").removesuffix("```").strip()
-        )
+        script = script.removeprefix("```py").removesuffix("```").strip()
         loop = asyncio.get_event_loop()
         async with aiohttp.ClientSession() as session:
             ret[ctx.message.id] = ""
 
             async def get_msg(url):
-                return await commands.MessageConverter().convert(
-                    ctx, url
-                )
+                return await commands.MessageConverter().convert(ctx, url)
 
             def _print(*txt):
                 ret[ctx.message.id] += " ".join(map(str, txt)) + "\n"
@@ -287,32 +261,24 @@ class AdminCog(commands.Cog):
                     [
                         ";".join(
                             [
-                                "from sembed import SEmbed,SAuthor,"
-                                "SFooter,SField",
+                                "from sembed import SEmbed,SAuthor," "SFooter,SField",
                                 "import io",
                             ]
                         ),
-                        "async def __ex(self,_bot,_ctx,ctx,session,"
-                        "print,get_msg):",
-                        *[
-                            f"    {line}"
-                            for line in script.split("\n")
-                        ],
+                        "async def __ex(self,_bot,_ctx,ctx,session," "print,get_msg):",
+                        *[f"    {line}" for line in script.split("\n")],
                     ]
                 )
             )
             exec_task = loop.create_task(
-                locals()["__ex"](
-                    self, self.bot, ctx, ctx, session, _print, get_msg
-                ),
+                locals()["__ex"](self, self.bot, ctx, ctx, session, _print, get_msg),
                 name="exec",
             )
             await ctx.message.add_reaction(Official_emojis["check4"])
             cancel_task = loop.create_task(
                 self.bot.wait_for(
                     "raw_reaction_add",
-                    check=lambda payload: payload.message_id
-                    == ctx.message.id
+                    check=lambda payload: payload.message_id == ctx.message.id
                     and payload.user_id == ctx.author.id
                     and payload.emoji.id == Official_emojis["check4"],
                 ),
@@ -330,32 +296,24 @@ class AdminCog(commands.Cog):
                 await ctx.send(
                     embed=SEmbed(
                         "stdout:",
-                        "```py\n"
-                        f"{str(ret[ctx.message.id])[:4080]}\n"
-                        "```".replace(self.bot.http.token, "[Token]"),
+                        "```py\n" f"{str(ret[ctx.message.id])[:4080]}\n" "```".replace(self.bot.http.token, "[Token]"),
                     )
                 )
             if task.result():
                 await ctx.send(
                     embed=SEmbed(
                         "return:",
-                        f"```py\n{str(task.result())[:4080]}\n```".replace(
-                            self.bot.http.token, "[Token]"
-                        ),
+                        f"```py\n{str(task.result())[:4080]}\n```".replace(self.bot.http.token, "[Token]"),
                     )
                 )
-        await ctx.message.remove_reaction(
-            Official_emojis["check4"], self.bot.user
-        )
+        await ctx.message.remove_reaction(Official_emojis["check4"], self.bot.user)
         await ctx.message.add_reaction(Official_emojis["check8"])
         del ret[ctx.message.id]
 
     @commands.command(hidden=True, name="eval")
     @commands.is_owner()
     async def _eval(self, ctx, *, script):
-        await ctx.send(
-            eval(script.replace("```py", "").replace("```", ""))
-        )
+        await ctx.send(eval(script.replace("```py", "").replace("```", "")))
 
     @commands.command(hidden=True)
     @commands.is_owner()
@@ -377,9 +335,7 @@ class AdminCog(commands.Cog):
                 return False
 
         try:
-            r, u = await self.bot.wait_for(
-                "reaction_add", check=check, timeout=10
-            )
+            r, u = await self.bot.wait_for("reaction_add", check=check, timeout=10)
             if r.emoji.name == "check5":
                 e = discord.Embed(
                     title=f"`{user}`をGBanしました。",
@@ -387,17 +343,14 @@ class AdminCog(commands.Cog):
                     color=Success,
                 )
                 msg = await msg.edit(embed=e)
-                GBan[user.id] = (
-                    "SevenBot#1769によりGBanされました。\n理由：" + reason
-                )
+                GBan[user.id] = "SevenBot#1769によりGBanされました。\n理由：" + reason
                 ga = []
                 for g in self.bot.guilds:
                     try:
                         ga.append(
                             g.ban(
                                 user,
-                                reason="SevenBot#1769によりGBanされました。\n理由："
-                                + reason,
+                                reason="SevenBot#1769によりGBanされました。\n理由：" + reason,
                             )
                         )
                     except Forbidden:
@@ -412,27 +365,18 @@ class AdminCog(commands.Cog):
                     cn = self.bot.get_channel(c)
 
                     if cn is None:
-                        Private_chat_info["gban"]["channels"].remove(
-                            c
-                        )
+                        Private_chat_info["gban"]["channels"].remove(c)
                     else:
                         ch_webhooks = await cn.webhooks()
-                        webhook = discord.utils.get(
-                            ch_webhooks, name=whname
-                        )
+                        webhook = discord.utils.get(ch_webhooks, name=whname)
                         if webhook is None:
-                            g = self.bot.get_guild(
-                                Official_discord_id
-                            )
+                            g = self.bot.get_guild(Official_discord_id)
                             a = g.icon.url
-                            webhook = await cn.create_webhook(
-                                name=whname, avatar=await a.read()
-                            )
+                            webhook = await cn.create_webhook(name=whname, avatar=await a.read())
                         un = "SevenBot GBan System"
                         loop.create_task(
                             webhook.send(
-                                content=f"**`{str(user)}` をGBanしました。**\n"
-                                f"理由：{reason}",
+                                content=f"**`{str(user)}` をGBanしました。**\n" f"理由：{reason}",
                                 username=un,
                                 avatar_url="https://i.imgur.com/wofeow9.png",
                             )
@@ -441,24 +385,18 @@ class AdminCog(commands.Cog):
                         # webhook.edit(avater_url="https://i.imgur.com/JffqEAl.png")
 
             else:
-                e = discord.Embed(
-                    title="キャンセルしました。", description="", color=Success
-                )
+                e = discord.Embed(title="キャンセルしました。", description="", color=Success)
                 msg = await msg.edit(embed=e)
 
         except asyncio.TimeoutError:
-            e = discord.Embed(
-                title="タイムアウトしました。", description="", color=Error
-            )
+            e = discord.Embed(title="タイムアウトしました。", description="", color=Error)
             msg = await msg.edit(embed=e)
 
     @commands.command(hidden=True)
     @commands.is_owner()
     async def blacklist(self, ctx, sid: int):
         server = await self.bot.fetch_guild(sid)
-        e = discord.Embed(
-            title=f"`{server.name}`をブラックリストに入れますか？", color=Process
-        )
+        e = discord.Embed(title=f"`{server.name}`をブラックリストに入れますか？", color=Process)
         msg = await ctx.send(embed=e)
         await msg.add_reaction(Official_emojis["check5"])
         await msg.add_reaction(Official_emojis["check6"])
@@ -470,9 +408,7 @@ class AdminCog(commands.Cog):
                 return False
 
         try:
-            r, _ = await self.bot.wait_for(
-                "reaction_add", check=check, timeout=10
-            )
+            r, _ = await self.bot.wait_for("reaction_add", check=check, timeout=10)
             if r.emoji.name == "check5":
                 e = discord.Embed(
                     title="ブラックリストしました。",
@@ -483,24 +419,18 @@ class AdminCog(commands.Cog):
                 Blacklists.append(sid)
                 await server.leave()
             else:
-                e = discord.Embed(
-                    title="キャンセルしました。", description="", color=Success
-                )
+                e = discord.Embed(title="キャンセルしました。", description="", color=Success)
                 msg = await msg.edit(embed=e)
 
         except asyncio.TimeoutError:
-            e = discord.Embed(
-                title="タイムアウトしました。", description="", color=Error
-            )
+            e = discord.Embed(title="タイムアウトしました。", description="", color=Error)
             msg = await msg.edit(embed=e)
 
     @commands.command(hidden=True)
     @commands.is_owner()
     async def gunban(self, ctx, uid: int):
         user = await self.bot.fetch_user(uid)
-        e = discord.Embed(
-            title=f"`{user}`をGUnBanしますか？", color=Process
-        )
+        e = discord.Embed(title=f"`{user}`をGUnBanしますか？", color=Process)
         msg = await ctx.send(embed=e)
         await msg.add_reaction(Official_emojis["check5"])
         await msg.add_reaction(Official_emojis["check6"])
@@ -512,13 +442,9 @@ class AdminCog(commands.Cog):
                 return False
 
         try:
-            r, _ = await self.bot.wait_for(
-                "reaction_add", check=check, timeout=10
-            )
+            r, _ = await self.bot.wait_for("reaction_add", check=check, timeout=10)
             if r.emoji.name == "check5":
-                e = discord.Embed(
-                    title="GUnBanしました。", description="", color=Success
-                )
+                e = discord.Embed(title="GUnBanしました。", description="", color=Success)
                 msg = await msg.edit(embed=e)
                 try:
                     del GBan[user.id]
@@ -535,15 +461,11 @@ class AdminCog(commands.Cog):
                 except Forbidden:
                     pass
             else:
-                e = discord.Embed(
-                    title="キャンセルしました。", description="", color=Success
-                )
+                e = discord.Embed(title="キャンセルしました。", description="", color=Success)
                 msg = await msg.edit(embed=e)
 
         except asyncio.TimeoutError:
-            e = discord.Embed(
-                title="タイムアウトしました。", description="", color=Error
-            )
+            e = discord.Embed(title="タイムアウトしました。", description="", color=Error)
             msg = await msg.edit(embed=e)
 
     @commands.command(hidden=True, aliases=["re"])
@@ -557,36 +479,27 @@ class AdminCog(commands.Cog):
             except commands.errors.NoEntryPointError:
                 pass
             self.bot.levenshtein._listup_commands(self.bot)
-            self.bot.cogs[
-                "InnerLevenshtein"
-            ].command_names = self.bot.levenshtein._command_names
-            return await ctx.message.add_reaction(
-                Official_emojis["check8"]
-            )
-        for o in os.listdir(
-            os.path.dirname(os.path.abspath(__file__))
-        ):
+            self.bot.cogs["InnerLevenshtein"].command_names = self.bot.levenshtein._command_names
+            return await ctx.message.add_reaction(Official_emojis["check8"])
+        for o in os.listdir(os.path.dirname(os.path.abspath(__file__))):
             try:
                 if not o.endswith(".py") or o.startswith("_"):
                     continue
-                bot.reload_extension(
-                    "cogs." + os.path.splitext(os.path.basename(o))[0]
-                )
+                bot.reload_extension("cogs." + os.path.splitext(os.path.basename(o))[0])
             except commands.errors.ExtensionNotLoaded:
-                bot.load_extension(
-                    "cogs." + os.path.splitext(os.path.basename(o))[0]
-                )
+                bot.load_extension("cogs." + os.path.splitext(os.path.basename(o))[0])
             except commands.errors.NoEntryPointError:
                 pass
-        await ctx.message.add_reaction(Official_emojis["check8"])
+        ci, cm = (
+            subprocess.run("git log --oneline", stdout=subprocess.PIPE).stdout.decode().splitlines()[0].split(" ", 1)
+        )
+        await ctx.reply(f"Reloaded\n`{ci}` {cm}")
 
     @commands.command(hidden=True)
     @commands.is_owner()
     async def testpre(self, ctx):
         game = discord.Game(hash(ctx.message.id))
-        await self.bot.change_presence(
-            status=discord.Status.idle, activity=game
-        )
+        await self.bot.change_presence(status=discord.Status.idle, activity=game)
 
     @commands.command(hidden=True)
     @commands.is_owner()
@@ -607,9 +520,7 @@ class AdminCog(commands.Cog):
                 ),
             ],
         )
-        com = await self.bot.wait_for(
-            "button_click", check=lambda c: c.message == msg
-        )
+        com = await self.bot.wait_for("button_click", check=lambda c: c.message == msg)
         if com.custom_id == "shutdown_yes":
             with open("./shutdown", "w"):
                 pass
@@ -636,9 +547,7 @@ class AdminCog(commands.Cog):
                 ),
             ],
         )
-        com = await self.bot.wait_for(
-            "button_click", check=lambda c: c.message == msg
-        )
+        com = await self.bot.wait_for("button_click", check=lambda c: c.message == msg)
         if com.custom_id == "reboot_yes":
             with open("./reboot", "w"):
                 pass
