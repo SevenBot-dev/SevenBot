@@ -1722,15 +1722,6 @@ class MainCog(commands.Cog):
 
     @commands.command()
     async def ping(self, ctx):
-        starttime = discord.utils.utcnow()
-        ctime = ctx.message.created_at
-        e = discord.Embed(
-            title=get_txt(ctx.guild.id, "ping_title"),
-            description=get_txt(ctx.guild.id, "wait"),
-            color=Bot_info,
-        )
-        msg = await ctx.reply(embed=e)
-        ping = starttime - ctime
         e = discord.Embed(
             title=get_txt(ctx.guild.id, "ping_title"),
             description=get_txt(ctx.guild.id, "ping_desc").format(
@@ -1738,7 +1729,7 @@ class MainCog(commands.Cog):
             ),
             color=Bot_info,
         )
-        await msg.edit(embed=e)
+        await ctx.reply(embed=e)
 
     @commands.command(aliases=["trans"])
     async def translate(self, ctx, *, txt):
