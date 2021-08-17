@@ -481,7 +481,7 @@ class AdminCog(commands.Cog):
             self.bot.levenshtein._listup_commands(self.bot)
             self.bot.cogs["InnerLevenshtein"].command_names = self.bot.levenshtein._command_names
             ci, cm = (
-                subprocess.run("git log --oneline", stdout=subprocess.PIPE)
+                subprocess.run("git", "log", "--oneline", stdout=subprocess.PIPE)
                 .stdout.decode()
                 .splitlines()[0]
                 .split(" ", 1)
@@ -498,7 +498,10 @@ class AdminCog(commands.Cog):
             except commands.errors.NoEntryPointError:
                 pass
         ci, cm = (
-            subprocess.run("git log --oneline", stdout=subprocess.PIPE).stdout.decode().splitlines()[0].split(" ", 1)
+            subprocess.run("git", "log", "--oneline", stdout=subprocess.PIPE)
+            .stdout.decode()
+            .splitlines()[0]
+            .split(" ", 1)
         )
         await ctx.reply(f"Reloaded\n`{ci}` {cm}")
 
