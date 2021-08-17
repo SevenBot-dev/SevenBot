@@ -480,7 +480,14 @@ class AdminCog(commands.Cog):
                 pass
             self.bot.levenshtein._listup_commands(self.bot)
             self.bot.cogs["InnerLevenshtein"].command_names = self.bot.levenshtein._command_names
-            return await ctx.message.add_reaction(Official_emojis["check8"])
+            ci, cm = (
+                subprocess.run("git log --oneline", stdout=subprocess.PIPE)
+                .stdout.decode()
+                .splitlines()[0]
+                .split(" ", 1)
+            )
+            await ctx.reply(f"Reloaded\n`{ci}` {cm}")
+            return
         for o in os.listdir(os.path.dirname(os.path.abspath(__file__))):
             try:
                 if not o.endswith(".py") or o.startswith("_"):
