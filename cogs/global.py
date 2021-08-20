@@ -32,9 +32,7 @@ SGC_STOP = False
 Gc_last_users = {}
 Image_exts = ["gif", "jpg", "jpeg", "jpe", "jfif", "png", "bmp", "ico"]
 Cant_image = "https://i.imgur.com/UuhmAUG.png"
-INVITE_PATTERN = re.compile(
-    r"(https?://)?((ptb|canary)\.)?(discord\.(gg|io)|discord(app)?.com/invite)/[0-9a-zA-Z]+"
-)
+INVITE_PATTERN = re.compile(r"(https?://)?((ptb|canary)\.)?(discord\.(gg|io)|discord(app)?.com/invite)/[0-9a-zA-Z]+")
 Private_chat_info = {}
 
 
@@ -63,23 +61,14 @@ class GlobalCog(commands.Cog):
         owner = self.bot.get_user(Private_chat_info[channel]["owner"])
         return SEmbed(
             f"`{channel}`のルール",
-            fields=[
-                SField(*r, False)
-                for r in Private_chat_info[channel]["rule"].items()
-            ],
-            author=SAuthor(
-                str(owner) + f"(ID:{owner.id})", str(owner.avatar.url)
-            ),
+            fields=[SField(*r, False) for r in Private_chat_info[channel]["rule"].items()],
+            author=SAuthor(str(owner) + f"(ID:{owner.id})", str(owner.avatar.url)),
             color=Info,
         )
 
     @commands.Cog.listener("on_message")
     async def on_message_sgc(self, message):
-        if (
-            message.channel.id in [SGC_ID, SGC_ID2]
-            and message.author.id != self.bot.user.id
-            and not SGC_STOP
-        ):
+        if message.channel.id in [SGC_ID, SGC_ID2] and message.author.id != self.bot.user.id and not SGC_STOP:
             loop = asyncio.get_event_loop()
             ga = []
             deletes = []
@@ -95,69 +84,71 @@ class GlobalCog(commands.Cog):
                 return
             loop.create_task(message.add_reaction(Official_emojis["network"]))
             if data.get("type", "message") == "message":
-                async def single_send(cn):
-                    ch_webhooks = await cn.webhooks()
-                    webhook = discord.utils.get(ch_webhooks, name=whname)
-                    if webhook is None:
-                        g = self.bot.get_guild(Official_discord_id)
-                        a = g.icon
-                        webhook = await cn.create_webhook(
-                            name=whname, avatar=await a.read()
-                        )
-                    un = data["userName"] + "#" + data["userDiscriminator"]
-                    un += "("
-                    if data.get("sb-tag", {}).get("type"):
-                        un = "[" + data.get("sb-tag", {}).get("emoji") + "]" + un
-                    un += f"ID:{data['userId']}, From:{message.author})"
-                    files = []
-                    async with aiohttp.ClientSession() as s:
+                async with aiohttp.ClientSession() as s:
+
+                    async def single_send(cn):
+                        ch_webhooks = await cn.webhooks()
+                        webhook = discord.utils.get(ch_webhooks, name=whname)
+                        if webhook is None:
+                            g = self.bot.get_guild(Official_discord_id)
+                            a = g.icon
+                            webhook = await cn.create_webhook(name=whname, avatar=await a.read())
+                        un = data["userName"] + "#" + data["userDiscriminator"]
+                        un += "("
+                        if data.get("sb-tag", {}).get("type"):
+                            un = "[" + data.get("sb-tag", {}).get("emoji") + "]" + un
+                        un += f"ID:{data['userId']}, From:{message.author})"
+                        files = []
                         for a in data.get("attachmentsUrl", []):
                             u = urllib.parse.unquote(a)
                             fio = io.BytesIO()
                             async with s.get(u) as r:
                                 fio.write(await r.read())
                             fio.seek(0)
-                            files.append(
-                                discord.File(fio, filename=u.split("/")[-1])
-                            )
+                            files.append(discord.File(fio, filename=u.split("/")[-1]))
                             fio.close()
-                    return await webhook.send(
-                        content=data["content"],  # content.replace("@", "@​")
-                        username=un,
-                        allowed_mentions=discord.AllowedMentions.none(),
-                        avatar_url="https://media.discordapp.net/avatars/"
-                        f"{data['userId']}/{data['userAvatar']}."
-                        f"{'gif' if data['userAvatar'].startswith('a_') else 'webp'}?size=1024",
-                        files=files,
-                        wait=True,
-                    )
+                        embed = None
+                        if reference_id := data.get("reference"):
+                            gms = self.bot.consts["gcm"]["sgc"]
+                            if reference := gms.get(reference_id):
+                                embed = discord.Embed(description=reference["content"], color=Chat)
+                                avatar = (
+                                    "https://media.discordapp.net/avatars/"
+                                    f"{data['userId']}/{data['userAvatar']}."
+                                    f"{'gif' if data['userAvatar'].startswith('a_') else 'webp'}?size=1024"
+                                )
+                                embed.set_author(
+                                    name=reference["userName"] + "#" + reference["userDiscriminator"],
+                                    icon_url=avatar,
+                                )
+                        return await webhook.send(
+                            content=data["content"],  # content.replace("@", "@​")
+                            username=un,
+                            allowed_mentions=discord.AllowedMentions.none(),
+                            avatar_url="https://media.discordapp.net/avatars/"
+                            f"{data['userId']}/{data['userAvatar']}."
+                            f"{'gif' if data['userAvatar'].startswith('a_') else 'webp'}?size=1024",
+                            files=files,
+                            embed=embed,
+                            wait=True,
+                        )
 
-                for c in each:
-                    cn = self.bot.get_channel(c)
-                    if cn is None:
-                        deletes.append(c)
-                        continue
-                    else:
-                        if cn.permissions_for(cn.guild.me).manage_webhooks:
-                            if not c == message.channel.id:
-                                ga.append(single_send(cn))
-                                # await
-                                # webhook.edit(avater_url="https://i.imgur.com/JffqEAl.png")
-                self.bot.consts["gcm"][
-                    data.get("messageId", message.id)
-                ] = await asyncio.gather(*ga)
-                if len(list(self.bot.consts["gcm"]["sgc"].keys())) > 30:
-                    del self.bot.consts["gcm"]["sgc"][
-                        list(self.bot.consts["gcm"]["sgc"].keys())[0]
-                    ]
-                loop.create_task(
-                    message.remove_reaction(
-                        Official_emojis["network"], self.bot.user
-                    )
-                )
-                loop.create_task(
-                    message.add_reaction(Official_emojis["check8"])
-                )
+                    for c in each:
+                        cn = self.bot.get_channel(c)
+                        if cn is None:
+                            deletes.append(c)
+                            continue
+                        else:
+                            if cn.permissions_for(cn.guild.me).manage_webhooks:
+                                if not c == message.channel.id:
+                                    ga.append(single_send(cn))
+                                    # await
+                                    # webhook.edit(avater_url="https://i.imgur.com/JffqEAl.png")
+                    self.bot.consts["gcm"][data.get("messageId", message.id)] = await asyncio.gather(*ga)
+                    if len(list(self.bot.consts["gcm"]["sgc"].keys())) > 30:
+                        del self.bot.consts["gcm"]["sgc"][list(self.bot.consts["gcm"]["sgc"].keys())[0]]
+                    loop.create_task(message.remove_reaction(Official_emojis["network"], self.bot.user))
+                    loop.create_task(message.add_reaction(Official_emojis["check8"]))
             elif data.get("type", "message") == "edit":
                 ga = []
                 for m in self.bot.consts["gcm"].get(data["messageId"], []):
@@ -169,15 +160,14 @@ class GlobalCog(commands.Cog):
                     ga.append(m.delete())
                 await asyncio.gather(*ga)
             elif data.get("type", "message") == "gg-gcconnect":
+
                 async def single_send(cn):
                     ch_webhooks = await cn.webhooks()
                     webhook = discord.utils.get(ch_webhooks, name=whname)
                     if webhook is None:
                         g = self.bot.get_guild(Official_discord_id)
                         a = g.icon
-                        webhook = await cn.create_webhook(
-                            name=whname, avatar=await a.read()
-                        )
+                        webhook = await cn.create_webhook(name=whname, avatar=await a.read())
                     fl = []
                     for at in message.attachments:
                         fl.append(await at.to_file())
@@ -186,21 +176,14 @@ class GlobalCog(commands.Cog):
                     un += f"ID:{message.author.id})"
                     e = SEmbed("新しいサーバーが参加しました。", data["guildName"])
                     if data["guildIcon"]:
-                        e.thumbnail_url = (
-                            f"https://cdn.discordapp.com/icons/{data['guildId']}/{data['guildIcon']}."
-                            + (
-                                "gif"
-                                if data["guildIcon"].startswith("a_")
-                                else "png"
-                            )
+                        e.thumbnail_url = f"https://cdn.discordapp.com/icons/{data['guildId']}/{data['guildIcon']}." + (
+                            "gif" if data["guildIcon"].startswith("a_") else "png"
                         )
                     return await webhook.send(
                         embed=e,  # content.replace("@", "@​")
                         username=un,
                         allowed_mentions=discord.AllowedMentions.none(),
-                        avatar_url=message.author.avatar.replace(
-                            static_format="png"
-                        ).url,
+                        avatar_url=message.author.avatar.replace(static_format="png").url,
                         wait=True,
                     )
 
@@ -213,9 +196,7 @@ class GlobalCog(commands.Cog):
                         if cn.permissions_for(cn.guild.me).manage_webhooks:
                             if not c == message.channel.id:
                                 ga.append(single_send(cn))
-                loop.create_task(
-                    message.add_reaction(Official_emojis["check8"])
-                )
+                loop.create_task(message.add_reaction(Official_emojis["check8"]))
             return
 
     async def send_mute(self, message):
@@ -231,14 +212,7 @@ class GlobalCog(commands.Cog):
         )
         if message.attachments != []:
             u = message.attachments[0].url
-            if (
-                "".join(
-                    os.path.splitext(
-                        os.path.basename(message.attachments[0].filename)
-                    )[1:]
-                )[1:]
-                not in Image_exts
-            ):
+            if "".join(os.path.splitext(os.path.basename(message.attachments[0].filename))[1:])[1:] not in Image_exts:
                 u = Cant_image
             e.set_image(url=u)
         e.set_author(
@@ -251,9 +225,7 @@ class GlobalCog(commands.Cog):
         )
         # loop = asyncio.get_event_loop()
         ga = []
-        if message.channel.id in flatten(
-            [c["channels"] for c in Private_chat_info.values()]
-        ):
+        if message.channel.id in flatten([c["channels"] for c in Private_chat_info.values()]):
             for pk, pv in Private_chat_info.items():
                 if message.channel.id in pv["channels"]:
                     channel = pk
@@ -292,15 +264,11 @@ class GlobalCog(commands.Cog):
                     if cn.permissions_for(cn.guild.me).manage_webhooks:
                         if not c == message.channel.id:
                             ch_webhooks = await cn.webhooks()
-                            webhook = discord.utils.get(
-                                ch_webhooks, name=whname
-                            )
+                            webhook = discord.utils.get(ch_webhooks, name=whname)
                             if webhook is None:
                                 g = self.bot.get_guild(Official_discord_id)
                                 a = g.icon
-                                webhook = await cn.create_webhook(
-                                    name=whname, avatar=await a.read()
-                                )
+                                webhook = await cn.create_webhook(name=whname, avatar=await a.read())
                             fl = []
                             for at in message.attachments:
                                 fl.append(await at.to_file())
@@ -308,29 +276,14 @@ class GlobalCog(commands.Cog):
                                 un_prefix = ""
                                 if message.author.id == Owner_ID:
                                     un_prefix = "[👑]"
-                                elif (
-                                    self.bot.get_guild(
-                                        Official_discord_id
-                                    ).get_member(message.author.id)
-                                    is not None
-                                ):
-                                    m = self.bot.get_guild(
-                                        Official_discord_id
-                                    ).get_member(message.author.id)
-                                    if (
-                                        self.bot.get_guild(
-                                            Official_discord_id
-                                        ).get_role(741837982012538910)
-                                        in m.roles
-                                    ):
+                                elif self.bot.get_guild(Official_discord_id).get_member(message.author.id) is not None:
+                                    m = self.bot.get_guild(Official_discord_id).get_member(message.author.id)
+                                    if self.bot.get_guild(Official_discord_id).get_role(741837982012538910) in m.roles:
                                         un_prefix = "[🛠️]"
                                     elif self.bot.is_premium(message.author):
                                         un_prefix = "[💎]"
                                     elif (
-                                        self.bot.get_guild(
-                                            Official_discord_id
-                                        ).get_role(747555900092580030)
-                                        in m.roles
+                                        self.bot.get_guild(Official_discord_id).get_role(747555900092580030) in m.roles
                                     ):
                                         un_prefix = "[✔️]"
                                 un_suffix = "("
@@ -352,12 +305,8 @@ class GlobalCog(commands.Cog):
                             rem = None
                             if message.reference:
                                 try:
-                                    rmsg = await message.channel.fetch_message(
-                                        message.reference.message_id
-                                    )
-                                    rem = discord.Embed(
-                                        description=rmsg.content, color=Chat
-                                    )
+                                    rmsg = await message.channel.fetch_message(message.reference.message_id)
+                                    rem = discord.Embed(description=rmsg.content, color=Chat)
                                     rem.set_author(
                                         name=rmsg.author.name,
                                         icon_url=rmsg.author.avatar.url,
@@ -369,9 +318,7 @@ class GlobalCog(commands.Cog):
                                     content=content,  # content.replace("@", "@​")
                                     username=un,
                                     allowed_mentions=discord.AllowedMentions.none(),
-                                    avatar_url=message.author.avatar.replace(
-                                        static_format="png"
-                                    ).url,
+                                    avatar_url=message.author.avatar.replace(static_format="png").url,
                                     files=fl,
                                     embed=embed or rem,
                                     wait=True,
@@ -388,22 +335,13 @@ class GlobalCog(commands.Cog):
                                 continue
                             e3 = discord.Embed(color=Chat)
                             u = a.url
-                            if (
-                                "".join(
-                                    os.path.splitext(
-                                        os.path.basename(a.filename)
-                                    )[1:]
-                                )[1:]
-                                not in Image_exts
-                            ):
+                            if "".join(os.path.splitext(os.path.basename(a.filename))[1:])[1:] not in Image_exts:
                                 u = Cant_image
                             e3.set_image(url=u)
                             await cn.send(embed=e3)
                 except discord.HTTPException:
                     pass
-        if not message.channel.permissions_for(
-            message.guild.me
-        ).manage_webhooks:
+        if not message.channel.permissions_for(message.guild.me).manage_webhooks:
             await message.delete()
         for d in deletes:
             each.remove(d)
@@ -434,35 +372,16 @@ class GlobalCog(commands.Cog):
             "sb-rawContent": message.content,
         }
         if message.attachments:
-            rjson["attachmentsUrl"] = [
-                urllib.parse.quote(a.url) for a in message.attachments
-            ]
+            rjson["attachmentsUrl"] = [urllib.parse.quote(a.url) for a in message.attachments]
         if message.author.id == Owner_ID:
             rjson["sb-tag"] = {"type": "admin", "emoji": "👑"}
-        elif (
-            self.bot.get_guild(Official_discord_id).get_member(
-                message.author.id
-            )
-            is not None
-        ):
-            m = self.bot.get_guild(Official_discord_id).get_member(
-                message.author.id
-            )
-            if (
-                self.bot.get_guild(Official_discord_id).get_role(
-                    741837982012538910
-                )
-                in m.roles
-            ):
+        elif self.bot.get_guild(Official_discord_id).get_member(message.author.id) is not None:
+            m = self.bot.get_guild(Official_discord_id).get_member(message.author.id)
+            if self.bot.get_guild(Official_discord_id).get_role(741837982012538910) in m.roles:
                 rjson["sb-tag"] = {"type": "moderator", "emoji": "🛠️"}
             elif self.bot.is_premium(message.author):
                 rjson["sb-tag"] = {"type": "premium", "emoji": "💎"}
-            elif (
-                self.bot.get_guild(Official_discord_id).get_role(
-                    747555900092580030
-                )
-                in m.roles
-            ):
+            elif self.bot.get_guild(Official_discord_id).get_role(747555900092580030) in m.roles:
                 rjson["sb-tag"] = {"type": "special", "emoji": "✔️"}
         if message.reference:
             gms = self.bot.consts["gcm"]["sgc"]
@@ -474,9 +393,7 @@ class GlobalCog(commands.Cog):
                 if msg:
                     rjson["reference"] = msg
 
-        await self.bot.get_channel(SGC_ID).send(
-            json.dumps(rjson, ensure_ascii=False)
-        )
+        await self.bot.get_channel(SGC_ID).send(json.dumps(rjson, ensure_ascii=False))
 
     @commands.Cog.listener("on_message")
     async def on_message_global(self, message):
@@ -487,9 +404,7 @@ class GlobalCog(commands.Cog):
             and message.author.bot
         ):
             await message.delete()
-        if (message.channel.id in self.bot.global_chats) and (
-            not message.author.bot and not message.webhook_id
-        ):
+        if (message.channel.id in self.bot.global_chats) and (not message.author.bot and not message.webhook_id):
             if is_command(message):
                 pass
             else:
@@ -505,29 +420,20 @@ class GlobalCog(commands.Cog):
                                 break
                     if (
                         message.author.id in Gc_last_users.keys()
-                        and time.time() - Gc_last_users[message.author.id]
-                        < slow
+                        and time.time() - Gc_last_users[message.author.id] < slow
                     ):
                         await message.add_reaction(Official_emojis["queue"])
                         await asyncio.sleep(slow)
-                        await message.remove_reaction(
-                            Official_emojis["queue"], self.bot.user
-                        )
+                        await message.remove_reaction(Official_emojis["queue"], self.bot.user)
                     Gc_last_users[message.author.id] = time.time()
                     await message.add_reaction(Official_emojis["network"])
                     try:
                         await self.send_messages(message)
                         try:
-                            await message.remove_reaction(
-                                Official_emojis["network"], message.guild.me
-                            )
-                            await message.add_reaction(
-                                Official_emojis["check8"]
-                            )
+                            await message.remove_reaction(Official_emojis["network"], message.guild.me)
+                            await message.add_reaction(Official_emojis["check8"])
                             await asyncio.sleep(2)
-                            await message.remove_reaction(
-                                Official_emojis["check8"], message.guild.me
-                            )
+                            await message.remove_reaction(Official_emojis["check8"], message.guild.me)
                         except NotFound:
                             pass
                     except discord.HTTPException:
@@ -537,8 +443,7 @@ class GlobalCog(commands.Cog):
     async def on_message_delete(self, message):
         if (
             message.channel.id in Global_chat
-            or message.channel.id
-            in flatten([c["channels"] for c in Private_chat_info.values()])
+            or message.channel.id in flatten([c["channels"] for c in Private_chat_info.values()])
         ) and not message.author.bot:
             # mi = 0
             dga = []
@@ -578,8 +483,7 @@ class GlobalCog(commands.Cog):
     async def on_message_edit(self, before, after):
         if (
             after.channel.id in Global_chat
-            or after.channel.id
-            in flatten([c["channels"] for c in Private_chat_info.values()])
+            or after.channel.id in flatten([c["channels"] for c in Private_chat_info.values()])
         ) and not after.author.bot:
             # mi = 0
             dga = []
@@ -627,9 +531,7 @@ class GlobalCog(commands.Cog):
         else:
             pass
 
-    @gchat.command(
-        name="activate", aliases=Activate_aliases + ["join", "connect"]
-    )
+    @gchat.command(name="activate", aliases=Activate_aliases + ["join", "connect"])
     @commands.has_permissions(manage_channels=True)
     async def activate_global(self, ctx, channel=None):
         if ctx.channel.id in Global_chat or ctx.channel.id in flatten(
@@ -668,9 +570,7 @@ class GlobalCog(commands.Cog):
                             ch_webhooks = await cn.webhooks()
                         except Forbidden:
                             continue
-                        webhook = discord.utils.get(
-                            ch_webhooks, name="sevenbot-global-webhook"
-                        )
+                        webhook = discord.utils.get(ch_webhooks, name="sevenbot-global-webhook")
                         if webhook is None:
                             g = self.bot.get_guild(Official_discord_id)
                             a = g.icon
@@ -714,10 +614,7 @@ class GlobalCog(commands.Cog):
             else:
 
                 def check(c):
-                    return (
-                        c.channel.id == ctx.author.dm_channel.id
-                        and not c.author.bot
-                    )
+                    return c.channel.id == ctx.author.dm_channel.id and not c.author.bot
 
                 if channel in list(Private_chat_info.keys()):
                     if Private_chat_info[channel]["pass"] == "":
@@ -727,9 +624,7 @@ class GlobalCog(commands.Cog):
                             color=Success,
                         )
                         e4.set_footer(text=f"チャンネルID: {ctx.channel.id}")
-                        Private_chat_info[channel]["channels"].append(
-                            ctx.channel.id
-                        )
+                        Private_chat_info[channel]["channels"].append(ctx.channel.id)
                         await ctx.reply(embed=e4)
                         if channel == "sgc":
                             await self.bot.get_channel(SGC_ID2).send(
@@ -761,24 +656,15 @@ class GlobalCog(commands.Cog):
                         e3.set_footer(text=f"チャンネルID: {ctx.channel.id}")
                         m = await ctx.author.send(embed=e3)
                         try:
-                            msg = await self.bot.wait_for(
-                                "message", check=check, timeout=30
-                            )
-                            if (
-                                Private_chat_info[channel]["pass"]
-                                == hashlib.sha256(
-                                    msg.content.encode()
-                                ).hexdigest()
-                            ):
+                            msg = await self.bot.wait_for("message", check=check, timeout=30)
+                            if Private_chat_info[channel]["pass"] == hashlib.sha256(msg.content.encode()).hexdigest():
                                 e4 = discord.Embed(
                                     title=f"個人グローバルチャット参加 - `{channel}`",
                                     description="パスワードを確認しました。",
                                     color=Success,
                                 )
                                 e4.set_footer(text=f"チャンネルID: {ctx.channel.id}")
-                                Private_chat_info[channel]["channels"].append(
-                                    ctx.channel.id
-                                )
+                                Private_chat_info[channel]["channels"].append(ctx.channel.id)
                                 await m.edit(embed=e4)
                                 await fm.edit(embed=e4)
                             else:
@@ -806,9 +692,7 @@ class GlobalCog(commands.Cog):
                         color=Chat,
                     )
                     e2.set_thumbnail(url=ctx.guild.icon.url)
-                    e2.set_footer(
-                        text=f"現在のチャンネル数：{len(Private_chat_info[channel]['channels'])}"
-                    )
+                    e2.set_footer(text=f"現在のチャンネル数：{len(Private_chat_info[channel]['channels'])}")
                     r = await ctx.send(embed=self.make_rule_embed(channel))
                     await r.pin()
                     loop = asyncio.get_event_loop()
@@ -863,20 +747,15 @@ class GlobalCog(commands.Cog):
                             "no_pass",
                             components.ButtonType.secondary,
                         ),
-                        components.Button(
-                            "キャンセル", "cancel", components.ButtonType.danger
-                        ),
+                        components.Button("キャンセル", "cancel", components.ButtonType.danger),
                     ]
-                    msg = await components.send(
-                        ctx.author, embed=e3, components=buttons
-                    )
+                    msg = await components.send(ctx.author, embed=e3, components=buttons)
                     try:
                         loop = asyncio.get_event_loop()
                         wait_msg = loop.create_task(
                             self.bot.wait_for(
                                 "message",
-                                check=lambda m: m.channel == msg.channel
-                                and not m.author.bot,
+                                check=lambda m: m.channel == msg.channel and not m.author.bot,
                                 timeout=30,
                             ),
                             name="wait_pass",
@@ -884,8 +763,7 @@ class GlobalCog(commands.Cog):
                         wait_button = loop.create_task(
                             self.bot.wait_for(
                                 "button_click",
-                                check=lambda c: c.channel == msg.channel
-                                and c.message == msg,
+                                check=lambda c: c.channel == msg.channel and c.message == msg,
                                 timeout=30,
                             ),
                             name="wait_button",
@@ -898,9 +776,7 @@ class GlobalCog(commands.Cog):
                         for task in pending_tasks:
                             task.cancel()
                         if done_task.get_name() == "wait_pass":
-                            password = hashlib.sha256(
-                                done_task.result().content.encode()
-                            ).hexdigest()
+                            password = hashlib.sha256(done_task.result().content.encode()).hexdigest()
                         elif done_task.get_name() == "wait_button":
                             await done_task.result().defer_update()
                             if done_task.result().custom_id == "cancel":
@@ -912,9 +788,7 @@ class GlobalCog(commands.Cog):
                                 e4.set_footer(text=f"チャンネルID: {ctx.channel.id}")
                                 for b in buttons:
                                     b.enabled = False
-                                await components.edit(
-                                    msg, embed=e4, components=buttons
-                                )
+                                await components.edit(msg, embed=e4, components=buttons)
                                 await fm.edit(embed=e4)
                                 return
                             else:
@@ -949,9 +823,7 @@ class GlobalCog(commands.Cog):
                         await components.edit(msg, embed=e4, components=buttons)
                         await fm.edit(embed=e4)
 
-    @gchat.command(
-        name="deactivate", aliases=Deactivate_aliases + ["leave", "disconnect"]
-    )
+    @gchat.command(name="deactivate", aliases=Deactivate_aliases + ["leave", "disconnect"])
     @commands.has_permissions(manage_channels=True)
     async def deactivate_global(self, ctx):
         if ctx.channel.id in Global_chat:
@@ -980,9 +852,7 @@ class GlobalCog(commands.Cog):
                         ch_webhooks = await cn.webhooks()
                     except Forbidden:
                         continue
-                    webhook = discord.utils.get(
-                        ch_webhooks, name="sevenbot-global-webhook"
-                    )
+                    webhook = discord.utils.get(ch_webhooks, name="sevenbot-global-webhook")
                     if webhook is None:
                         g = self.bot.get_guild(Official_discord_id)
                         a = g.icon
@@ -1001,9 +871,7 @@ class GlobalCog(commands.Cog):
                         )
                     )
                     # https://i.imgur.com/eaXHbTe.png
-        elif ctx.channel.id in flatten(
-            [c["channels"] for c in Private_chat_info.values()]
-        ):
+        elif ctx.channel.id in flatten([c["channels"] for c in Private_chat_info.values()]):
             for pk, pv in Private_chat_info.items():
                 if ctx.channel.id in pv["channels"]:
                     pn = pk
@@ -1026,9 +894,7 @@ class GlobalCog(commands.Cog):
                 color=Chat,
             )
             e2.set_thumbnail(url=ctx.guild.icon.url)
-            e2.set_footer(
-                text=f"現在のチャンネル数：{len(Private_chat_info[pk]['channels'])}"
-            )
+            e2.set_footer(text=f"現在のチャンネル数：{len(Private_chat_info[pk]['channels'])}")
             if pk == "sgc":
                 await self.bot.get_channel(SGC_ID2).send(
                     json.dumps(
@@ -1053,9 +919,7 @@ class GlobalCog(commands.Cog):
                         ch_webhooks = await cn.webhooks()
                     except Forbidden:
                         continue
-                    webhook = discord.utils.get(
-                        ch_webhooks, name="sevenbot-private-webhook-" + pk
-                    )
+                    webhook = discord.utils.get(ch_webhooks, name="sevenbot-private-webhook-" + pk)
                     if webhook is None:
                         g = self.bot.get_guild(Official_discord_id)
                         a = g.icon
@@ -1082,9 +946,7 @@ class GlobalCog(commands.Cog):
             )
             await ctx.reply(embed=e)
 
-    @gchat.group(
-        name="private", aliases=["p", "pr"], invoke_without_command=True
-    )
+    @gchat.group(name="private", aliases=["p", "pr"], invoke_without_command=True)
     async def private_global(self, ctx):
         await self.bot.send_subcommands(ctx)
 
@@ -1106,9 +968,7 @@ class GlobalCog(commands.Cog):
         e3.set_footer(text=f"チャンネルID: {ctx.channel.id}")
 
         buttons = [
-            components.Button(
-                "パスワード無し", "no_pass", components.ButtonType.secondary
-            ),
+            components.Button("パスワード無し", "no_pass", components.ButtonType.secondary),
             components.Button("キャンセル", "cancel", components.ButtonType.danger),
         ]
         msg = await components.send(ctx.author, embed=e3, components=buttons)
@@ -1117,8 +977,7 @@ class GlobalCog(commands.Cog):
             wait_msg = loop.create_task(
                 self.bot.wait_for(
                     "message",
-                    check=lambda m: m.channel == msg.channel
-                    and not m.author.bot,
+                    check=lambda m: m.channel == msg.channel and not m.author.bot,
                     timeout=30,
                 ),
                 name="wait_pass",
@@ -1126,22 +985,17 @@ class GlobalCog(commands.Cog):
             wait_button = loop.create_task(
                 self.bot.wait_for(
                     "button_click",
-                    check=lambda c: c.channel == msg.channel
-                    and c.message == msg,
+                    check=lambda c: c.channel == msg.channel and c.message == msg,
                     timeout=30,
                 ),
                 name="wait_button",
             )
-            done_tasks, pending_tasks = await asyncio.wait(
-                {wait_msg, wait_button}, return_when=asyncio.FIRST_COMPLETED
-            )
+            done_tasks, pending_tasks = await asyncio.wait({wait_msg, wait_button}, return_when=asyncio.FIRST_COMPLETED)
             done_task = done_tasks.pop()
             for task in pending_tasks:
                 task.cancel()
             if done_task.get_name() == "wait_pass":
-                Private_chat_info[channel]["pass"] = hashlib.sha256(
-                    msg.content.encode()
-                ).hexdigest()
+                Private_chat_info[channel]["pass"] = hashlib.sha256(msg.content.encode()).hexdigest()
             elif done_task.get_name() == "wait_button":
                 await done_task.result().defer_update()
                 if done_task.result().custom_id == "no_pass":
@@ -1196,9 +1050,7 @@ class GlobalCog(commands.Cog):
         )
         await ctx.reply(embed=e4)
 
-    @private_global.group(
-        name="rule", aliases=["r"], invoke_without_command=True
-    )
+    @private_global.group(name="rule", aliases=["r"], invoke_without_command=True)
     async def rule_private_global(self, ctx):
         await self.bot.send_subcommands(ctx)
 
@@ -1230,9 +1082,7 @@ class GlobalCog(commands.Cog):
         await ctx.reply(embed=e)
         await ctx.send("プレビュー", embed=self.make_rule_embed(channel))
 
-    @rule_private_global.command(
-        name="remove", aliases=["del", "delete", "rem"]
-    )
+    @rule_private_global.command(name="remove", aliases=["del", "delete", "rem"])
     async def remove_rule_private_global(self, ctx, channel, name):
         if await self.only_owner(ctx, channel, "ルール設定"):
             return
@@ -1253,9 +1103,7 @@ class GlobalCog(commands.Cog):
             )
             await ctx.reply(embed=e)
 
-    @rule_private_global.command(
-        name="view", aliases=["show", "preview", "check"]
-    )
+    @rule_private_global.command(name="view", aliases=["show", "preview", "check"])
     async def view_rule_private_global(self, ctx, channel):
         await ctx.send(
             f"`{channel}`のルール",
@@ -1280,9 +1128,7 @@ class GlobalCog(commands.Cog):
                 return False
 
         try:
-            r, _ = await self.bot.wait_for(
-                "reaction_add", check=check, timeout=10
-            )
+            r, _ = await self.bot.wait_for("reaction_add", check=check, timeout=10)
             if r.emoji.name == "check5":
                 Private_chat_info[channel]["mute"].append(uid)
                 e = discord.Embed(
@@ -1292,9 +1138,7 @@ class GlobalCog(commands.Cog):
                 )
                 msg = await msg.edit(embed=e)
             else:
-                e = discord.Embed(
-                    title="キャンセルしました。", description="", color=Success
-                )
+                e = discord.Embed(title="キャンセルしました。", description="", color=Success)
                 msg = await msg.edit(embed=e)
 
         except asyncio.TimeoutError:
@@ -1323,9 +1167,7 @@ class GlobalCog(commands.Cog):
             if self.bot.get_channel(c):
                 index += 1
                 tdesc = desc + ""
-                tdesc += (
-                    f"`{index}`: " + self.bot.get_channel(c).guild.name + "\n"
-                )
+                tdesc += f"`{index}`: " + self.bot.get_channel(c).guild.name + "\n"
                 if len(tdesc) > 2000:
                     await ctx.author.send(embed=SEmbed("", desc, color=Process))
                     desc = ""
@@ -1339,11 +1181,7 @@ class GlobalCog(commands.Cog):
         try:
             msg = await self.bot.wait_for("message", check=check, timeout=30)
             if msg.content.lower() == "cancel":
-                return await ctx.author.send(
-                    embed=SEmbed(
-                        f"キック - `{channel}`", "キャンセルしました。", color=Success
-                    )
-                )
+                return await ctx.author.send(embed=SEmbed(f"キック - `{channel}`", "キャンセルしました。", color=Success))
             else:
                 dl = set()
                 for n in msg.content.split():
@@ -1352,9 +1190,7 @@ class GlobalCog(commands.Cog):
                         dl.add(Private_chat_info[channel]["channels"][i - 1])
                     except (ValueError, IndexError):
                         pass
-            Private_chat_info[channel]["channels"] = list(
-                set(Private_chat_info[channel]["channels"]) - dl
-            )
+            Private_chat_info[channel]["channels"] = list(set(Private_chat_info[channel]["channels"]) - dl)
             e4 = discord.Embed(
                 title=f"キック - `{channel}`",
                 description=f"{len(dl)}チャンネルをキックしました。",
@@ -1374,11 +1210,7 @@ class GlobalCog(commands.Cog):
     @commands.command()
     async def sgc(self, ctx):
         res = ""
-        for m in (
-            self.bot.get_guild(706905953320304772)
-            .get_role(773868241713627167)
-            .members
-        ):
+        for m in self.bot.get_guild(706905953320304772).get_role(773868241713627167).members:
             if m.status == discord.Status.offline:
                 res += str(Official_emojis["offline"])
             elif m.status == discord.Status.dnd:
@@ -1417,17 +1249,13 @@ class GlobalCog(commands.Cog):
     async def sync_pc_data(self):
         async for c in self.bot.db.private_chat.find({}, {"_id": False}):
             if c != Private_chat_info[c["name"]]:
-                await self.bot.db.private_chat.replace_one(
-                    {"name": c["name"]}, Private_chat_info[c["name"]]
-                )
+                await self.bot.db.private_chat.replace_one({"name": c["name"]}, Private_chat_info[c["name"]])
 
     async def get_pc_data(self):
         async with self.bot.db.private_chat.watch() as change_stream:
             async for change in change_stream:
                 if change["operationType"] == "update":
-                    pcd = await self.bot.db.guild_settings.find_one(
-                        change["documentKey"]
-                    )
+                    pcd = await self.bot.db.guild_settings.find_one(change["documentKey"])
                     Private_chat_info[pcd["name"]] = pcd
 
     def cog_unload(self):
