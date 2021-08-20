@@ -95,7 +95,6 @@ class GlobalCog(commands.Cog):
                 return
             loop.create_task(message.add_reaction(Official_emojis["network"]))
             if data.get("type", "message") == "message":
-
                 async def single_send(cn):
                     ch_webhooks = await cn.webhooks()
                     webhook = discord.utils.get(ch_webhooks, name=whname)
@@ -105,9 +104,6 @@ class GlobalCog(commands.Cog):
                         webhook = await cn.create_webhook(
                             name=whname, avatar=await a.read()
                         )
-                    fl = []
-                    for at in message.attachments:
-                        fl.append(await at.to_file())
                     un = data["userName"] + "#" + data["userDiscriminator"]
                     un += "("
                     if data.get("sb-tag", {}).get("type"):
@@ -173,7 +169,6 @@ class GlobalCog(commands.Cog):
                     ga.append(m.delete())
                 await asyncio.gather(*ga)
             elif data.get("type", "message") == "gg-gcconnect":
-
                 async def single_send(cn):
                     ch_webhooks = await cn.webhooks()
                     webhook = discord.utils.get(ch_webhooks, name=whname)
@@ -475,9 +470,9 @@ class GlobalCog(commands.Cog):
             if data:
                 rjson["reference"] = message.reference.message_id
             else:
-                msg = discord.utils.find(lambda g: g[1].id == message.reference.message_id, gms.values())
+                msg = discord.utils.find(lambda k: message.reference.message_id in [m.id for m in gms[k]], gms.keys())
                 if msg:
-                    rjson["reference"] = msg.id
+                    rjson["reference"] = msg
 
         await self.bot.get_channel(SGC_ID).send(
             json.dumps(rjson, ensure_ascii=False)
