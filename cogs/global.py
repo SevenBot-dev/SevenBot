@@ -475,7 +475,7 @@ class GlobalCog(commands.Cog):
             if data:
                 rjson["reference"] = message.reference.message_id
             else:
-                msg = discord.utils.find(lambda g: g[1].id == message.reference.message_id, gms)
+                msg = discord.utils.find(lambda g: g[1].id == message.reference.message_id, gms.values())
                 if msg:
                     rjson["reference"] = msg.id
 
