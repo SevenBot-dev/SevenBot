@@ -471,11 +471,11 @@ class GlobalCog(commands.Cog):
                 rjson["sb-tag"] = {"type": "special", "emoji": "✔️"}
         if message.reference:
             gms = self.bot.consts["gcm"]["sgc"]
-            data = gms.get(message.reference.id)
+            data = gms.get(message.reference.message_id)
             if data:
-                rjson["reference"] = message.reference.id
+                rjson["reference"] = message.reference.message_id
             else:
-                msg = discord.utils.find(lambda g: g[1].id == message.reference.id, gms)
+                msg = discord.utils.find(lambda g: g[1].id == message.reference.message_id, gms)
                 if msg:
                     rjson["reference"] = msg.id
 
