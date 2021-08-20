@@ -420,7 +420,7 @@ class GlobalCog(commands.Cog):
         if channel == "sgc":
             await self.send_sgc(message, content)
 
-    async def send_sgc(self, message, content):
+    async def send_sgc(self, message: discord.Message, content: str):
         rjson = {
             "type": "message",
             "userId": message.author.id,
@@ -469,6 +469,16 @@ class GlobalCog(commands.Cog):
                 in m.roles
             ):
                 rjson["sb-tag"] = {"type": "special", "emoji": "✔️"}
+        if message.reference:
+            gms = self.bot.consts["gcm"]["sgc"]
+            data = gms.get(message.reference.id)
+            if data:
+                rjson["reference"] = message.reference.id
+            else:
+                msg = discord.utils.find(lambda g: g[1].id == message.reference.id, gms)
+                if msg:
+                    rjson["reference"] = msg.id
+
         await self.bot.get_channel(SGC_ID).send(
             json.dumps(rjson, ensure_ascii=False)
         )
