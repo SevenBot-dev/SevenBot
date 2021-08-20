@@ -51,20 +51,13 @@ def delta_to_text(delta, ctx):
     elif not delta.seconds:
         return res
     else:
-        return (
-            res
-            + str(s % 60)
-            + get_txt(ctx.guild.id, "delta_txt")[3]
-            + get_txt(ctx.guild.id, "delta_txt")[4]
-        )
+        return res + str(s % 60) + get_txt(ctx.guild.id, "delta_txt")[3] + get_txt(ctx.guild.id, "delta_txt")[4]
 
 
 def get_warn_text(bot, ctx, p):
     res = get_txt(ctx.guild.id, "warn_punish")[p["action"]]
     if p["action"] == "mute":
-        res += (
-            f'({delta_to_text(datetime.timedelta(seconds=p["length"]), ctx)})'
-        )
+        res += f'({delta_to_text(datetime.timedelta(seconds=p["length"]), ctx)})'
     elif p["action"] in ("role_add", "role_remove"):
         r = ctx.guild.get_role(p["role"])
         res += f"({r.name})"
@@ -114,9 +107,7 @@ class ModerationCog(commands.Cog):
             try:
                 k, v = rk.split("=", 1)
             except ValueError:
-                e = discord.Embed(
-                    title=get_txt(ctx.guild.id, "clear_format"), color=Error
-                )
+                e = discord.Embed(title=get_txt(ctx.guild.id, "clear_format"), color=Error)
                 await ctx.reply(embed=e)
                 return
             if k not in flatten(Options.items()):
@@ -162,18 +153,12 @@ class ModerationCog(commands.Cog):
     async def archive(self, ctx):
         global Guild_settings
         ow = ctx.channel.overwrites.copy()
-        if not self.bot.get_channel(
-            Guild_settings[ctx.guild.id]["archive_category"]
-        ):
-            cat = await ctx.guild.create_category_channel(
-                get_txt(ctx.guild.id, "archive_category")
-            )
+        if not self.bot.get_channel(Guild_settings[ctx.guild.id]["archive_category"]):
+            cat = await ctx.guild.create_category_channel(get_txt(ctx.guild.id, "archive_category"))
             Guild_settings[ctx.guild.id]["archive_category"] = cat.id
         else:
 
-            cat = self.bot.get_channel(
-                Guild_settings[ctx.guild.id]["archive_category"]
-            )
+            cat = self.bot.get_channel(Guild_settings[ctx.guild.id]["archive_category"])
         for ok, ov in ow.items():
             if isinstance(ok, discord.Member):
                 continue
@@ -184,9 +169,7 @@ class ModerationCog(commands.Cog):
 
         await ctx.channel.edit(overwrites=ow, category=cat)
 
-        e = discord.Embed(
-            title=get_txt(ctx.guild.id, "archive_title"), color=Success
-        )
+        e = discord.Embed(title=get_txt(ctx.guild.id, "archive_title"), color=Success)
         return await ctx.reply(embed=e)
 
     @commands.command(name="lockdown", aliases=["lock"])
@@ -197,9 +180,7 @@ class ModerationCog(commands.Cog):
         loop = asyncio.get_event_loop()
         for p in pins:
             if p.embeds:
-                if p.embeds[0].color == Success and p.embeds[
-                    0
-                ].title == get_txt(ctx.guild.id, "lockdown_title"):
+                if p.embeds[0].color == Success and p.embeds[0].title == get_txt(ctx.guild.id, "lockdown_title"):
                     roles = p.embeds[0].description
                     loop.create_task(p.unpin())
                     break
@@ -270,9 +251,7 @@ class ModerationCog(commands.Cog):
         await self.bot.send_subcommands(ctx)
 
     @fatal_role.command(name="add")
-    async def fatal_role_add(
-        self, ctx, role: discord.Role, target: discord.Role = None
-    ):
+    async def fatal_role_add(self, ctx, role: discord.Role, target: discord.Role = None):
         c = 0
         s = 0
         e = 0
@@ -291,9 +270,7 @@ class ModerationCog(commands.Cog):
         await ctx.reply(embed=e)
 
     @fatal_role.command(name="remove", aliases=["rem", "del", "delete"])
-    async def fatal_role_remove(
-        self, ctx, role: discord.Role, target: discord.Role = None
-    ):
+    async def fatal_role_remove(self, ctx, role: discord.Role, target: discord.Role = None):
         c = 0
         s = 0
         e = 0
@@ -338,9 +315,7 @@ class ModerationCog(commands.Cog):
         e = 0
         await ctx.reply(f"送信を開始します。およそ{6 * len(role.members) / 60}分かかります。")
         em = discord.Embed(
-            title=get_txt(ctx.guild.id, "fatal_role_dm_title").format(
-                ctx.guild.name
-            ),
+            title=get_txt(ctx.guild.id, "fatal_role_dm_title").format(ctx.guild.name),
             description=message,
             color=Chat,
         )
@@ -382,9 +357,7 @@ class ModerationCog(commands.Cog):
 
         for i, m in enumerate(targets):
             loop.create_task(m.edit(nick=member_nicks[i]))
-        e = discord.Embed(
-            title=f"`{len(targets)}`人のニックネームをシャッフルしています。", color=Success
-        )
+        e = discord.Embed(title=f"`{len(targets)}`人のニックネームをシャッフルしています。", color=Success)
         await ctx.reply(embed=e)
 
     @fatal_nick.command(name="reset")
@@ -408,15 +381,11 @@ class ModerationCog(commands.Cog):
         res = {}
         for m in ctx.guild.members:
             res[m.id] = m.display_name
-        e = discord.Embed(
-            title=f"`{len(res.keys())}`人のニックネームをエクスポートしました。", color=Success
-        )
+        e = discord.Embed(title=f"`{len(res.keys())}`人のニックネームをエクスポートしました。", color=Success)
         sio = io.StringIO(json.dumps(res))
         await ctx.reply(
             embed=e,
-            file=discord.File(
-                sio, filename=f"{ctx.guild.id}_{int(time.time())}.sbnicks"
-            ),
+            file=discord.File(sio, filename=f"{ctx.guild.id}_{int(time.time())}.sbnicks"),
         )
         sio.close()
 
@@ -451,23 +420,20 @@ class ModerationCog(commands.Cog):
     @commands.command()
     @commands.has_permissions(kick_members=True)
     async def warn(self, ctx, target: discord.Member, count: int = 1):
-        e = SEmbed(
-            get_txt(ctx.guild.id, "warn").format(target, count), color=Info
-        )
+        e = SEmbed(get_txt(ctx.guild.id, "warn").format(target, count), color=Info)
         if not Guild_settings[ctx.guild.id]["warns"].get(target.id):
             Guild_settings[ctx.guild.id]["warns"][target.id] = 0
         Guild_settings[ctx.guild.id]["warns"][target.id] += count
+        if Guild_settings[ctx.guild.id]["warns"][target.id] < 0:
+            Guild_settings[ctx.guild.id]["warns"][target.id] = 0
+        elif Guild_settings[ctx.guild.id]["warns"][target.id] >= 2 ** 64:
+            Guild_settings[ctx.guild.id]["warns"][target.id] = 2 ** 64 - 1
         pun = Guild_settings[ctx.guild.id]["warn_settings"]["punishments"]
         nw = Guild_settings[ctx.guild.id]["warns"][target.id]
-        e.description += (
-            get_txt(ctx.guild.id, "warn_desc_info").format(target, nw) + "\n"
-        )
+        e.description += get_txt(ctx.guild.id, "warn_desc_info").format(target, nw) + "\n"
         if pun.get(nw):
             e.description += (
-                get_txt(ctx.guild.id, "warn_desc_now").format(
-                    nw, get_warn_text(self.bot, ctx, pun[nw])
-                )
-                + "\n"
+                get_txt(ctx.guild.id, "warn_desc_now").format(nw, get_warn_text(self.bot, ctx, pun[nw])) + "\n"
             )
             await punish(target, pun[nw])
 
@@ -477,9 +443,7 @@ class ModerationCog(commands.Cog):
                 get_warn_text(self.bot, ctx, pun[length]), length
             )
         else:
-            e.description += get_txt(
-                ctx.guild.id, "warn_desc_next_none"
-            ).format()
+            e.description += get_txt(ctx.guild.id, "warn_desc_next_none").format()
         await ctx.reply(embed=e)
 
     @commands.group(aliases=["ws"])
@@ -501,9 +465,7 @@ class ModerationCog(commands.Cog):
         elif punish == "role_remove":
             res["role"] = (await commands.RoleConverter().convert(ctx, arg)).id
 
-        Guild_settings[ctx.guild.id]["warn_settings"]["punishments"][
-            count
-        ] = res
+        Guild_settings[ctx.guild.id]["warn_settings"]["punishments"][count] = res
         e = discord.Embed(title="処罰を追加しました。", color=Success)
         await ctx.reply(embed=e)
 
@@ -514,29 +476,14 @@ class ModerationCog(commands.Cog):
         res = ""
         count = 0
         new = {}
-        if (
-            txt
-            in Guild_settings[ctx.guild.id]["warn_settings"][
-                "punishments"
-            ].keys()
-        ):
-            res += (
-                "`"
-                + Guild_settings[ctx.guild.id]["warn_settings"]["punishments"][
-                    txt
-                ][1]
-                + "`\n"
-            )
-            for ark, ar in Guild_settings[ctx.guild.id]["warn_settings"][
-                "punishments"
-            ].items():
+        if txt in Guild_settings[ctx.guild.id]["warn_settings"]["punishments"].keys():
+            res += "`" + Guild_settings[ctx.guild.id]["warn_settings"]["punishments"][txt][1] + "`\n"
+            for ark, ar in Guild_settings[ctx.guild.id]["warn_settings"]["punishments"].items():
                 if ark != txt:
                     new[ark] = ar
             count = 1
         else:
-            for ark, ar in Guild_settings[ctx.guild.id]["warn_settings"][
-                "punishments"
-            ].items():
+            for ark, ar in Guild_settings[ctx.guild.id]["warn_settings"]["punishments"].items():
                 if ar[0] == txt:
                     count += 1
                     res += "`" + ar[1] + "`\n"
@@ -549,9 +496,7 @@ class ModerationCog(commands.Cog):
                 color=Error,
             )
         else:
-            e = discord.Embed(
-                title="処罰を削除しました。", description=res, color=Success
-            )
+            e = discord.Embed(title="処罰を削除しました。", description=res, color=Success)
             Guild_settings[ctx.guild.id]["warn_settings"]["punishments"] = new
         await ctx.reply(embed=e)
 
@@ -599,14 +544,10 @@ class ModerationCog(commands.Cog):
     ):
         global Guild_settings
         if u == self.bot.user:
-            return await ctx.reply(
-                embed=SEmbed("SevenBotをミュートすることはできません。", color=Error)
-            )
+            return await ctx.reply(embed=SEmbed("SevenBotをミュートすることはできません。", color=Error))
         if time.total_seconds() == 0:
             del Guild_settings[ctx.guild.id]["muted"][u.id]
-            e = discord.Embed(
-                title=f"`{u.display_name}`のミュートを解除しました。", color=Success
-            )
+            e = discord.Embed(title=f"`{u.display_name}`のミュートを解除しました。", color=Success)
             await ctx.reply(embed=e)
         else:
             dt = discord.utils.utcnow() + time
