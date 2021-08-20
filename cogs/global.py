@@ -110,15 +110,12 @@ class GlobalCog(commands.Cog):
                         embed = None
                         if reference_id := data.get("reference"):
                             gms = self.bot.consts["gcm"]["sgc"]
-                            if reference := gms.get(reference_id):
-                                embed = discord.Embed(description=reference["content"], color=Chat)
-                                avatar = (
-                                    "https://media.discordapp.net/avatars/"
-                                    f"{data['userId']}/{data['userAvatar']}."
-                                    f"{'gif' if data['userAvatar'].startswith('a_') else 'webp'}?size=1024"
-                                )
+                            if references := gms.get(reference_id):
+                                reference = references[0]
+                                embed = discord.Embed(description=reference.content, color=Chat)
+                                avatar = reference.author.avatar.url.removeprefix("('")
                                 embed.set_author(
-                                    name=reference["userName"] + "#" + reference["userDiscriminator"],
+                                    name=reference.author.name,
                                     icon_url=avatar,
                                 )
                         return await webhook.send(
@@ -144,7 +141,7 @@ class GlobalCog(commands.Cog):
                                     ga.append(single_send(cn))
                                     # await
                                     # webhook.edit(avater_url="https://i.imgur.com/JffqEAl.png")
-                    self.bot.consts["gcm"][data.get("messageId", message.id)] = await asyncio.gather(*ga)
+                    self.bot.consts["gcm"]["sgc"][int(data.get("messageId", message.id))] = await asyncio.gather(*ga)
                     if len(list(self.bot.consts["gcm"]["sgc"].keys())) > 30:
                         del self.bot.consts["gcm"]["sgc"][list(self.bot.consts["gcm"]["sgc"].keys())[0]]
                     loop.create_task(message.remove_reaction(Official_emojis["network"], self.bot.user))
