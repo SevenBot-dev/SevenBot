@@ -220,7 +220,7 @@ class GlobalCog(commands.Cog):
             text=f"{message.guild.name}(ID:{message.guild.id})",
             icon_url=message.guild.icon.url,
         )
-        # loop = asyncio.get_event_loop()
+        loop = asyncio.get_event_loop()
         ga = []
         if message.channel.id in flatten([c["channels"] for c in Private_chat_info.values()]):
             for pk, pv in Private_chat_info.items():
@@ -250,6 +250,8 @@ class GlobalCog(commands.Cog):
                 content = "\n".join(content.splitlines()[:10]) + "\n..."
             if len(content) > 1000:
                 content = content[:1000] + "..."
+        if channel == "sgc":
+            loop.create_task(self.send_sgc(message, content))
         for c in each:
             cn = self.bot.get_channel(c)
             if cn is None:
@@ -347,8 +349,6 @@ class GlobalCog(commands.Cog):
         gms[message.id] = r
         if len(list(gms.keys())) > 30:
             del gms[list(gms.keys())[0]]
-        if channel == "sgc":
-            await self.send_sgc(message, content)
 
     async def send_sgc(self, message: discord.Message, content: str):
         rjson = {
