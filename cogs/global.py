@@ -148,12 +148,12 @@ class GlobalCog(commands.Cog):
                     loop.create_task(message.add_reaction(Official_emojis["check8"]))
             elif data.get("type", "message") == "edit":
                 ga = []
-                for m in self.bot.consts["gcm"].get(data["messageId"], []):
+                for m in self.bot.consts["gcm"]["sgc"].get(int(data["messageId"]), []):
                     ga.append(m.edit(content=data["content"]))
                 await asyncio.gather(*ga)
             elif data.get("type", "message") == "delete":
                 ga = []
-                for m in self.bot.consts["gcm"].get(data["messageId"], []):
+                for m in self.bot.consts["gcm"]["sgc"].get(int(data["messageId"]), []):
                     ga.append(m.delete())
                 await asyncio.gather(*ga)
             elif data.get("type", "message") == "gg-gcconnect":
