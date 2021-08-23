@@ -758,12 +758,6 @@ class MainCog(commands.Cog):
 
     @commands.command(aliases=["h", "?"])
     async def help(self, ctx, *, detail=None):
-        if not self.bot.consts.get("ads"):
-            await self.on_message_ad(
-                await self.bot.get_channel(800628621010141224).fetch_message(
-                    800634459178663946
-                )
-            )
         if detail is None:
             desc = (
                 get_txt(ctx.guild.id, "help_categories")[1]
