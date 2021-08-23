@@ -390,7 +390,7 @@ class GlobalCog(commands.Cog):
                 if msg:
                     rjson["reference"] = msg
 
-        await self.bot.get_channel(SGC_ID).send(json.dumps(rjson, ensure_ascii=False))
+        await self.bot.get_channel(SGC_ID).send(json.dumps(rjson, ensure_ascii=False), allowed_mentions=discord.AllowedMentions.none())
 
     @commands.Cog.listener("on_message")
     async def on_message_global(self, message):
