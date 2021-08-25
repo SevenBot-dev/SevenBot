@@ -353,23 +353,23 @@ class GlobalCog(commands.Cog):
     async def send_sgc(self, message: discord.Message, content: str):
         rjson = {
             "type": "message",
-            "userId": message.author.id,
+            "userId": str(message.author.id),
             "userName": message.author.name,
             "userDiscriminator": message.author.discriminator,
             "userAvatar": message.author.avatar.key,
             "isBot": message.author.bot,
-            "guildId": message.guild.id,
+            "guildId": str(message.guild.id),
             "guildName": message.guild.name,
             "guildIcon": message.guild.icon and message.guild.icon.key,
-            "channelId": message.channel.id,
+            "channelId": str(message.channel.id),
             "channelName": message.channel.name,
-            "messageId": message.id,
+            "messageId": str(message.id),
             "content": content,
             "sb-tag": {"type": None},
             "sb-rawContent": message.content,
         }
         if message.attachments:
-            rjson["attachmentsUrl"] = [urllib.parse.quote(a.url) for a in message.attachments]
+            rjson["attachmentsUrl"] = [a.url for a in message.attachments]
         if message.author.id == Owner_ID:
             rjson["sb-tag"] = {"type": "admin", "emoji": "👑"}
         elif self.bot.get_guild(Official_discord_id).get_member(message.author.id) is not None:
@@ -454,7 +454,7 @@ class GlobalCog(commands.Cog):
             if e == "sgc":
                 await self.bot.get_channel(SGC_ID2).send(
                     json.dumps(
-                        {"type": "delete", "messageId": message.id},
+                        {"type": "delete", "messageId": str(message.id)},
                         ensure_ascii=False,
                     )
                 )
@@ -496,7 +496,7 @@ class GlobalCog(commands.Cog):
                     json.dumps(
                         {
                             "type": "edit",
-                            "messageId": after.id,
+                            "messageId": str(after.id),
                             "content": after.content,
                         },
                         ensure_ascii=False,
@@ -629,7 +629,7 @@ class GlobalCog(commands.Cog):
                                     {
                                         "type": "sb-guildJoin",
                                         "guildName": ctx.guild.name,
-                                        "guildId": ctx.guild.id,
+                                        "guildId": str(ctx.guild.id),
                                         "guildIcon": ctx.guild.icon.key,
                                         "channelName": ctx.channel.name,
                                         "channelID": ctx.channel.id,
@@ -898,7 +898,7 @@ class GlobalCog(commands.Cog):
                         {
                             "type": "sb-guildLeft",
                             "guildName": ctx.guild.name,
-                            "guildId": ctx.guild.id,
+                            "guildId": str(ctx.guild.id),
                             "guildIcon": ctx.guild.icon.key,
                             "channelName": ctx.channel.name,
                             "channelID": ctx.channel.id,
