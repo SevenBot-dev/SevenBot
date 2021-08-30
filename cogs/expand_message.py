@@ -38,6 +38,8 @@ class MessageExpandCog(commands.Cog):
             return
         if message.guild.id not in Guild_settings.keys():
             return
+        if message.author.bot:
+            return
         if (
             re.match(Message_url_re, message.content) is not None
             and Guild_settings[message.guild.id]["expand_message"]
