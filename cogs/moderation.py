@@ -558,8 +558,8 @@ class ModerationCog(commands.Cog):
             )
             await ctx.reply(embed=e)
 
-    @commands.group(name="gban_settings")
-    @commands.has_guild_permissions(ban_members=True, invoke_without_command=True)
+    @commands.group(name="gban_settings", invoke_without_command=True)
+    @commands.has_guild_permissions(ban_members=True)
     async def gban_settings(self, ctx):
         await self.bot.send_subcommands(ctx)
 
