@@ -806,7 +806,10 @@
         "develop_tool rtfm": "リファレンスを検索します。",
         "develop_tool rtfm dpy": "[discord.py](https://discordpy.readthedocs.io/ja/stable/)のリファレンスを検索します。\nキーワード: 検索するキーワード。（文字列）",
         "develop_tool rtfm djs": "[discord.js](https://discord.js.org/#/docs/main)のリファレンスを検索します。\nキーワード: 検索するキーワード。（文字列）",
-        "snowflake": "Snowflake（DiscordのID）の情報を表示します。\nSnowflake: 情報を表示するSnowflake（数値）"
+        "snowflake": "Snowflake（DiscordのID）の情報を表示します。\nSnowflake: 情報を表示するSnowflake（数値）",
+        "gban_settings": "GBan関連の設定です。",
+        "gban_settings activate": "GBanを有効にします。",
+        "gban_settings deactivate": "GBanを無効にします。"
     },
     "help_categories": [
         "Help - Categories",
