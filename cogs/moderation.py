@@ -14,7 +14,7 @@ from texttable import Texttable
 
 
 import _pathmagic  # type: ignore # noqa
-from common_resources.consts import Info, Success, Error, Chat
+from common_resources.consts import Info, Success, Error, Chat, Activate_aliases, Deactivate_aliases
 from common_resources.tools import flatten, convert_timedelta
 
 
@@ -557,6 +557,37 @@ class ModerationCog(commands.Cog):
                 color=Success,
             )
             await ctx.reply(embed=e)
+
+    @commands.group(name="gban_settings")
+    @commands.has_guild_permissions(ban_members=True, invoke_without_command=True)
+    async def gban_settings(self, ctx):
+        await self.bot.send_subcommands(ctx)
+
+    @gban_settings.command("activate", aliases=Activate_aliases)
+    async def gban_activate(self, ctx):
+        if Guild_settings[ctx.guild.id]["gban_enabled"]:
+            e = discord.Embed(title=get_txt(ctx.guild.id, "activate_fail"), color=Error)
+            return await ctx.reply(embed=e)
+        else:
+            Guild_settings[ctx.guild.id]["gban_enabled"] = True
+            e = discord.Embed(
+                title=get_txt(ctx.guild.id, "activate").format("GBan"),
+                color=Success,
+            )
+            return await ctx.reply(embed=e)
+
+    @gban_settings.command("deactivate", aliases=Deactivate_aliases)
+    async def gban_deactivate(self, ctx):
+        if not Guild_settings[ctx.guild.id]["gban_enabled"]:
+            e = discord.Embed(title=get_txt(ctx.guild.id, "deactivate_fail"), color=Error)
+            return await ctx.reply(embed=e)
+        else:
+            Guild_settings[ctx.guild.id]["gban_enabled"] = False
+            e = discord.Embed(
+                title=get_txt(ctx.guild.id, "deactivate").format("GBan"),
+                color=Success,
+            )
+            return await ctx.reply(embed=e)
 
 
 def setup(_bot):

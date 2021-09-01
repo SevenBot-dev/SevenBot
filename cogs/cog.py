@@ -164,6 +164,7 @@ Default_settings = {
     "economy": {},
     "timed_role": {},
     "auto_text": [],
+    "gban_enabled": False
 }
 Last_favorite = {}
 Time_format = "%Y-%m-%d %H:%M:%S"

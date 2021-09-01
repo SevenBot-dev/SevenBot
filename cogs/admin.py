@@ -346,6 +346,8 @@ class AdminCog(commands.Cog):
                 GBan[user.id] = "SevenBot#1769によりGBanされました。\n理由：" + reason
                 ga = []
                 for g in self.bot.guilds:
+                    if not Guild_settings[g.id]["gban_enabled"]:
+                        next
                     try:
                         ga.append(
                             g.ban(
