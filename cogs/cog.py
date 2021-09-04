@@ -293,7 +293,8 @@ class MainCog(commands.Cog):
         Guild_settings[g.id] = copy.deepcopy(Default_settings)
         if g.owner_id == self.bot.user.id:
             return
-        await self.bot.get_channel(756254787191963768).send(
+        await components.send(
+            self.bot.get_channel(756254787191963768),
             emebds=[
                 SEmbed(
                     "<サーバー参加>", f"名前：{g.name}\nID：{g.id}\n現在の個数：{len(self.bot.guilds)}", color=discord.Color.green()
