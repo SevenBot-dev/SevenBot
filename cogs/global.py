@@ -367,6 +367,7 @@ class GlobalCog(commands.Cog):
             "content": content,
             "sb-tag": {"type": None},
             "sb-rawContent": message.content,
+            "version": "2.1.7",
         }
         if message.attachments:
             rjson["attachmentsUrl"] = [a.url for a in message.attachments]
