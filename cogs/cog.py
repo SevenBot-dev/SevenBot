@@ -281,6 +281,7 @@ class MainCog(commands.Cog):
         if g.id in Blacklists:
             return
         await self.bot.get_channel(756254787191963768).send(
+            "サーバー退出",
             embeds=[SEmbed("<サーバー退出>", f"名前：{g.name}\nID：{g.id}", color=discord.Color.red())]
         )
 
@@ -294,7 +295,8 @@ class MainCog(commands.Cog):
         if g.owner_id == self.bot.user.id:
             return
         await self.bot.get_channel(756254787191963768).send(
-            embeds=[
+            f"サーバー参加\n{g.id}",
+             embeds=[
                 SEmbed(
                     "<サーバー参加>", f"名前：{g.name}\nID：{g.id}\n現在の個数：{len(self.bot.guilds)}", color=discord.Color.green()
                 ),
