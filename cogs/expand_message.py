@@ -66,7 +66,7 @@ class MessageExpandCog(commands.Cog):
                 try:
                     try:
                         m = await c.fetch_message(ids[2])
-                    except discord.errors.NotFound:
+                    except (discord.errors.NotFound, discord.errors.Forbidden):
                         return
                     mc = m.content
                     if not (
