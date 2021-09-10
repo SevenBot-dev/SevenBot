@@ -7,24 +7,27 @@ import os
 import re
 import time
 import urllib.parse
+
 import aiohttp
 import discord
-from discord.ext import commands, tasks, components
-from discord.errors import Forbidden, NotFound
-from sembed import SEmbed, SField, SAuthor  # , SField, SAuthor, SFooter
-import _pathmagic  # type: ignore # noqa
+import websockets
 from common_resources.consts import (
-    Info,
-    Success,
-    Error,
+    Activate_aliases,
     Chat,
+    Deactivate_aliases,
+    Error,
+    Info,
     Official_discord_id,
     Owner_ID,
-    Activate_aliases,
-    Deactivate_aliases,
     Process,
+    Success,
 )
 from common_resources.tools import flatten
+from discord.errors import Forbidden, NotFound
+from discord.ext import commands, components, tasks
+from sembed import SAuthor, SEmbed, SField  # , SField, SAuthor, SFooter
+
+import _pathmagic  # type: ignore # noqa
 
 SGC_ID = 707158257818664991
 SGC_ID2 = 799184205316751391
@@ -56,6 +59,8 @@ class GlobalCog(commands.Cog):
             self.bot.consts["pci"] = Private_chat_info
         self.sync_pc_data.start()
         self.bot.loop.create_task(self.get_pc_data())
+        self.bot.loop.create_task(self.keep_websocket())
+        self.websocket_flag = False
 
     def make_rule_embed(self, channel):
         owner = self.bot.get_user(Private_chat_info[channel]["owner"])
@@ -70,93 +75,27 @@ class GlobalCog(commands.Cog):
     async def on_message_sgc(self, message):
         if message.channel.id in [SGC_ID, SGC_ID2] and message.author.id != self.bot.user.id and not SGC_STOP:
             loop = asyncio.get_event_loop()
-            ga = []
-            deletes = []
-            whname = "sevenbot-private-webhook-sgc"
-            each = Private_chat_info["sgc"]["channels"]
-            # print(message.content)
+            loop.create_task(message.add_reaction(Official_emojis["network"]))
             try:
                 data = json.loads(message.content)
             except json.JSONDecodeError:
                 return
-            # print(data)
-            if data.get("isBot", False):
-                return
-            loop.create_task(message.add_reaction(Official_emojis["network"]))
-            if data.get("type", "message") == "message":
-                async with aiohttp.ClientSession() as s:
+            await self.handle_sgc(data, message.author.id, "sgc")
+            loop.create_task(message.remove_reaction(Official_emojis["network"], self.bot.user))
+            loop.create_task(message.add_reaction(Official_emojis["check8"]))
+            return
 
-                    async def single_send(cn):
-                        ch_webhooks = await cn.webhooks()
-                        webhook = discord.utils.get(ch_webhooks, name=whname)
-                        if webhook is None:
-                            g = self.bot.get_guild(Official_discord_id)
-                            a = g.icon
-                            webhook = await cn.create_webhook(name=whname, avatar=await a.read())
-                        un = data["userName"] + "#" + data["userDiscriminator"]
-                        un += "("
-                        if data.get("sb-tag", {}).get("type"):
-                            un = "[" + data.get("sb-tag", {}).get("emoji") + "]" + un
-                        un += f"ID:{data['userId']}, From:{message.author})"
-                        files = []
-                        for a in data.get("attachmentsUrl", []):
-                            u = urllib.parse.unquote(a)
-                            fio = io.BytesIO()
-                            async with s.get(u) as r:
-                                fio.write(await r.read())
-                            fio.seek(0)
-                            files.append(discord.File(fio, filename=u.split("/")[-1]))
-                            fio.close()
-                        embed = None
-                        if reference_id := data.get("reference"):
-                            gms = self.bot.consts["gcm"]["sgc"]
-                            if references := gms.get(reference_id):
-                                reference = references[0]
-                                embed = discord.Embed(description=reference.content, color=Chat)
-                                avatar = reference.author.avatar.url.removeprefix("('")
-                                embed.set_author(
-                                    name=reference.author.name,
-                                    icon_url=avatar,
-                                )
-                        return await webhook.send(
-                            content=data["content"],  # content.replace("@", "@​")
-                            username=un,
-                            allowed_mentions=discord.AllowedMentions.none(),
-                            avatar_url="https://media.discordapp.net/avatars/"
-                            f"{data['userId']}/{data['userAvatar']}."
-                            f"{'gif' if data['userAvatar'].startswith('a_') else 'webp'}?size=1024",
-                            files=files,
-                            embed=embed,
-                            wait=True,
-                        )
-
-                    for c in each:
-                        cn = self.bot.get_channel(c)
-                        if cn is None:
-                            deletes.append(c)
-                            continue
-                        else:
-                            if cn.permissions_for(cn.guild.me).manage_webhooks:
-                                if not c == message.channel.id:
-                                    ga.append(single_send(cn))
-                                    # await
-                                    # webhook.edit(avater_url="https://i.imgur.com/JffqEAl.png")
-                    self.bot.consts["gcm"]["sgc"][int(data.get("messageId", message.id))] = await asyncio.gather(*ga)
-                    if len(list(self.bot.consts["gcm"]["sgc"].keys())) > 30:
-                        del self.bot.consts["gcm"]["sgc"][list(self.bot.consts["gcm"]["sgc"].keys())[0]]
-                    loop.create_task(message.remove_reaction(Official_emojis["network"], self.bot.user))
-                    loop.create_task(message.add_reaction(Official_emojis["check8"]))
-            elif data.get("type", "message") == "edit":
-                ga = []
-                for m in self.bot.consts["gcm"]["sgc"].get(int(data["messageId"]), []):
-                    ga.append(m.edit(content=data["content"]))
-                await asyncio.gather(*ga)
-            elif data.get("type", "message") == "delete":
-                ga = []
-                for m in self.bot.consts["gcm"]["sgc"].get(int(data["messageId"]), []):
-                    ga.append(m.delete())
-                await asyncio.gather(*ga)
-            elif data.get("type", "message") == "gg-gcconnect":
+    async def handle_sgc(self, data, from_id, channel):
+        from_user = self.bot.get_user(from_id)
+        ga = []
+        deletes = []
+        whname = f"sevenbot-private-webhook-{channel}"
+        each = Private_chat_info[channel]["channels"]
+        # print(data)
+        if data.get("isBot", False):
+            return
+        if data.get("type", "message") == "message":
+            async with aiohttp.ClientSession() as s:
 
                 async def single_send(cn):
                     ch_webhooks = await cn.webhooks()
@@ -165,22 +104,40 @@ class GlobalCog(commands.Cog):
                         g = self.bot.get_guild(Official_discord_id)
                         a = g.icon
                         webhook = await cn.create_webhook(name=whname, avatar=await a.read())
-                    fl = []
-                    for at in message.attachments:
-                        fl.append(await at.to_file())
-                    un = str(message.author)
+                    un = data["userName"] + "#" + data["userDiscriminator"]
                     un += "("
-                    un += f"ID:{message.author.id})"
-                    e = SEmbed("新しいサーバーが参加しました。", data["guildName"])
-                    if data["guildIcon"]:
-                        e.thumbnail_url = f"https://cdn.discordapp.com/icons/{data['guildId']}/{data['guildIcon']}." + (
-                            "gif" if data["guildIcon"].startswith("a_") else "png"
-                        )
+                    if data.get("sb-tag", {}).get("type"):
+                        un = "[" + data.get("sb-tag", {}).get("emoji") + "]" + un
+                    un += f"ID:{data['userId']}, From:{from_user})"
+                    files = []
+                    for a in data.get("attachmentsUrl", []):
+                        u = urllib.parse.unquote(a)
+                        fio = io.BytesIO()
+                        async with s.get(u) as r:
+                            fio.write(await r.read())
+                        fio.seek(0)
+                        files.append(discord.File(fio, filename=u.split("/")[-1]))
+                        fio.close()
+                    embed = None
+                    if reference_id := data.get("reference"):
+                        gms = self.bot.consts["gcm"][channel]
+                        if references := gms.get(reference_id):
+                            reference = references[0]
+                            embed = discord.Embed(description=reference.content, color=Chat)
+                            avatar = reference.author.avatar.url.removeprefix("('")
+                            embed.set_author(
+                                name=reference.author.name,
+                                icon_url=avatar,
+                            )
                     return await webhook.send(
-                        embed=e,  # content.replace("@", "@​")
+                        content=data["content"],  # content.replace("@", "@​")
                         username=un,
                         allowed_mentions=discord.AllowedMentions.none(),
-                        avatar_url=message.author.avatar.replace(static_format="png").url,
+                        avatar_url="https://media.discordapp.net/avatars/"
+                        f"{data['userId']}/{data['userAvatar']}."
+                        f"{'gif' if data['userAvatar'].startswith('a_') else 'webp'}?size=1024",
+                        files=files,
+                        embed=embed,
                         wait=True,
                     )
 
@@ -191,15 +148,35 @@ class GlobalCog(commands.Cog):
                         continue
                     else:
                         if cn.permissions_for(cn.guild.me).manage_webhooks:
-                            if not c == message.channel.id:
-                                ga.append(single_send(cn))
-                loop.create_task(message.add_reaction(Official_emojis["check8"]))
-            return
+                            ga.append(single_send(cn))
+                self.bot.consts["gcm"][channel][int(data["messageId"])] = await asyncio.gather(*ga)
+                if len(list(self.bot.consts["gcm"][channel].keys())) > 30:
+                    del self.bot.consts["gcm"][channel][list(self.bot.consts["gcm"][channel].keys())[0]]
+        elif data.get("type", "message") == "edit":
+            ga = []
+            for m in self.bot.consts["gcm"][channel].get(int(data["messageId"]), []):
+                ga.append(m.edit(content=data["content"]))
+            await asyncio.gather(*ga)
+        elif data.get("type", "message") == "delete":
+            ga = []
+            for m in self.bot.consts["gcm"][channel].get(int(data["messageId"]), []):
+                ga.append(m.delete())
+            await asyncio.gather(*ga)
 
     async def send_mute(self, message):
         await message.delete()
         e2 = discord.Embed(title="あなたはミュートされています。", color=Error)
         await message.author.send(embed=e2)
+
+    async def keep_websocket(self):
+        async with websockets.connect("wss://wsgc-gw1.cyberrex.jp") as websocket:
+            self.websocket = websocket
+            await websocket.send(json.dumps({"t": "REGISTER", "d": {"id": str(self.bot.user.id)}}))
+            while not self.websocket_flag:
+                msg = await websocket.recv()
+                json_msg = json.loads(msg)
+                await self.handle_sgc(json_msg["d"], int(json_msg["f"]["id"]), "wsgc")
+            await websocket.send(json.dumps({"t": "CLOSE", "d": None}))
 
     async def send_messages(self, message, *, username=None, embed=None):
         e = discord.Embed(
@@ -249,9 +226,14 @@ class GlobalCog(commands.Cog):
             if len(content.splitlines()) > 10:
                 content = "\n".join(content.splitlines()[:10]) + "\n..."
             if len(content) > 1000:
-                content = content[:1000] + "..."
+                content = content[:1000]
+                if content.count("```") % 2 != 0:
+                    content += "\n```"
+                content += "..."
         if channel == "sgc":
             loop.create_task(self.send_sgc(message, content))
+        elif channel == "wsgc":
+            loop.create_task(self.send_wsgc(message, content))
         for c in each:
             cn = self.bot.get_channel(c)
             if cn is None:
@@ -351,6 +333,16 @@ class GlobalCog(commands.Cog):
             del gms[list(gms.keys())[0]]
 
     async def send_sgc(self, message: discord.Message, content: str):
+        rjson = self.create_sgc_payload(message, content)
+        await self.bot.get_channel(SGC_ID).send(
+            json.dumps(rjson, ensure_ascii=False), allowed_mentions=discord.AllowedMentions.none()
+        )
+
+    async def send_wsgc(self, message: discord.Message, content: str):
+        rjson = self.create_sgc_payload(message, content)
+        await self.websocket.send(json.dumps({"t": "SGC_MESSAGE", "d": rjson}, ensure_ascii=False))
+
+    def create_sgc_payload(self, message, content):
         rjson = {
             "type": "message",
             "userId": str(message.author.id),
@@ -391,9 +383,7 @@ class GlobalCog(commands.Cog):
                 if msg:
                     rjson["reference"] = msg
 
-        await self.bot.get_channel(SGC_ID).send(
-            json.dumps(rjson, ensure_ascii=False), allowed_mentions=discord.AllowedMentions.none()
-        )
+        return rjson
 
     @commands.Cog.listener("on_message")
     async def on_message_global(self, message):
@@ -461,6 +451,8 @@ class GlobalCog(commands.Cog):
                         ensure_ascii=False,
                     )
                 )
+            elif e == "wsgc":
+                await self.wsgc_event_send({"type": "delete", "messageId": str(message.id)})
             for ml in self.bot.consts["gcm"][e].get(message.id, []):
                 try:
                     dga.append(ml.delete())
@@ -505,6 +497,15 @@ class GlobalCog(commands.Cog):
                         ensure_ascii=False,
                     )
                 )
+            elif e == "wsgc":
+                await self.wsgc_event_send(
+                    {
+                        "type": "edit",
+                        "messageId": str(after.id),
+                        "content": after.content,
+                    }
+                )
+
             for ml in self.bot.consts["gcm"][e].get(after.id, []):
                 try:
                     dga.append(ml.edit(content=after.content))
@@ -530,6 +531,14 @@ class GlobalCog(commands.Cog):
             await self.bot.send_subcommands(ctx)
         else:
             pass
+
+    async def wsgc_event_send(self, payload):
+        await self.websocket.send(
+            json.dumps(
+                {"t": "SGC_EVENT", "d": payload},
+                ensure_ascii=False,
+            )
+        )
 
     @gchat.command(name="activate", aliases=Activate_aliases + ["join", "connect"])
     @commands.has_permissions(manage_channels=True)
@@ -640,7 +649,17 @@ class GlobalCog(commands.Cog):
                                     ensure_ascii=False,
                                 )
                             )
-                        # return
+                        elif channel == "wsgc":
+                            await self.wsgc_event_send(
+                                {
+                                    "type": "sb-guildJoin",
+                                    "guildName": ctx.guild.name,
+                                    "guildId": str(ctx.guild.id),
+                                    "guildIcon": ctx.guild.icon.key,
+                                    "channelName": ctx.channel.name,
+                                    "channelID": ctx.channel.id,
+                                },
+                            )
                     else:
                         e2 = discord.Embed(
                             title=f"個人グローバルチャット参加 - `{channel}`",
@@ -908,6 +927,17 @@ class GlobalCog(commands.Cog):
                         },
                         ensure_ascii=False,
                     )
+                )
+            elif pk == "wsgc":
+                await self.wsgc_event_send(
+                    {
+                        "type": "sb-guildLeft",
+                        "guildName": ctx.guild.name,
+                        "guildId": str(ctx.guild.id),
+                        "guildIcon": ctx.guild.icon.key,
+                        "channelName": ctx.channel.name,
+                        "channelID": ctx.channel.id,
+                    }
                 )
             loop = asyncio.get_event_loop()
             for c in Private_chat_info[pk]["channels"]:
@@ -1260,6 +1290,7 @@ class GlobalCog(commands.Cog):
 
     def cog_unload(self):
         self.sync_pc_data.stop()
+        self.websocket_flag = True
 
 
 def setup(_bot):
