@@ -175,6 +175,8 @@ class GlobalCog(commands.Cog):
             while not self.websocket_flag:
                 msg = await websocket.recv()
                 json_msg = json.loads(msg)
+                if json_msg.get("t", "") == "ERROR":
+                    return await self.bot.get_channel(763877469928554517).send(json_msg)
                 await self.handle_sgc(json_msg["d"], int(json_msg["f"]["id"]), "wsgc")
             await websocket.send(json.dumps({"t": "CLOSE", "d": None}))
 
