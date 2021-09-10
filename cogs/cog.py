@@ -141,7 +141,7 @@ Default_settings = {
     "auto_parse": [],
     "do_everyone_alert": True,
     "lang": "ja",
-    "expand_message": True,
+    "expand_message": False,
     "do_bump_alert": True,
     "invites": [],
     "prefix": None,
@@ -281,8 +281,7 @@ class MainCog(commands.Cog):
         if g.id in Blacklists:
             return
         await self.bot.get_channel(756254787191963768).send(
-            "サーバー退出",
-            embeds=[SEmbed("<サーバー退出>", f"名前：{g.name}\nID：{g.id}", color=discord.Color.red())]
+            "サーバー退出", embeds=[SEmbed("<サーバー退出>", f"名前：{g.name}\nID：{g.id}", color=discord.Color.red())]
         )
 
     @commands.Cog.listener(name="on_guild_join")
@@ -296,12 +295,12 @@ class MainCog(commands.Cog):
             return
         await self.bot.get_channel(756254787191963768).send(
             f"サーバー参加\n{g.id}",
-             embeds=[
+            embeds=[
                 SEmbed(
                     "<サーバー参加>", f"名前：{g.name}\nID：{g.id}\n現在の個数：{len(self.bot.guilds)}", color=discord.Color.green()
                 ),
                 SEmbed("", f"人数：{len(g.members)}\nオーナー：{self.bot.get_user(g.owner_id)}"),
-            ]
+            ],
         )
         lang = "ja"
         await self.bot.save()
