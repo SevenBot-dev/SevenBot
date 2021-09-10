@@ -175,13 +175,15 @@ class GlobalCog(commands.Cog):
                 msg = await websocket.recv()
                 json_msg = json.loads(msg)
                 if json_msg.get("t", "") == "ERROR":
-                    return await self.bot.get_channel(763877469928554517).send(json_msg)
+                    await self.bot.get_channel(763877469928554517).send(json_msg)
                 elif json_msg["t"] == "HELLO":
                     await websocket.send(json.dumps({"t": "REGISTER", "d": {"id": str(self.bot.user.id)}}))
+                elif json_msg["t"] == "HEARTBEAT":
+                    pass
                 elif json_msg.get("f"):
                     await self.handle_sgc(json_msg["d"], int(json_msg["f"]["id"]), "wsgc")
                 else:
-                    return await self.bot.get_channel(763877469928554517).send(json_msg)
+                    await self.bot.get_channel(763877469928554517).send(json_msg)
             await websocket.send(json.dumps({"t": "CLOSE", "d": None}))
 
     async def send_messages(self, message, *, username=None, embed=None):
