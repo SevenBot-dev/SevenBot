@@ -177,8 +177,10 @@ class GlobalCog(commands.Cog):
                 json_msg = json.loads(msg)
                 if json_msg.get("t", "") == "ERROR":
                     return await self.bot.get_channel(763877469928554517).send(json_msg)
-                elif json_msg.get("t", "") not in ["SGC_MESSAGE", "SGC_EVENT"]:
+                elif json_msg.get("f"):
                     await self.handle_sgc(json_msg["d"], int(json_msg["f"]["id"]), "wsgc")
+                else:
+                    return await self.bot.get_channel(763877469928554517).send(json_msg)
             await websocket.send(json.dumps({"t": "CLOSE", "d": None}))
 
     async def send_messages(self, message, *, username=None, embed=None):
