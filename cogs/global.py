@@ -169,7 +169,7 @@ class GlobalCog(commands.Cog):
         await message.author.send(embed=e2)
 
     async def keep_websocket(self):
-        async with websockets.connect("wss://wsgc-gw1.cyberrex.jp") as websocket:
+        async with websockets.connect("wss://wsgc-gw1.cyberrex.jp", 443) as websocket:
             self.websocket = websocket
             await websocket.send(json.dumps({"t": "REGISTER", "d": {"id": str(self.bot.user.id)}}))
             while not self.websocket_flag:
