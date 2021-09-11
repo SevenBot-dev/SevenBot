@@ -169,22 +169,26 @@ class GlobalCog(commands.Cog):
         await message.author.send(embed=e2)
 
     async def keep_websocket(self):
-        async with websockets.connect("wss://wsgc-gw1.cyberrex.jp/v1") as websocket:
-            self.websocket = websocket
-            while not self.websocket_flag:
-                msg = await websocket.recv()
-                json_msg = json.loads(msg)
-                if json_msg.get("t", "") == "ERROR":
-                    await self.bot.get_channel(763877469928554517).send(json_msg)
-                elif json_msg["t"] == "HELLO":
-                    await websocket.send(json.dumps({"t": "REGISTER", "d": {"id": str(self.bot.user.id)}}))
-                elif json_msg["t"] == "HEARTBEAT":
-                    pass
-                elif json_msg.get("f"):
-                    await self.handle_sgc(json_msg["d"], int(json_msg["f"]["id"]), "wsgc")
-                else:
-                    await self.bot.get_channel(763877469928554517).send(json_msg)
-            await websocket.send(json.dumps({"t": "CLOSE", "d": None}))
+        while not self.websocket_flag:
+            try:
+                async with websockets.connect("wss://wsgc-gw1.cyberrex.jp/v1") as websocket:
+                    self.websocket = websocket
+                    while not self.websocket_flag:
+                        msg = await websocket.recv()
+                        json_msg = json.loads(msg)
+                        if json_msg.get("t", "") == "ERROR":
+                            await self.bot.get_channel(763877469928554517).send(json_msg)
+                        elif json_msg["t"] == "HELLO":
+                            await websocket.send(json.dumps({"t": "REGISTER", "d": {"id": str(self.bot.user.id)}}))
+                        elif json_msg["t"] == "HEARTBEAT":
+                            pass
+                        elif json_msg.get("f"):
+                            await self.handle_sgc(json_msg["d"], int(json_msg["f"]["id"]), "wsgc")
+                        else:
+                            await self.bot.get_channel(763877469928554517).send(json_msg)
+                    await websocket.send(json.dumps({"t": "CLOSE", "d": None}))
+            except websockets.ConnectionClosedOK:
+                pass
 
     async def send_messages(self, message, *, username=None, embed=None):
         e = discord.Embed(
