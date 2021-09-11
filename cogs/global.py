@@ -121,7 +121,7 @@ class GlobalCog(commands.Cog):
                     embed = None
                     if reference_id := data.get("reference"):
                         gms = self.bot.consts["gcm"][channel]
-                        if references := gms.get(reference_id):
+                        if references := gms.get(int(reference_id)):
                             reference = references[0]
                             embed = discord.Embed(description=reference.content, color=Chat)
                             avatar = reference.author.avatar.url.removeprefix("('")
