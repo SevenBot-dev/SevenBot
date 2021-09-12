@@ -187,7 +187,7 @@ class GlobalCog(commands.Cog):
                         else:
                             await self.bot.get_channel(763877469928554517).send(json_msg)
                     await websocket.send(json.dumps({"t": "CLOSE", "d": None}))
-            except websockets.ConnectionClosedOK:
+            except websockets.ConnectionClosed:
                 pass
 
     async def send_messages(self, message, *, username=None, embed=None):
