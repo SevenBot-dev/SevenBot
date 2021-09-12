@@ -65,7 +65,7 @@ Categories = {
     ],
     "info": ["lookup", "check_url", "getid", "snowflake"],
     "panel": ["vote", "party"],
-    "tools": ["translate", "afk", "music", "tts", "shorten"],
+    "tools": ["translate", "afk", "tts", "shorten"],
     "fun": [
         "werewolf",
         "bignum",

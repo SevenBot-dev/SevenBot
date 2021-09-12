@@ -131,7 +131,6 @@ class SevenBot(commands.Bot):
         self.texts = common_resources.Texts
         self.default_user_settings = {
             "level_dm": False,
-            "favorite_musics": [],
             "tts_settings": {},
         }
         print("Debug mode: " + str(self.debug))
