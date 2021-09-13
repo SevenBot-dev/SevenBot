@@ -22,6 +22,7 @@ from common_resources.consts import (
     Process,
     Success,
 )
+from common_resources.tokens import wsgc_token
 from common_resources.tools import flatten
 from discord.errors import Forbidden, NotFound
 from discord.ext import commands, components, tasks
@@ -179,7 +180,7 @@ class GlobalCog(commands.Cog):
                         if json_msg.get("t", "") == "ERROR":
                             await self.bot.get_channel(763877469928554517).send(json_msg)
                         elif json_msg["t"] == "HELLO":
-                            await websocket.send(json.dumps({"t": "REGISTER", "d": {"id": str(self.bot.user.id)}}))
+                            await websocket.send(json.dumps({"t": "REGISTER", "d": {"id": str(self.bot.user.id), "token": wsgc_token}}))
                         elif json_msg["t"] == "HEARTBEAT":
                             pass
                         elif json_msg.get("f"):
