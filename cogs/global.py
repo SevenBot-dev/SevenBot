@@ -180,7 +180,7 @@ class GlobalCog(commands.Cog):
                         if json_msg.get("t", "") == "ERROR":
                             await self.bot.get_channel(763877469928554517).send(json_msg)
                         elif json_msg["t"] == "HELLO":
-                            await websocket.send(json.dumps({"t": "REGISTER", "d": {"id": str(self.bot.user.id), "token": wsgc_token}}))
+                            await websocket.send(json.dumps({"t": "CONNECT", "d": {"id": str(self.bot.user.id), "token": wsgc_token}}))
                         elif json_msg["t"] == "HEARTBEAT":
                             pass
                         elif json_msg.get("f"):
