@@ -180,7 +180,9 @@ class GlobalCog(commands.Cog):
                         if json_msg.get("t", "") == "ERROR":
                             await self.bot.get_channel(763877469928554517).send(json_msg)
                         elif json_msg["t"] == "HELLO":
-                            await websocket.send(json.dumps({"t": "CONNECT", "d": {"id": str(self.bot.user.id), "token": wsgc_token}}))
+                            await websocket.send(
+                                json.dumps({"t": "CONNECT", "d": {"id": str(self.bot.user.id), "token": wsgc_token}})
+                            )
                         elif json_msg["t"] in ("HEARTBEAT", "CONNECTED"):
                             pass
                         elif json_msg.get("f"):
@@ -1292,7 +1294,9 @@ class GlobalCog(commands.Cog):
     async def sync_pc_data(self):
         async for c in self.bot.db.private_chat.find({}, {"_id": False}):
             if c != Private_chat_info[c["name"]]:
-                await self.bot.db.private_chat.replace_one({"name": c["name"]}, Private_chat_info[c["name"]])
+                await self.bot.db.private_chat.update_one(
+                    {"name": c["name"]}, Private_chat_info[c["name"]], upsert=True
+                )
 
     async def get_pc_data(self):
         async with self.bot.db.private_chat.watch() as change_stream:
