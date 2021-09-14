@@ -1295,7 +1295,7 @@ class GlobalCog(commands.Cog):
         async for c in self.bot.db.private_chat.find({}, {"_id": False}):
             if c != Private_chat_info[c["name"]]:
                 await self.bot.db.private_chat.update_one(
-                    {"name": c["name"]}, Private_chat_info[c["name"]], upsert=True
+                    {"name": c["name"]}, {"$set": Private_chat_info[c["name"]]}, upsert=True
                 )
 
     async def get_pc_data(self):
