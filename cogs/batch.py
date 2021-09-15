@@ -49,16 +49,10 @@ class BatchCog(commands.Cog):
     @tasks.loop(seconds=10)
     async def batch_change_activity(self):
         s = getattr(self.bot, "custom_status", None)
-        n = s or (
-            f"sb#help to Help | {len(self.bot.guilds)} Servers | "
-            + ("https://sevenbot.jp")
-        )
+        n = s or (f"sb#help to Help | {len(self.bot.guilds)} Servers | " + ("https://sevenbot.jp"))
         if (
             not self.bot.get_guild(715540925081714788).me.activity
-            or self.bot.get_guild(715540925081714788).me.activity.name.replace(
-                "⠀", ""
-            )
-            != n
+            or self.bot.get_guild(715540925081714788).me.activity.name.replace("⠀", "") != n
         ):
             await self.bot.change_presence(
                 activity=discord.Game(name=n + "⠀" * 10),
@@ -81,16 +75,12 @@ class BatchCog(commands.Cog):
                 "mem": {"percent": mem.percent, "gb": mem.used / gb},
                 "time": time.time(),
                 "save": {
-                    "main": len(
-                        str(self.bot.raw_config).encode("utf8")
-                    ) / 1024,
+                    "main": len(str(self.bot.raw_config).encode("utf8")) / 1024,
                     "db": call["dataSize"] / 1024,
                 },
             }
         )
-        await self.bot.db.status_log.delete_many(
-            {"time": {"$lt": time.time() - 60 * 60 * 24 * 3}}
-        )
+        await self.bot.db.status_log.delete_many({"time": {"$lt": time.time() - 60 * 60 * 24 * 3}})
 
     @batch_send_status.before_loop
     async def batch_send_status_before(self):
@@ -98,16 +88,7 @@ class BatchCog(commands.Cog):
 
     @tasks.loop(minutes=5)
     async def batch_save(self):
-        try:
-            await self.bot.save()
-        except Exception as e:
-            await self.bot.get_user(686547120534454315).send(
-                "batch_save:```\n"
-                + "".join(
-                    traceback.TracebackException.from_exception(e).format()
-                )
-                + "```"
-            )
+        await self.bot.save()
 
     @tasks.loop(seconds=50)
     async def botdd_post(self):
@@ -122,13 +103,9 @@ class BatchCog(commands.Cog):
         async with self.bot.db.guild_settings.watch() as change_stream:
             async for change in change_stream:
                 if change["operationType"] == "update":
-                    gs = await self.bot.db.guild_settings.find_one(
-                        change["documentKey"]
-                    )
+                    gs = await self.bot.db.guild_settings.find_one(change["documentKey"])
                     gid = gs["gid"]
-                    for ufk, ufv in recr_items(
-                        change["updateDescription"]["updatedFields"]
-                    ):
+                    for ufk, ufv in recr_items(change["updateDescription"]["updatedFields"]):
                         if ".".join(ufk) in [
                             "levels",
                             "level_counts",
