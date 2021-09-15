@@ -3,7 +3,6 @@ import datetime
 
 # import sys
 import time
-import traceback
 
 import aiohttp
 import discord
