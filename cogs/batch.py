@@ -79,7 +79,7 @@ class BatchCog(commands.Cog):
                 },
             }
         )
-        await self.bot.db.status_log.delete_many({"time": {"$lt": time.time() - 60 * 60 * 24 * 3}})
+        await self.bot.db.status_log.delete_many({"time": {"$lt": time.time() - 60 * 60 * 24 * 7}})
 
     @batch_send_status.before_loop
     async def batch_send_status_before(self):
