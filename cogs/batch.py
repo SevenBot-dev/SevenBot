@@ -93,8 +93,8 @@ class BatchCog(commands.Cog):
     async def botdd_post(self):
         async with aiohttp.ClientSession() as s:
             async with s.post(
-                "https://botdd.alpaca131.tk/api/heartbeat",
-                headers={"token": botdd_token},
+                "https://botdd.alpaca131.com/api/heartbeat",
+                headers={"authorization": "Bearer " + botdd_token},
             ):
                 pass
 
