@@ -61,6 +61,8 @@ class BatchCog(commands.Cog):
     @tasks.loop(minutes=10)
     async def batch_send_status(self):
         loop = asyncio.get_event_loop()
+        if self.bot.latency > 5:
+            return
         cpu = await loop.run_in_executor(None, psutil.cpu_percent, 1)
         mem = await loop.run_in_executor(None, psutil.virtual_memory)
         gb = 1024 * 1024 * 1024
