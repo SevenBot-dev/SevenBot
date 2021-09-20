@@ -500,10 +500,17 @@ class AuthCog(commands.Cog):
     @commands.has_guild_permissions(manage_roles=True)
     async def auth_react_web(self, ctx, role: discord.Role = 0):
         global Guild_settings
-        if role == 0:
-            role = ctx.guild.get_role(
-                Guild_settings[ctx.guild.id]["auth_role"]
+        if (
+            Guild_settings[ctx.guild.id]["auth_role"] == 0
+            and role == 0
+        ):
+            e = discord.Embed(
+                title="ロールが登録されていません",
+                description="初回はロールを登録する必要があります",
+                color=Error,
             )
+            m = await ctx.reply(embed=e)
+            return
         if role == 0:
             role = ctx.guild.get_role(
                 Guild_settings[ctx.guild.id]["auth_role"]
