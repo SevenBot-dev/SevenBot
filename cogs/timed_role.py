@@ -190,10 +190,13 @@ class TimedRoleCog(commands.Cog):
         nt = []
         for t in Timed_roles:
             if t["time"] < time.time():
-                guild = self.bot.get_guild(t["guild"])
-                await guild.get_member(t["member"]).remove_roles(
-                    guild.get_role(t["role"])
-                )
+                try:
+                    guild = self.bot.get_guild(t["guild"])
+                    await guild.get_member(t["member"]).remove_roles(
+                        guild.get_role(t["role"])
+                    )
+                except AttributeError:
+                    pass
             else:
                 nt.append(t)
 
