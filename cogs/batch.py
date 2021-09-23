@@ -91,7 +91,7 @@ class BatchCog(commands.Cog):
     async def batch_save(self):
         await self.bot.save()
 
-    @tasks.loop(seconds=50)
+    @tasks.loop(seconds=30)
     async def botdd_post(self):
         async with aiohttp.ClientSession() as s:
             async with s.post(
