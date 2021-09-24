@@ -1857,7 +1857,7 @@ class FunCog(commands.Cog):
     async def _image_5000(self, ctx, top, bottom):
         e = SEmbed(
             color=0xFF0000,
-            image_url="https://gsapi.cyberrex.ml/image?"
+            image_url="https://gsapi.cyberrex.jp/image?"
             f"top={urllib.parse.quote(top)}&bottom={urllib.parse.quote(bottom)}",
             footer="Powered by 5000choyen-api",
         )
