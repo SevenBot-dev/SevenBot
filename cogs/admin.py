@@ -347,7 +347,7 @@ class AdminCog(commands.Cog):
                 ga = []
                 for g in self.bot.guilds:
                     if not Guild_settings[g.id]["gban_enabled"]:
-                        next
+                        continue
                     try:
                         ga.append(
                             g.ban(
