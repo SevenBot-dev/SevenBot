@@ -352,6 +352,7 @@ class AdminCog(commands.Cog):
                                 user,
                                 reason="SevenBot#1769によりGBanされました。\n理由：" + reason,
                               )
+                        await asyncio.sleep(1)
                     except Forbidden:
                         pass
                 loop = asyncio.get_event_loop()
