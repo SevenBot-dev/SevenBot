@@ -344,23 +344,16 @@ class AdminCog(commands.Cog):
                 )
                 msg = await msg.edit(embed=e)
                 GBan[user.id] = "SevenBot#1769によりGBanされました。\n理由：" + reason
-                ga = []
                 for g in self.bot.guilds:
                     if not Guild_settings[g.id]["gban_enabled"]:
                         continue
                     try:
-                        ga.append(
-                            g.ban(
+                        await g.ban(
                                 user,
                                 reason="SevenBot#1769によりGBanされました。\n理由：" + reason,
-                            )
-                        )
+                              )
                     except Forbidden:
                         pass
-                try:
-                    await asyncio.gather(*ga)
-                except Forbidden:
-                    pass
                 loop = asyncio.get_event_loop()
                 whname = "sevenbot-private-webhook-gban"
                 for c in Private_chat_info["gban"]["channels"]:
