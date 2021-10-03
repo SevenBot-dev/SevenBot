@@ -195,7 +195,7 @@ class TimedRoleCog(commands.Cog):
                     await guild.get_member(t["member"]).remove_roles(
                         guild.get_role(t["role"])
                     )
-                except AttributeError:
+                except (AttributeError, discord.Forbidden):
                     pass
             else:
                 nt.append(t)
