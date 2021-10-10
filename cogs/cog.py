@@ -105,6 +105,7 @@ Categories = {
         "warn_settings",
         "auto_text",
         "gban_settings",
+        "lock_message",
     ],
 }
 Default_settings = {
@@ -167,7 +168,7 @@ Default_settings = {
     "auto_text": [],
     "gban_enabled": False,
     "lock_message_content": {},
-    "lock_message_id": {}
+    "lock_message_id": {},
 }
 Last_favorite = {}
 Time_format = "%Y-%m-%d %H:%M:%S"
