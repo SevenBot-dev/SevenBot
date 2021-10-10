@@ -166,6 +166,8 @@ Default_settings = {
     "timed_role": {},
     "auto_text": [],
     "gban_enabled": False,
+    "lock_message_content": {},
+    "lock_message_id": {}
 }
 Last_favorite = {}
 Time_format = "%Y-%m-%d %H:%M:%S"

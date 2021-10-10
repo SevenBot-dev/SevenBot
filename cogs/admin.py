@@ -349,9 +349,9 @@ class AdminCog(commands.Cog):
                         continue
                     try:
                         await g.ban(
-                                user,
-                                reason="SevenBot#1769によりGBanされました。\n理由：" + reason,
-                              )
+                            user,
+                            reason="SevenBot#1769によりGBanされました。\n理由：" + reason,
+                        )
                         await asyncio.sleep(1)
                     except Forbidden:
                         pass

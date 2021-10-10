@@ -749,7 +749,10 @@
         "snowflake": "Snowflake（DiscordのID）の情報を表示します。\nSnowflake: 情報を表示するSnowflake（数値）",
         "gban_settings": "GBan関連の設定です。",
         "gban_settings activate": "GBanを有効にします。",
-        "gban_settings deactivate": "GBanを無効にします。"
+        "gban_settings deactivate": "GBanを無効にします。",
+        "lock_message": "メッセージ固定関連のコマンドです。",
+        "lock_message activate": "メッセージ固定を有効にします。\n内容: メッセージの内容（文字列）",
+        "lock_message deactivate": "メッセージ固定を無効にします。"
     },
     "help_categories": [
         "ヘルプ - カテゴリー一覧",
