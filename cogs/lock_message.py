@@ -63,7 +63,7 @@ class LockMessageCog(commands.Cog):
             return
         if message.author == self.bot.user:
             if embeds := message.embeds:
-                if (not isinstance(embeds, discord.embeds._EmptyEmbed)) and "?locked" in embeds[0].author.url:
+                if embeds[0].author.url and "?locked" in embeds[0].author.url:
                     return
         if content := Guild_settings[message.guild.id]["lock_message_content"].get(str(message.channel.id)):
             if message_id := Guild_settings[message.guild.id]["lock_message_id"].get(str(message.channel.id)):
