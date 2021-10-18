@@ -947,20 +947,21 @@ class MainCog(commands.Cog):
             f'{get_txt(ctx.guild.id,"abouts")[-2]}'
             f"({round(len(Sevennet_channels)/len(list(Guild_settings.keys()))*100)}%)",
         )
-        inf = await self.bot.DBL_client.get_bot_info()
-        e.add_field(
-            name=get_txt(ctx.guild.id, "abouts")[8],
-            value=get_txt(ctx.guild.id, "abouts")[9].format(inf["points"], inf["monthly_points"]),
-        )
-        e.add_field(
-            name=get_txt(ctx.guild.id, "abouts")[10],
-            value="[SevenBot-dev/SevenBot](https://github.com/SevenBot-dev/SevenBot)",
-        )
         e.add_field(
             name=get_txt(ctx.guild.id, "abouts")[13],
             value=get_txt(ctx.guild.id, "abouts")[14],
         )
-        return await ctx.reply(embed=e)
+        return await components.reply(
+            ctx,
+            embed=e,
+            components=[
+                components.Button("利用規約", style=components.ButtonType.link, url="https://sevenbot.jp/tos"),
+                components.Button("プライバシーポリシー", style=components.ButtonType.link, url="https://sevenbot.jp/privacy"),
+                components.Button(
+                    "ソースコード", style=components.ButtonType.link, url="https://github.com/SevenBot-dev/SevenBot"
+                ),
+            ],
+        )
 
     @commands.Cog.listener(name="on_command_error")
     async def on_command_error(self, ctx, error):
