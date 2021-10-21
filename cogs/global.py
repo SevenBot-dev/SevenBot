@@ -371,7 +371,7 @@ class GlobalCog(commands.Cog):
             "channelId": str(message.channel.id),
             "channelName": message.channel.name,
             "messageId": str(message.id),
-            "content": content,
+            "content": content.replace("@everyone", "@\u200beveryone").replace("@here", "@\u200bhere"),
             "sb-tag": {"type": None},
             "sb-rawContent": message.content,
             "version": "2.1.7",
