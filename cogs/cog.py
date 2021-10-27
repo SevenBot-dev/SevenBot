@@ -965,7 +965,6 @@ class MainCog(commands.Cog):
 
     @commands.Cog.listener(name="on_command_error")
     async def on_command_error(self, ctx, error):
-        print(error)
         if isinstance(error, CommandNotFound):
             return
         elif isinstance(error, commands.errors.MissingRequiredArgument):
