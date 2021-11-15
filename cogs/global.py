@@ -237,7 +237,7 @@ class GlobalCog(commands.Cog):
             if whname == "sevenbot-global-webhook"
             else message.content
         )
-        if whname == "sevenbot-global-webhook":
+        if whname == "sevenbot-global-webhook" or Private_chat_info[channel]["antispam"]:
             if len(content.splitlines()) > 10:
                 content = "\n".join(content.splitlines()[:10]) + "\n..."
             if len(content) > 1000:
@@ -323,7 +323,7 @@ class GlobalCog(commands.Cog):
                             # await
                             # webhook.edit(avater_url="https://i.imgur.com/JffqEAl.png")
                     else:
-                        await cn.send(embed=e)
+                        embeds = [e]
                         tmp = False
                         for a in message.attachments:
                             if not tmp:
@@ -334,7 +334,8 @@ class GlobalCog(commands.Cog):
                             if "".join(os.path.splitext(os.path.basename(a.filename))[1:])[1:] not in Image_exts:
                                 u = Cant_image
                             e3.set_image(url=u)
-                            await cn.send(embed=e3)
+                            embeds.append(e3)
+                        ga.append(cn.send(embeds=embeds))
                 except discord.HTTPException:
                     pass
         if not message.channel.permissions_for(message.guild.me).manage_webhooks:
@@ -834,6 +835,7 @@ class GlobalCog(commands.Cog):
                             "mute": [],
                             "rule": {},
                             "slow": 5,
+                            "antispam": False,
                         }
                         e4 = discord.Embed(
                             title=f"個人グローバルチャット作成 - `{channel}`",
