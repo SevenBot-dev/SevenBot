@@ -169,6 +169,16 @@ class GlobalCog(commands.Cog):
         e2 = discord.Embed(title="あなたはミュートされています。", color=Error)
         await message.author.send(embed=e2)
 
+    def process_spam(self, content):
+        if len(content.splitlines()) > 10:
+            content = "\n".join(content.splitlines()[:10]) + "\n..."
+        if len(content) > 1000:
+            content = content[:1000]
+            if content.count("```") % 2 != 0:
+                content += "\n```"
+            content += "..."
+        return content
+
     async def keep_websocket(self):
         while not self.websocket_flag:
             try:
@@ -238,13 +248,7 @@ class GlobalCog(commands.Cog):
             else message.content
         )
         if whname == "sevenbot-global-webhook" or Private_chat_info[channel]["antispam"]:
-            if len(content.splitlines()) > 10:
-                content = "\n".join(content.splitlines()[:10]) + "\n..."
-            if len(content) > 1000:
-                content = content[:1000]
-                if content.count("```") % 2 != 0:
-                    content += "\n```"
-                content += "..."
+            content = self.process_spam(content)
         if channel == "sgc":
             loop.create_task(self.send_sgc(message, content))
         elif channel == "wsgc":
@@ -502,13 +506,17 @@ class GlobalCog(commands.Cog):
                     if after.channel.id in pc["channels"]:
                         e = pck
                         break
+            if (not e) or Private_chat_info[e]["antispam"]:
+                content = self.process_spam(after.content)
+            else:
+                content = after.content
             if e == "sgc":
                 await self.bot.get_channel(SGC_ID2).send(
                     json.dumps(
                         {
                             "type": "edit",
                             "messageId": str(after.id),
-                            "content": after.content,
+                            "content": content,
                         },
                         ensure_ascii=False,
                     )
@@ -518,13 +526,13 @@ class GlobalCog(commands.Cog):
                     {
                         "type": "edit",
                         "messageId": str(after.id),
-                        "content": after.content,
+                        "content": content,
                     }
                 )
 
             for ml in self.bot.consts["gcm"][e].get(after.id, []):
                 try:
-                    dga.append(ml.edit(content=after.content))
+                    dga.append(ml.edit(content=content))
                 except AttributeError:
                     pass
             # async def single(gcc, ind):
