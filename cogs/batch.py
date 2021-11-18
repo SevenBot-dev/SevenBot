@@ -10,7 +10,6 @@ import psutil
 from discord.ext import commands, tasks
 
 import _pathmagic  # type: ignore # noqa
-from common_resources.tools import recr_items
 from common_resources.tokens import botdd_token
 
 Last_favorite = {}
@@ -103,24 +102,31 @@ class BatchCog(commands.Cog):
     async def sync_db(self):
         async with self.bot.db.guild_settings.watch() as change_stream:
             async for change in change_stream:
+                if change["operationType"] == "delete":
+                    # del Guild_settings[change["documentKey"]["gid"]]
+                    pass  # TODO: delete guild settings
                 if change["operationType"] == "update":
                     gs = await self.bot.db.guild_settings.find_one(change["documentKey"])
-                    gid = gs["gid"]
-                    for ufk, ufv in recr_items(change["updateDescription"]["updatedFields"]):
-                        if ".".join(ufk) in [
-                            "levels",
-                            "level_counts",
-                            "warns",
-                            "warn_settings.punishments",
-                            "ticket_time",
-                            "ticket_subject",
-                            "level_boosts",
-                        ]:
-                            ufv = dict([(int(k), v) for k, v in ufv.items()])
-                        t = Guild_settings[gid]
-                        for k in ufk[:-1]:
-                            t = t[k]
-                        t[ufk[-1]] = ufv
+                    for ik in self.bot.number_keys:
+                        t = gs
+                        for ikc in ik.split("."):
+                            t = t[ikc]
+                        t2 = dict([(int(k), v) for k, v in t.items()])
+                        t.clear()
+                        t.update(t2)
+                    del gs["_id"]
+                    Guild_settings[gs["gid"]] = gs
+                if change["operationType"] == "insert":
+                    gs = change["fullDocument"]
+                    for ik in self.bot.number_keys:
+                        t = gs
+                        for ikc in ik.split("."):
+                            t = t[ikc]
+                        t2 = dict([(int(k), v) for k, v in t.items()])
+                        t.clear()
+                        t.update(t2)
+                    del gs["_id"]
+                    Guild_settings[gs["gid"]] = gs
 
     def cog_unload(self):
         for ba in Batchs:
