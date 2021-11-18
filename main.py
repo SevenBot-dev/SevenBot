@@ -28,9 +28,7 @@ logger.setLevel(logging.INFO)
 # handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 # logger.addHandler(handler)
 handler = logging.StreamHandler()
-handler.setFormatter(
-    logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s")
-)
+handler.setFormatter(logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s"))
 logger.addHandler(handler)
 
 sentry_sdk.init(
@@ -86,19 +84,20 @@ except requests.exceptions.HTTPError:
 print("Done")
 print("Loading saves from db...", end="")
 gs = {}
+number_keys = [
+    "levels",
+    "level_counts",
+    "warns",
+    "warn_settings.punishments",
+    "ticket_time",
+    "ticket_subject",
+    "level_boosts",
+    "level_roles",
+    "timed_role",
+]
 tmp_client = pymongo.MongoClient(cstr)
 for g in tmp_client.sevenbot.guild_settings.find({}, {"_id": False}):
-    for ik in [
-        "levels",
-        "level_counts",
-        "warns",
-        "warn_settings.punishments",
-        "ticket_time",
-        "ticket_subject",
-        "level_boosts",
-        "level_roles",
-        "timed_role",
-    ]:
+    for ik in number_keys:
         t = g
         for ikc in ik.split("."):
             t = t[ikc]
@@ -133,6 +132,7 @@ class SevenBot(commands.Bot):
             "level_dm": False,
             "tts_settings": {},
         }
+        self.number_keys = number_keys
         print("Debug mode: " + str(self.debug))
         self.check(commands.cooldown(2, 2))
 
@@ -156,14 +156,9 @@ class SevenBot(commands.Bot):
         for o in os.listdir("./cogs"):
             if o.endswith(".py") and not o.startswith("_"):
                 with open(f"./cogs/{o}") as f:
-                    if (
-                        f.read().startswith("# -*- ignore_on_debug -*-")
-                        and self.debug
-                    ):
+                    if f.read().startswith("# -*- ignore_on_debug -*-") and self.debug:
                         continue
-                bot.load_extension(
-                    "cogs." + os.path.splitext(os.path.basename(o))[0]
-                )
+                bot.load_extension("cogs." + os.path.splitext(os.path.basename(o))[0])
         self.levenshtein = levenshtein.Levenshtein(self, max_length=1)
         if not self.debug:
             self.DBL_client = topgg.DBLClient(self, dbl_token, autopost=True)
@@ -172,13 +167,7 @@ class SevenBot(commands.Bot):
     def is_premium(self, user: Union[discord.User, discord.Member]):
         return self.get_guild(Premium_guild).get_member(user.id) and (
             self.get_guild(Premium_guild).get_member(user.id).premium_since
-            or Premium_role
-            in [
-                r.id
-                for r in self.get_guild(715540925081714788)
-                .get_member(user.id)
-                .roles
-            ]
+            or Premium_role in [r.id for r in self.get_guild(715540925081714788).get_member(user.id).roles]
         )
 
     async def save(self):
@@ -210,14 +199,10 @@ class SevenBot(commands.Bot):
 
         sio = await self.loop.run_in_executor(
             None,
-            lambda: io.StringIO(
-                str({k: v for k, v in self.raw_config.items() if k != "gs"})
-            ),
+            lambda: io.StringIO(str({k: v for k, v in self.raw_config.items() if k != "gs"})),
         )
         await (await self.fetch_channel(765489262123548673)).send(
-            file=discord.File(
-                sio, filename=f"save_{datetime.datetime.now()}.txt"
-            )
+            file=discord.File(sio, filename=f"save_{datetime.datetime.now()}.txt")
         )
         sio.close()
         #         print(games)
@@ -243,17 +228,13 @@ class SevenBot(commands.Bot):
                 + (
                     self.get_txt(ctx.guild.id, "help_detail").get(
                         str(c),
-                        "_"
-                        + self.get_txt(ctx.guild.id, "help_detail_none")
-                        + "_",
+                        "_" + self.get_txt(ctx.guild.id, "help_detail_none") + "_",
                     )
                 ).split("\n")[0]
                 + "\n"
             )
         e = discord.Embed(
-            title=self.get_txt(ctx.guild.id, "subcommand").format(
-                ctx.command.name
-            ),
+            title=self.get_txt(ctx.guild.id, "subcommand").format(ctx.command.name),
             description=desc,
             color=0x00CCFF,
         )
@@ -276,9 +257,7 @@ class SevenBot(commands.Bot):
 bot = SevenBot(
     command_prefix=prefix,
     help_command=None,
-    allowed_mentions=discord.AllowedMentions(
-        everyone=False, replied_user=False
-    ),
+    allowed_mentions=discord.AllowedMentions(everyone=False, replied_user=False),
     intents=intent,
     strip_after_prefix=True,
     case_insensitive=True,
