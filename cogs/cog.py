@@ -286,6 +286,7 @@ class MainCog(commands.Cog):
         await self.bot.get_channel(756254787191963768).send(
             "サーバー退出", embeds=[SEmbed("<サーバー退出>", f"名前：{g.name}\nID：{g.id}", color=discord.Color.red())]
         )
+        await self.bot.db.guild_settings.delete_one({"gid": g.id})
 
     @commands.Cog.listener(name="on_guild_join")
     async def on_guild_join(self, g: discord.Guild):
@@ -306,8 +307,8 @@ class MainCog(commands.Cog):
             ],
         )
         lang = "ja"
-        await self.bot.save()
         Guild_settings[g.id]["lang"] = lang
+        await self.bot.db.guild_settings.insert_one(dict(Guild_settings[g.id], gid=g.id))
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
