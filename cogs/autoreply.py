@@ -109,7 +109,7 @@ class AutoreplyCog(commands.Cog):
             for ar in arp.values():
                 if await self.do_reply(ar, message, message.content) and not is_command(message):
                     ga.append(ar_send(message.channel, ar[1]))
-        await asyncio.gather(*ga)
+        await asyncio.gather(*ga[:5])
         if random_tmp:
             await ar_send(message.channel, random.choice(random_tmp))
 
