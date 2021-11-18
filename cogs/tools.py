@@ -3,7 +3,6 @@ import base64
 import datetime
 import hashlib
 import hmac
-import io
 import json
 import random
 import re
@@ -16,10 +15,9 @@ import discord
 from authlib.integrations.base_client import errors as authlib_err
 from authlib.integrations.httpx_client.oauth1_client import AsyncOAuth1Client
 from discord.ext import commands, tasks
-from sembed import SEmbed
 
 import _pathmagic  # type: ignore # noqa: F401
-from common_resources.consts import Deactivate_aliases, Info, Process, Success
+from common_resources.consts import Deactivate_aliases, Info, Success
 from common_resources.tokens import (
     twitter_consumer_key,
     twitter_consumer_secret,
@@ -749,30 +747,6 @@ class ToolCog(commands.Cog):
             color=Info,
         )
         await ctx.reply(embed=e)
-
-    @commands.command()
-    @commands.cooldown(10, 5)
-    async def webshot(self, ctx, *, url):
-        msg = await ctx.reply(embed=SEmbed("取得中です。しばらくお待ち下さい。", color=Process))
-        async with aiohttp.ClientSession() as s:
-            async with s.post(
-                "https://api.sevenbot.jp/webshot",
-                json={"password": self.bot.web_pass, "url": url},
-            ) as r:
-                temp = await self.bot.get_channel(765528694500360212).send(
-                    file=discord.File(
-                        io.BytesIO(await r.read()), filename="result.png"
-                    )
-                )
-        title = f"`{url}`のスクリーンショット"
-        if len(title) > 256:
-            s = len(title) - len(url)
-            title = f"`{url[:256 - s - 4]}...`のスクリーンショット"
-        await msg.edit(
-            embed=SEmbed(
-                title, url=url, image_url=temp.attachments[0].url, color=Success
-            )
-        )
 
     def cog_unload(self):
         Batch["sync_afk"].cancel()
