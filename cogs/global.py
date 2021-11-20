@@ -169,12 +169,26 @@ class GlobalCog(commands.Cog):
         e2 = discord.Embed(title="あなたはミュートされています。", color=Error)
         await message.author.send(embed=e2)
 
+    def short_line(self, data, length):
+        res = ""
+        count = 0
+        for c in data:
+            if ord(c) > 256:
+                count += 2
+            else:
+                count += 1
+            if count > length:
+                res = res[:-2] + "..."
+                break
+            res += c
+        return res
+
     def process_spam(self, content):
         if len(content.splitlines()) > 10:
             content = "\n".join(content.splitlines()[:10]) + "\n..."
-        content = "\n".join([(l[:37] + "..." if len(l) > 40 else l) for l in content.splitlines()])
-        if len(content) > 200:
-            content = content[:200]
+        content = "\n".join([self.short_line(li, 100) for li in content.splitlines()])
+        if len(content) > 500:
+            content = content[:500]
             if content.count("```") % 2 != 0:
                 content += "\n```"
             content += "..."
