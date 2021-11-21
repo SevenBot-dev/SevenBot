@@ -558,6 +558,27 @@ class ModerationCog(commands.Cog):
             )
             await ctx.reply(embed=e)
 
+    @commands.command()
+    @commands.has_permissions(kick_members=True)
+    async def bmute(
+        self,
+        ctx,
+        u: discord.Member,
+        time: convert_timedelta = datetime.timedelta(hours=1),
+    ):
+        if u.bot:
+            return await ctx.reply(embed=SEmbed("Botはミュートできません。", color=Error))
+        dt = discord.utils.utcnow() + time
+        r = discord.http.Route("PATCH", f"/guilds/{ctx.guild.id}/members/{ctx.author.id}")
+        await self.bot.http.request(r, json={
+            "communication_disabled_until": dt.isoformat()esplit("+")[0]
+        })
+        e = discord.Embed(
+            title=f"`{u.display_name}`を{discord.utils.format_dt(dt)}までミュートしました。",
+            color=Success,
+        )
+        await ctx.reply(embed=e)
+
     @commands.group(name="gban_settings", invoke_without_command=True)
     @commands.has_guild_permissions(ban_members=True)
     async def gban_settings(self, ctx):
