@@ -569,9 +569,14 @@ class ModerationCog(commands.Cog):
         if u.bot:
             return await ctx.reply(embed=SEmbed("Botはミュートできません。", color=Error))
         dt = discord.utils.utcnow() + time
-        r = discord.http.Route("PATCH", f"/guilds/{ctx.guild.id}/members/{ctx.author.id}")
+        r = discord.http.Route(
+            "PATCH",
+            "/guilds/{guild_id}/members/{member_id}",
+            guild_id=ctx.guild.id,
+            member_id=ctx.author.id
+        )
         await self.bot.http.request(r, json={
-            "communication_disabled_until": dt.isoformat()esplit("+")[0]
+            "communication_disabled_until": dt.isoformat()
         })
         e = discord.Embed(
             title=f"`{u.display_name}`を{discord.utils.format_dt(dt)}までミュートしました。",
