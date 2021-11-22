@@ -186,7 +186,7 @@ class GlobalCog(commands.Cog):
     def process_spam(self, content):
         if len(content.splitlines()) > 10:
             content = "\n".join(content.splitlines()[:10]) + "\n..."
-        content = "\n".join([self.short_line(li, 100) for li in content.splitlines()])
+        content = "\n".join([self.short_line(li, 200) for li in content.splitlines()])
         if len(content) > 500:
             content = content[:500]
             if content.count("```") % 2 != 0:
