@@ -246,12 +246,16 @@ class GlobalCog(commands.Cog):
                     each = pv["channels"]
                     break
             whname = f"sevenbot-private-webhook-{channel}"
+            if not self.bot.consts["gcm"].get(channel):
+                self.bot.consts["gcm"][channel] = {} 
             gms = self.bot.consts["gcm"][channel]
             # print(Private_chat_info[channel]["mute"])
             if message.author.id in Private_chat_info[channel]["mute"]:
                 return await self.send_mute(message)
         else:
             whname = "sevenbot-global-webhook"
+            if not self.bot.consts["gcm"].get(None):
+                self.bot.consts["gcm"][None] = {}
             gms = self.bot.consts["gcm"][None]
             channel = None
             each = Global_chat

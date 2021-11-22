@@ -153,6 +153,9 @@ class SevenBot(commands.Bot):
         bot.load_extension("jishaku")
         bot.load_extension("dpy_peper")
         bot.load_extension("discord.ext.components")
+        
+        if not self.debug:
+            self.DBL_client = topgg.DBLClient(self, dbl_token, autopost=True)
         for o in os.listdir("./cogs"):
             if o.endswith(".py") and not o.startswith("_"):
                 with open(f"./cogs/{o}") as f:
@@ -160,8 +163,6 @@ class SevenBot(commands.Bot):
                         continue
                 bot.load_extension("cogs." + os.path.splitext(os.path.basename(o))[0])
         self.levenshtein = levenshtein.Levenshtein(self, max_length=1)
-        if not self.debug:
-            self.DBL_client = topgg.DBLClient(self, dbl_token, autopost=True)
         print("on_ready done")
 
     def is_premium(self, user: Union[discord.User, discord.Member]):
