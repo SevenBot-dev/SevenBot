@@ -69,8 +69,9 @@ class BatchCog(commands.Cog):
         cpu = await loop.run_in_executor(None, psutil.cpu_percent, 1)
         mem = await loop.run_in_executor(None, psutil.virtual_memory)
         gb = 1024 * 1024 * 1024
-        ping_before = time.time()
         call = await self.bot.db.command("dbstats")
+        ping_before = time.time()
+        await self.bot.db.ping.insert_one({"ping": "pong"})
         db_ping = time.time() - ping_before
         ping_before = time.time()
         async with aiohttp.ClientSession() as c:
@@ -94,6 +95,7 @@ class BatchCog(commands.Cog):
             }
         )
         await self.bot.db.status_log.delete_many({"time": {"$lt": time.time() - 60 * 60 * 24 * 7}})
+        await self.bot.db.ping.delete_many({"ping": "pong"})
 
     @batch_send_status.before_loop
     async def batch_send_status_before(self):
