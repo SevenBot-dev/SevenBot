@@ -1724,7 +1724,7 @@ class MainCog(commands.Cog):
                 if show_bot:
                     r += f"({ui.mention} : {mci}{Texts[Guild_settings[ctx.guild.id]['lang']]['rc_people']})\n"
             else:
-                per = round(len(ui.members) / float(len(ctx.guild.members)) * 100)
+                per = round(len(ui.members) / float(len(ctx.guild.members)) * 100, 2)
                 r += f"{ui.mention} : {mci}{Texts[Guild_settings[ctx.guild.id]['lang']]['rc_people']} - {per}%\n"
         e = discord.Embed(title=get_txt(ctx.guild.id, "rc_title"), description=r, color=Info)
         return await ctx.reply(embed=e)
