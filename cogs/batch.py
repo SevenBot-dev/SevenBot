@@ -60,15 +60,19 @@ class BatchCog(commands.Cog):
     @tasks.loop(minutes=10)
     async def batch_send_status(self):
         loop = asyncio.get_event_loop()
-        if self.bot.latency > 5 or len(self.bot.users) < 1000:
+        if self.bot.latency > 5:
+            return
+        if len(self.bot.users) < 1000:
+            for guild in self.bot.guilds:
+                await guild.chunk()
             return
         cpu = await loop.run_in_executor(None, psutil.cpu_percent, 1)
         mem = await loop.run_in_executor(None, psutil.virtual_memory)
         gb = 1024 * 1024 * 1024
-        ping_before = time.time() 
+        ping_before = time.time()
         call = await self.bot.db.command("dbstats")
         db_ping = time.time() - ping_before
-        ping_before = time.time() 
+        ping_before = time.time()
         async with aiohttp.ClientSession() as c:
             async with c.get("https://sevenbot.jp") as r:
                 await r.text()
