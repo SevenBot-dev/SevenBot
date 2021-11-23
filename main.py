@@ -153,7 +153,6 @@ class SevenBot(commands.Bot):
         bot.load_extension("jishaku")
         bot.load_extension("dpy_peper")
         bot.load_extension("discord.ext.components")
-        
         if not self.debug:
             self.DBL_client = topgg.DBLClient(self, dbl_token, autopost=True)
         for o in os.listdir("./cogs"):
