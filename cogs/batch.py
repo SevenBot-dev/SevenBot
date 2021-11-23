@@ -73,7 +73,6 @@ class BatchCog(commands.Cog):
             async with c.get("https://sevenbot.jp") as r:
                 await r.text()
         web_ping = time.time() - ping_before
-        call = await self.bot.db.command("dbstats")
         await self.bot.db.status_log.insert_one(
             {
                 "ping": round(self.bot.latency * 1000),
