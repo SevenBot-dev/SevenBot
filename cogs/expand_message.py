@@ -13,7 +13,7 @@ from common_resources.consts import (
 )
 
 Message_url_re = re.compile(
-    r"https?://(?:(?:ptb|canary)\.)?(?:discord(?:app)?\.com)/channels/(\d+)/(\d+)/(\d+)"
+    r"(?<!<)https?://(?:(?:ptb|canary)\.)?(?:discord(?:app)?\.com)/channels/(\d+)/(\d+)/(\d+)(?!>)"
 )
 
 
