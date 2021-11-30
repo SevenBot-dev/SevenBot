@@ -574,10 +574,10 @@ class AdminCog(commands.Cog):
         res = ""
         for k, v in value.items():
             if v:
-                res += f"\n+ {k.rjust(value_max)}: Online"
+                res += f"\n+ {k.ljust(value_max)}: Online"
             else:
-                res += f"\n- {k.rjust(value_max)}: Offline"
-        await ctx.reply(embed=SEmbed("タスクの稼働状況", "```diff" + res + "\n```"))
+                res += f"\n- {k.ljust(value_max)}: Offline"
+        await ctx.reply(embed=SEmbed("タスクの稼働状況", "```diff" + res + "\n```", color=Info))
 
 def setup(_bot):
     global bot
