@@ -561,6 +561,23 @@ class AdminCog(commands.Cog):
         else:
             await com.send("キャンセルされました。")
 
+    @commands.command()
+    @commands.is_owner()
+    async def tasks_monitor(self, ctx):
+        value: dict[str, discord.ext.tasks.Loop] = {}
+        for c in self.bot.cogs.values():
+            for a in filter(lambda a: not a.startswith("_"), dir(c)):
+                v = getattr(c, a)
+                if isinstance(v, discord.ext.tasks.Loop):
+                    value[a] = v.is_running()
+        value_max = len(max(value.keys(), key=len))
+        res = ""
+        for k, v in value.items():
+            if v:
+                res += f"\n+ {k.rjust(value_max)}: Online"
+            else:
+                res += f"\n- {k.rjust(value_max)}: Offline"
+        await ctx.reply(embed=SEmbed("タスクの稼働状況", "```diff" + res + "\n```"))
 
 def setup(_bot):
     global bot
