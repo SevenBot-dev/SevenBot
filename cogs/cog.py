@@ -1076,7 +1076,7 @@ class MainCog(commands.Cog):
             e.fields.append(
                 SField(
                     name=get_txt(ctx.guild.id, "suggest"),
-                    value=get_txt(ctx.guild.id, "yt_no_matches"),
+                    value=get_txt(ctx.guild.id, "no_match"),
                     inline=False,
                 )
             )

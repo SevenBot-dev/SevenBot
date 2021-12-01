@@ -3,6 +3,7 @@
     "too_high": "値が大きすぎます。",
     "help_closed": "{}でヘルプを再表示",
     "no_member": "メンバーが見付かりませんでした。",
+    "no_match": "見付かりませんでした。",
     "premium": "このコマンドはSevenBot Premium限定です。",
     "premium_desc": "公式サーバーをブーストすると使えるようになります。",
     "serverinfo": {
