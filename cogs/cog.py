@@ -997,7 +997,15 @@ class MainCog(commands.Cog):
                 description=get_txt(ctx.guild.id, "see_help") + f"\n```\n{error}```",
                 color=Error,
             )
-            return await ctx.reply(embed=e)
+            e.add_field(
+                name="ヒント", value="[]、<>は不必要です。"
+            )
+
+            return await components.reply(ctx, embed=e, components=[
+                components.Button(
+                    "パラメータについてのヘルプ", style=components.ButtonType.link, url="https://sevenbot.jp/tutorial/command-howto"
+                )
+            ])
         elif isinstance(error, commands.MissingPermissions):
             res = ""
             for p in error.missing_permissions:
