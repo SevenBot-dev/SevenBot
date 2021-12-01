@@ -997,15 +997,19 @@ class MainCog(commands.Cog):
                 description=get_txt(ctx.guild.id, "see_help") + f"\n```\n{error}```",
                 color=Error,
             )
-            e.add_field(
-                name="ヒント", value="[]、<>は不必要です。"
-            )
+            e.add_field(name="ヒント", value="[]、<>は不必要です。")
 
-            return await components.reply(ctx, embed=e, components=[
-                components.Button(
-                    "パラメータについてのヘルプ", style=components.ButtonType.link, url="https://sevenbot.jp/tutorial/command-howto"
-                )
-            ])
+            return await components.reply(
+                ctx,
+                embed=e,
+                components=[
+                    components.Button(
+                        "パラメータについてのヘルプ",
+                        style=components.ButtonType.link,
+                        url="https://sevenbot.jp/tutorial/command-howto",
+                    )
+                ],
+            )
         elif isinstance(error, commands.MissingPermissions):
             res = ""
             for p in error.missing_permissions:
@@ -1066,11 +1070,14 @@ class MainCog(commands.Cog):
             return
 
     @commands.Cog.listener()
-    async def on_command_suggest(self, ctx, suggested_commands):
+    async def on_command_suggest(self, ctx: commands.Context, suggested_commands):
         e = SEmbed(
             title=get_txt(ctx.guild.id, "unknown_cmd"),
             description=get_txt(ctx.guild.id, "see_help"),
             color=Error,
+        )
+        suggested_commands = filter(
+            lambda x: set(x) & set(ctx.message.content.split(" ")[0].removeprefix(ctx.prefix)), suggested_commands
         )
         if not suggested_commands:
             e.fields.append(
