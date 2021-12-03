@@ -30,7 +30,7 @@ logger.setLevel(logging.INFO)
 handler = logging.StreamHandler()
 handler.setFormatter(logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s"))
 logger.addHandler(handler)
-if sys.argv[1] != "debug":
+if len(sys.argv) > 0 and sys.argv[1] != "debug":
     sentry_sdk.init(
         sentry_url,
         traces_sample_rate=1.0,
