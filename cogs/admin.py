@@ -564,7 +564,7 @@ class AdminCog(commands.Cog):
     @commands.command()
     @commands.is_owner()
     async def tasks_monitor(self, ctx):
-        value: dict[str, discord.ext.tasks.Loop] = {}
+        value: dict[str, bool] = {}
         for c in self.bot.cogs.values():
             for a in filter(lambda a: not a.startswith("_"), dir(c)):
                 v = getattr(c, a)
@@ -577,7 +577,29 @@ class AdminCog(commands.Cog):
                 res += f"\n+ {k.ljust(value_max)}: Online"
             else:
                 res += f"\n- {k.ljust(value_max)}: Offline"
+
         await ctx.reply(embed=SEmbed("タスクの稼働状況", "```diff" + res + "\n```", color=Info))
+
+    @commands.command("tasks_monitor!")
+    @commands.is_owner()
+    async def tasks_monitor_restart(self, ctx):
+        value: dict[str, discord.ext.tasks.Loop] = {}
+        for c in self.bot.cogs.values():
+            for a in filter(lambda a: not a.startswith("_"), dir(c)):
+                v = getattr(c, a)
+                if isinstance(v, discord.ext.tasks.Loop):
+                    value[a] = v
+        value_max = len(max(value.keys(), key=len))
+        res = ""
+        for k, v in value.items():
+            if v.is_running():
+                res += f"\n// {k.ljust(value_max)}: None"
+            else:
+                v.start()
+                res += f"\n#  {k.ljust(value_max)}: Restarting"
+
+        await ctx.reply(embed=SEmbed("タスクの再稼働状況", "```c" + res + "\n```", color=Info))
+
 
 def setup(_bot):
     global bot
