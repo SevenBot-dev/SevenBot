@@ -931,6 +931,8 @@
             "manage_guild": "サーバー管理",
             "manage_roles": "ロールの管理",
             "manage_channels": "チャンネルの管理",
+            "manage_events": "イベントの管理",
+            "manage_members": "メンバーの管理",
             "kick_members": "メンバーをキック",
             "ban_members": "メンバーをBAN",
             "create_instant_invite": "招待を作成",
@@ -944,13 +946,18 @@
             "name": "テキストの権限",
             "view_guild_insights|read_messages": "メッセージを読む",
             "send_messages": "メッセージを送信",
+            "send_messages_in_threads": "スレッドでメッセージを送信",
             "send_tts_messages": "TTSメッセージを送信",
             "manage_messages": "メッセージの管理",
+            "manage_threads": "スレッドの管理",
+            "create_public_threads": "公開スレッドを作成",
+            "create_private_threads": "プライベートスレッドの作成",
             "embed_links": "埋め込みリンク",
             "attach_files": "ファイルを添付",
             "read_message_history": "メッセージ履歴を読む",
             "mention_everyone": "@everyone、@here、全てのロールにメンション",
             "external_emojis": "外部の絵文字の使用",
+            "external_stickers": "外部のスタンプの使用",
             "add_reactions": "リアクションの追加",
             "use_slash_commands": "スラッシュコマンドの使用"
         },
@@ -964,7 +971,8 @@
             "move_members": "メンバーを移動",
             "use_voice_activation": "音声検出を使用",
             "priority_speaker": "優先スピーカー",
-            "request_to_speak": "発言を申請"
+            "request_to_speak": "発言を申請",
+            "start_embedded_activities": "埋め込みアクティビティの開始"
         }
     ],
     "only_admin": "このコマンドはBotオーナーにしか実行できません。",
