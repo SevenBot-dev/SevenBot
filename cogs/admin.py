@@ -593,12 +593,12 @@ class AdminCog(commands.Cog):
         res = ""
         for k, v in value.items():
             if v.is_running():
-                res += f"\n// {k.ljust(value_max)}: None"
+                res += f"\n*** {k.ljust(value_max)}: None"
             else:
                 v.start()
-                res += f"\n#  {k.ljust(value_max)}: Restarting"
+                res += f"\n!!! {k.ljust(value_max)}: Restarting"
 
-        await ctx.reply(embed=SEmbed("タスクの再稼働状況", "```c" + res + "\n```", color=Info))
+        await ctx.reply(embed=SEmbed("タスクの再稼働状況", "```diff" + res + "\n```", color=Info))
 
 
 def setup(_bot):
