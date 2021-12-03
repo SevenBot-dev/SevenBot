@@ -62,7 +62,7 @@ class BatchCog(commands.Cog):
         loop = asyncio.get_event_loop()
         if self.bot.latency > 5:
             return
-        if len(self.bot.users) < 1000:
+        if len(self.bot.users) < 10000:
             for guild in self.bot.guilds:
                 await guild.chunk()
             return
