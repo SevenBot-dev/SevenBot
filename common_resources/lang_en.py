@@ -1,4 +1,4 @@
-import ujson as json
+import json
 import os
 
 Event_dict2 = {"join": "On join", "leave": "On leave"}

@@ -36,12 +36,16 @@ topggpy="~=1.1.0"
 websockets="~=10.1"
 xmltodict="~=0.12.0"
 youtube-dl="~=2021.6.6"
-ujson = "^4.3.0"
 
 [tool.poetry.dev-dependencies]
 pip-chill="~=1.0.1"
 flake8="~=4.0.1"
 black="~=21.11b1"
+pyproject-flake8 = "^0.0.1-alpha.2"
+
+[tool.flake8]
+max-line-length=120
+extend-ignore="E203,W503"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

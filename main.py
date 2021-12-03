@@ -3,7 +3,7 @@ import copy
 import datetime
 import importlib
 import io
-import ujson as json
+import json
 import logging
 import os
 import sys

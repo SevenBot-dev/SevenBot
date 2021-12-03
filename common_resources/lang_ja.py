@@ -1,4 +1,4 @@
-import ujson as json
+import json
 import os
 
 Event_dict = {"join": "参加時", "leave": "退出時"}

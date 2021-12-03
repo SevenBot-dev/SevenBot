@@ -1,6 +1,7 @@
 import asyncio
 import os
 import subprocess
+from typing import TYPE_CHECKING
 
 import aiohttp
 import discord
@@ -9,6 +10,7 @@ from discord.ext import commands, components  # , tasks
 from sembed import SEmbed  # SAuthor, SField, SFooter
 
 import _pathmagic  # type: ignore # noqa
+
 from common_resources.consts import (
     Info,
     Success,
@@ -19,6 +21,8 @@ from common_resources.consts import (
     Official_discord_id,
 )
 
+if TYPE_CHECKING:
+    from ..main import SevenBot
 
 ret = {}
 
@@ -28,7 +32,7 @@ class AdminCog(commands.Cog):
         global Guild_settings, Official_emojis, Global_chat, Global_mute
         global Private_chat_info, Sevennet_channels, GBan, Blacklists
         global get_txt
-        self.bot: commands.Bot = bot
+        self.bot: SevenBot = bot
         Guild_settings = bot.guild_settings
         Global_chat = bot.raw_config["gc"]
         GBan = bot.raw_config["gb"]

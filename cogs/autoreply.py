@@ -1,7 +1,7 @@
 import asyncio
 import hashlib
 import io
-import ujson as json
+import json
 import random
 import time
 import zlib

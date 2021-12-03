@@ -2,7 +2,7 @@ import asyncio
 import math
 import datetime
 import io
-import ujson as json
+import json
 import random
 import time
 

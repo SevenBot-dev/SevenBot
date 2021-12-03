@@ -417,25 +417,8 @@ class MainCog(commands.Cog):
             await message.channel.send(
                 get_txt(message.guild.id, "mention_txt").format(self.bot.command_prefix(self.bot, message)[2])
             )
-        if message.channel.id == Channel_ids["announce"]:
-
-            for gs in Guild_settings:
-                if not Guild_settings[gs]["do_announce"]:
-                    continue
-                if gs != DBL_id:
-                    continue
-                g = self.bot.get_guild(gs)
-                fc = g.text_channels[0]
-                if Guild_settings[g.id]["announce_channel"]:
-                    fc = self.bot.get_channel(Guild_settings[g.id]["announce_channel"])
-                elif g.system_channel is not None:
-                    fc = g.system_channel
-                try:
-                    await fc.send(f"**__SevenBot公式鯖より:__**\n```{message.content}```")
-                except Forbidden:
-                    pass
             return
-        gs = Guild_settings.get(message.guild.id)
+        # gs = Guild_settings.get(message.guild.id)
         if (message.channel.id in Sevennet_channels) and not is_command(message):
             if message.author.id in Global_mute:
                 await message.delete()

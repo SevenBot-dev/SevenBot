@@ -3,7 +3,7 @@ import base64
 import datetime
 import hashlib
 import hmac
-import ujson as json
+import json
 import random
 import re
 import string
