@@ -3,7 +3,7 @@ import copy
 import datetime
 import importlib
 import io
-import json
+import ujson as json
 import logging
 import os
 import sys
@@ -30,11 +30,11 @@ logger.setLevel(logging.INFO)
 handler = logging.StreamHandler()
 handler.setFormatter(logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s"))
 logger.addHandler(handler)
-
-sentry_sdk.init(
-    sentry_url,
-    traces_sample_rate=1.0,
-)
+if sys.argv[1] != "debug":
+    sentry_sdk.init(
+        sentry_url,
+        traces_sample_rate=1.0,
+    )
 
 Channel_ids = {
     "log": 756254787191963768,
@@ -261,6 +261,7 @@ bot = SevenBot(
     intents=intent,
     strip_after_prefix=True,
     case_insensitive=True,
+    enable_debug_events=True,
 )
 
 
@@ -277,6 +278,10 @@ async def reload_lang(ctx):
 async def on_message(msg):
     pass
 
+
+@bot.event
+async def on_socket_raw_receive(event):
+    bot.dispatch("socket_response", json.loads(event))
 
 Texts = common_resources.Texts
 

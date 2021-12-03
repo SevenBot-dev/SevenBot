@@ -2,7 +2,7 @@
 import asyncio
 import hashlib
 import io
-import json
+import ujson as json
 import os
 import re
 import time
