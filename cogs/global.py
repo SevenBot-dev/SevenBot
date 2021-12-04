@@ -68,7 +68,7 @@ class GlobalCog(commands.Cog):
         return SEmbed(
             f"`{channel}`のルール",
             fields=[SField(*r, False) for r in Private_chat_info[channel]["rule"].items()],
-            author=SAuthor(str(owner) + f"(ID:{owner.id})", str(owner.avatar.url)),
+            author=SAuthor(str(owner) + f"(ID:{owner.id})", str(owner.display_avatar.url)),
             color=Info,
         )
 
@@ -125,7 +125,7 @@ class GlobalCog(commands.Cog):
                         if references := gms.get(int(reference_id)):
                             reference = references[0]
                             embed = discord.Embed(description=reference.content, color=Chat)
-                            avatar = reference.author.avatar.url.removeprefix("('")
+                            avatar = reference.author.display_avatar.url.removeprefix("('")
                             embed.set_author(
                                 name=reference.author.name,
                                 icon_url=avatar,
@@ -231,7 +231,7 @@ class GlobalCog(commands.Cog):
             e.set_image(url=u)
         e.set_author(
             name=f"{message.author}(ID:{message.author.id})",
-            icon_url=message.author.avatar.url,
+            icon_url=message.author.display_avatar.url,
         )
         e.set_footer(
             text=f"{message.guild.name}(ID:{message.guild.id})",
@@ -328,7 +328,7 @@ class GlobalCog(commands.Cog):
                                     rem = discord.Embed(description=rmsg.content, color=Chat)
                                     rem.set_author(
                                         name=rmsg.author.name,
-                                        icon_url=rmsg.author.avatar.url,
+                                        icon_url=rmsg.author.display_avatar.url,
                                     )
                                 except discord.errors.NotFound:
                                     rem = None
@@ -337,7 +337,7 @@ class GlobalCog(commands.Cog):
                                     content=content,  # content.replace("@", "@​")
                                     username=un,
                                     allowed_mentions=discord.AllowedMentions.none(),
-                                    avatar_url=message.author.avatar.replace(static_format="png").url,
+                                    avatar_url=message.author.display_avatar.replace(static_format="png").url,
                                     files=fl,
                                     embed=embed or rem,
                                     wait=True,
@@ -387,7 +387,7 @@ class GlobalCog(commands.Cog):
             "userId": str(message.author.id),
             "userName": message.author.name,
             "userDiscriminator": message.author.discriminator,
-            "userAvatar": message.author.avatar.key,
+            "userAvatar": message.author.display_avatar.key,
             "isBot": message.author.bot,
             "guildId": str(message.guild.id),
             "guildName": message.guild.name,

@@ -204,7 +204,7 @@ class AdminCog(commands.Cog):
                 )
                 e3.set_author(
                     name=f"{message.author.name}(ID:{message.author.id})",
-                    icon_url=message.author.avatar.url,
+                    icon_url=message.author.display_avatar.url,
                 )
                 e3.set_footer(
                     text=f"{message.guild.name}(ID:{message.guild.id})",

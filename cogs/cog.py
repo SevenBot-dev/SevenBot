@@ -487,7 +487,7 @@ class MainCog(commands.Cog):
                     mid = hashlib.md5(str(message.id).encode()).hexdigest()[0:8]
                     e.set_author(
                         name=f"{message.author}(ID:{message.author.id})",
-                        icon_url=message.author.avatar.url,
+                        icon_url=message.author.display_avatar.url,
                     )
                     e.set_footer(
                         text=f"Server: {message.guild.name} | ID: {mid} | ±0 ( +0 / -0 )",
@@ -533,7 +533,7 @@ class MainCog(commands.Cog):
                     )
                     e.set_author(
                         name=f"{message.author.name}(ID:{message.author.id})",
-                        icon_url=message.author.avatar.url,
+                        icon_url=message.author.display_avatar.url,
                     )
                     e.set_footer(
                         text="Powered by async_google_trans_new",
@@ -572,7 +572,7 @@ class MainCog(commands.Cog):
                     content=res,
                     username=message.author.display_name,
                     allowed_mentions=discord.AllowedMentions.none(),
-                    avatar_url=message.author.avatar.url_as(format="png"),
+                    avatar_url=message.author.display_avatar.url_as(format="png"),
                     files=message.attachments,
                     embeds=message.embeds,
                 )
@@ -773,7 +773,7 @@ class MainCog(commands.Cog):
                         color=Bot_info,
                         author=SAuthor(
                             name=f"{ctx.author.display_name}(ID:{ctx.author.id})",
-                            icon_url=ctx.author.avatar.url,
+                            icon_url=ctx.author.display_avatar.url,
                         ),
                     )
                     return await ctx.reply(embed=e)
@@ -1732,7 +1732,7 @@ class MainCog(commands.Cog):
         )
         if used_api:
             e.title += get_txt(ctx.guild.id, "lookup")[12]
-        e.set_thumbnail(url=u.avatar.url)
+        e.set_thumbnail(url=u.display_avatar.url)
         e.add_field(
             name=Texts[Guild_settings[ctx.guild.id]["lang"]]["lookup"][1],
             value=u.display_name,
@@ -1801,7 +1801,7 @@ class MainCog(commands.Cog):
         )
         e.set_author(
             name=f"{guild.owner.display_name}({guild.owner}, ID:{guild.owner.id})",
-            icon_url=guild.owner.avatar.url,
+            icon_url=guild.owner.display_avatar.url,
         )
         e.set_thumbnail(url=guild.icon.url)
         chs = (

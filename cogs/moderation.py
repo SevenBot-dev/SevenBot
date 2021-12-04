@@ -321,7 +321,7 @@ class ModerationCog(commands.Cog):
         )
         em.set_author(
             name=f"{ctx.author}(ID:{ctx.author.id})",
-            icon_url=ctx.author.avatar.url,
+            icon_url=ctx.author.display_avatar.url,
         )
         for m in role.members:
             c += 1

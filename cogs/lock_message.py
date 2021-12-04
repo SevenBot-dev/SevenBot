@@ -58,15 +58,15 @@ class LockMessageCog(commands.Cog):
             )
 
     @commands.Cog.listener()
-    async def on_message(self, message):
+    async def on_message(self, message: discord.Message):
         if message.guild is None:
             return
         if message.author == self.bot.user:
             if embeds := message.embeds:
                 if embeds[0].author.url and "?locked" in embeds[0].author.url:
                     return
-        if content := Guild_settings[message.guild.id]["lock_message_content"].get(str(message.channel.id)):
-            if message_id := Guild_settings[message.guild.id]["lock_message_id"].get(str(message.channel.id)):
+        if content := Guild_settings[message.guild.id]["lock_message_content"].get(message.channel.id):
+            if message_id := Guild_settings[message.guild.id]["lock_message_id"].get(message.channel.id):
                 if time.time() - discord.Object(message_id).created_at.timestamp() < 10:
                     return
                 try:
@@ -75,7 +75,7 @@ class LockMessageCog(commands.Cog):
                     pass
             author = message.guild.get_member(content["author"])
             if author is None:
-                del Guild_settings[message.guild.id]["lock_message_content"][str(message.channel.id)]
+                del Guild_settings[message.guild.id]["lock_message_content"][message.channel.id]
                 return
             msg = await message.channel.send(
                 embed=sembed.SEmbed(
@@ -83,11 +83,11 @@ class LockMessageCog(commands.Cog):
                     color=Chat,
                     author=sembed.SAuthor(
                         name=author.display_name,
-                        icon_url=author.avatar.url + "?locked"
+                        icon_url=author.display_avatar.url + "?locked"
                     ),
                 )
             )
-            Guild_settings[message.guild.id]["lock_message_id"][str(message.channel.id)] = msg.id
+            Guild_settings[message.guild.id]["lock_message_id"][message.channel.id] = msg.id
 
 
 def setup(_bot):

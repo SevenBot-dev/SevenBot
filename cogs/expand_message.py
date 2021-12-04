@@ -87,7 +87,7 @@ class MessageExpandCog(commands.Cog):
                     em.set_author(
                         name=m.author.display_name,
                         icon_url=getattr(
-                            m.author.avatar, "url", discord.Embed.Empty
+                            m.author.display_avatar, "url", discord.Embed.Empty
                         ),
                     )
                     footer = Texts[Guild_settings[message.guild.id]["lang"]][

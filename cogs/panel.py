@@ -74,7 +74,7 @@ class PanelCog(commands.Cog):
         )
         e.set_author(
             name=f"{ctx.author.display_name}(ID:{ctx.author.id})",
-            icon_url=ctx.author.avatar.url,
+            icon_url=ctx.author.display_avatar.url,
         )
         e.set_footer(text=get_txt(ctx.guild.id, "voting")[5])
         m = await ctx.reply(embed=e)
@@ -95,7 +95,7 @@ class PanelCog(commands.Cog):
         e.add_field(name="参加者(現在0人)", value="現在参加者はいません", inline=False)
         e.set_author(
             name=f"{ctx.author}(ID:{ctx.author.id})",
-            icon_url=ctx.author.avatar.url,
+            icon_url=ctx.author.display_avatar.url,
         )
         e.set_footer(text=get_txt(ctx.guild.id, "voting")[5])
         m = await ctx.reply(embed=e)
