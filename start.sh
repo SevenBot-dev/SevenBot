@@ -1,3 +1,5 @@
 #! /usr/bin/env bash
-nohup poetry run python3.9 boot_manager.py &
+source ./.venv/bin/activate
+nohup python3.9 boot_manager.py &
+deactivate
 echo "Done"
