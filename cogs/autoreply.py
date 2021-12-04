@@ -18,11 +18,11 @@ from common_resources.consts import Info, Success, Error, Alert
 
 class AutoreplyCog(commands.Cog):
     def __init__(self, bot):
-        global Guild_settings, Texts, Official_emojis, GBan, SB_Bans
+        global Texts, Official_emojis, GBan, SB_Bans
         global get_txt, is_command
         self.bot: commands.Bot = bot
         is_command = self.bot.is_command
-        Guild_settings = bot.guild_settings
+        self.bot.guild_settings = bot.guild_settings
         Official_emojis = bot.consts["oe"]
         Texts = bot.texts
         get_txt = bot.get_txt
@@ -67,17 +67,16 @@ class AutoreplyCog(commands.Cog):
 
     @commands.Cog.listener("on_message")
     async def on_message_ar(self, message):
-        global Guild_settings
         if message.author.id in GBan.keys() or message.channel.id in self.bot.global_chats:
             return
         if not self.bot.is_ready():
             return
-        if message.author.bot or message.channel.id in Guild_settings[message.guild.id]["lainan_talk"]:
+        if message.author.bot or message.channel.id in self.bot.guild_settings[message.guild.id]["lainan_talk"]:
             return
         if message.author.id in SB_Bans.keys() and is_command(message):
             if SB_Bans[message.author.id] > time.time():
                 return
-        arp = Guild_settings[message.guild.id].get("autoreply")
+        arp = self.bot.guild_settings[message.guild.id].get("autoreply")
         random_tmp = []
 
         async def ar_send(ch, msg_content):
@@ -121,16 +120,15 @@ class AutoreplyCog(commands.Cog):
     @autoreply.command(name="add", aliases=["set"])
     @commands.has_guild_permissions(manage_messages=True)
     async def ar_add(self, ctx, base, *, reply):
-        global Guild_settings
         dat = base + reply
         rid = hashlib.md5(dat.encode("utf8")).hexdigest()[0:8]
-        if ctx.guild.id not in Guild_settings:
+        if ctx.guild.id not in self.bot.guild_settings:
             await self.reset(ctx)
-        if "autoreply" not in Guild_settings[ctx.guild.id]:
-            Guild_settings[ctx.guild.id]["autoreply"] = {}
-        if len(Guild_settings[ctx.guild.id]["autoreply"]) >= 500:
+        if "autoreply" not in self.bot.guild_settings[ctx.guild.id]:
+            self.bot.guild_settings[ctx.guild.id]["autoreply"] = {}
+        if len(self.bot.guild_settings[ctx.guild.id]["autoreply"]) >= 500:
             await ctx.reply(embed=discord.Embed(title="自動返信の上限に達しました。", description="自動返信の上限は500です。", color=Error))
-        Guild_settings[ctx.guild.id]["autoreply"][rid] = [base, reply]
+        self.bot.guild_settings[ctx.guild.id]["autoreply"][rid] = [base, reply]
         e = discord.Embed(
             title=f"自動返信に`{base}`を追加しました。",
             description=f"戻すには`sb#autoreply remove {base}`または" f"`sb#autoreply remove {rid}`を使用してください",
@@ -148,18 +146,17 @@ class AutoreplyCog(commands.Cog):
     @autoreply.command(name="remove", aliases=["del", "delete", "rem"])
     @commands.has_guild_permissions(manage_messages=True)
     async def ar_remove(self, ctx, *, txt):
-        global Guild_settings
         res = ""
         count = 0
         new = {}
-        if txt in Guild_settings[ctx.guild.id]["autoreply"].keys():
-            res += "`" + Guild_settings[ctx.guild.id]["autoreply"][txt][1] + "`\n"
-            for ark, ar in Guild_settings[ctx.guild.id]["autoreply"].items():
+        if txt in self.bot.guild_settings[ctx.guild.id]["autoreply"].keys():
+            res += "`" + self.bot.guild_settings[ctx.guild.id]["autoreply"][txt][1] + "`\n"
+            for ark, ar in self.bot.guild_settings[ctx.guild.id]["autoreply"].items():
                 if ark != txt:
                     new[ark] = ar
             count = 1
         else:
-            for ark, ar in Guild_settings[ctx.guild.id]["autoreply"].items():
+            for ark, ar in self.bot.guild_settings[ctx.guild.id]["autoreply"].items():
                 if ar[0] == txt:
                     count += 1
                     res += "`" + ar[1] + "`\n"
@@ -173,15 +170,15 @@ class AutoreplyCog(commands.Cog):
             )
         else:
             e = discord.Embed(title=f"{count}個の自動返信を削除しました。", description=res, color=Success)
-            Guild_settings[ctx.guild.id]["autoreply"] = new
+            self.bot.guild_settings[ctx.guild.id]["autoreply"] = new
         return await ctx.reply(embed=e)
 
     @autoreply.command(name="list")
     async def ar_list(self, ctx):
         g = ctx.guild.id
-        if g not in Guild_settings:
+        if g not in self.bot.guild_settings:
             await self.reset(ctx)
-        gs = Guild_settings[g]
+        gs = self.bot.guild_settings[g]
         if gs["autoreply"] == {}:
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "ar_list_no"),
@@ -267,7 +264,7 @@ class AutoreplyCog(commands.Cog):
     @autoreply.command(name="export")
     async def ar_export(self, ctx):
         res = {}
-        replies = Guild_settings[ctx.guild.id]["autoreply"]
+        replies = self.bot.guild_settings[ctx.guild.id]["autoreply"]
         for key, value in replies.values():
             res[key] = value
         res_str = zlib.compress(json.dumps(res, ensure_ascii=False).encode("utf8"))
@@ -297,7 +294,7 @@ class AutoreplyCog(commands.Cog):
                     embed=discord.Embed(title="数が多すぎます。", description="自動返信の最大数は500です。", color=Error)
                 )
 
-            Guild_settings[ctx.guild.id]["autoreply"] = final
+            self.bot.guild_settings[ctx.guild.id]["autoreply"] = final
             await ctx.reply(embed=discord.Embed(title="自動返信を読み込みました。", color=Success))
 
 

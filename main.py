@@ -1,4 +1,5 @@
 import ast
+import asyncio
 import copy
 import datetime
 import importlib
@@ -21,6 +22,7 @@ from common_resources import consts as common_resources
 from common_resources.tokens import TOKEN, cstr, dbl_token, web_pass, sentry_url
 from common_resources.consts import Official_discord_id, Sub_discord_id
 from common_resources.tools import flatten
+from common_resources.settings import GuildSettings
 
 logger = logging.getLogger("discord")
 logger.setLevel(logging.INFO)
@@ -40,6 +42,7 @@ if len(sys.argv) > 1 and sys.argv[1] != "debug":
 else:
     os.environ["DEBUG"] = "True"
     db_name = "development"
+    logger.setLevel(logging.DEBUG)
 
 Channel_ids = {
     "log": 756254787191963768,
@@ -52,16 +55,6 @@ Channel_ids = {
 Premium_guild = 715540925081714788
 Premium_role = 779685018964066336
 Save_channel_id = 765489262123548673
-
-
-def prefix(bot, message):
-    if Guild_settings[message.guild.id]["prefix"] is None:
-        if bot.debug:
-            return ["sb/"]
-        else:
-            return ["sb#", "sb."]
-    else:
-        return Guild_settings[message.guild.id]["prefix"]
 
 
 intent = discord.Intents.all()
@@ -87,35 +80,19 @@ except requests.exceptions.HTTPError:
     with open("./save.sample", "r", encoding="utf8") as f:
         raw_save = f.read()
 print("Done")
-print("Loading saves from db...", end="")
-gs = {}
-number_keys = [
-    "levels",
-    "level_counts",
-    "warns",
-    "warn_settings.punishments",
-    "ticket_time",
-    "ticket_subject",
-    "level_boosts",
-    "level_roles",
-    "timed_role",
-]
-tmp_client = pymongo.MongoClient(cstr)
-for g in tmp_client.sevenbot.guild_settings.find({}, {"_id": False}):
-    for ik in number_keys:
-        t = g
-        for ikc in ik.split("."):
-            t = t[ikc]
-        t2 = dict([(int(k), v) for k, v in t.items()])
-        t.clear()
-        t.update(t2)
-    gs[g["gid"]] = g
-print("Done")
 
 
 class SevenBot(commands.Bot):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self):
+        super().__init__(
+            command_prefix=self.prefix,
+            help_command=None,
+            allowed_mentions=discord.AllowedMentions(everyone=False, replied_user=False),
+            intents=intent,
+            strip_after_prefix=True,
+            case_insensitive=True,
+            enable_debug_events=True,
+        )
         self.consts = {
             "qu": {},
             "ch": {},
@@ -125,26 +102,70 @@ class SevenBot(commands.Bot):
             "pci": {},
         }
         self.raw_config = ast.literal_eval(raw_save)
-        self.guild_settings = gs
         self.dbclient = motor.AsyncIOMotorClient(cstr)
-        self.sync_dbclient = tmp_client
-        self.db = self.dbclient.sevenbot
-        self.sync_db = self.sync_dbclient.sevenbot
+        self.sync_dbclient = pymongo.MongoClient(cstr)
+        self.db = self.dbclient[db_name]
+        self.sync_db = self.sync_dbclient[db_name]
         self.web_pass = web_pass
-        self.debug = len(sys.argv) != 1 and sys.argv[1] == "debug"
+        self.debug = os.environ["DEBUG"] == "True"
         self.texts = common_resources.Texts
         self.default_user_settings = {
             "level_dm": False,
             "tts_settings": {},
         }
-        self.number_keys = number_keys
+        self.number_keys = [
+            "levels",
+            "level_counts",
+            "warns",
+            "warn_settings.punishments",
+            "ticket_time",
+            "ticket_subject",
+            "level_boosts",
+            "level_roles",
+            "timed_role",
+        ]
+        self.guild_settings: GuildSettings = {}
+        print("Loading saves from db...", end="")
+        self.load_saves()
+        print("Done")
         print("Debug mode: " + str(self.debug))
         self.check(commands.cooldown(2, 2))
 
+    def prefix(self, bot, message):
+        if self.guild_settings[message.guild.id]["prefix"] is None:
+            if self.debug:
+                return ["sb/"]
+            else:
+                return ["sb#", "sb."]
+        else:
+            return self.guild_settings[message.guild.id]["prefix"]
+
+    def load_saves(self):
+        if self.debug:
+            self.loop.create_task(self.load_saves_debug())
+
+        for g in self.sync_dbclient[db_name].guild_settings.find({}, {"_id": False}):
+            for ik in self.number_keys:
+                t = g
+                for ikc in ik.split("."):
+                    t = t[ikc]
+                t2 = dict([(int(k), v) for k, v in t.items()])
+                t.clear()
+                t.update(t2)
+            self.guild_settings[g["gid"]] = g
+
+    async def to_coro(self, f: asyncio.Future):
+        await f
+
+    async def load_saves_debug(self):
+        for c in await self.dbclient["production"].list_collection_names():
+            async for r in self.dbclient["production"][c].find():
+                self.loop.create_task(
+                    self.to_coro(self.dbclient["development"][c].replace_one({"_id": r["_id"]}, r, upsert=True))
+                )
+
     async def on_ready(self):
-        global Guild_settings
         print("on_ready fired")
-        Guild_settings = self.guild_settings
         for k, v in Channel_ids.items():
             self.consts["ch"][k] = self.get_channel(v)
         g = self.get_guild(Official_discord_id)
@@ -179,10 +200,10 @@ class SevenBot(commands.Bot):
         # await self.change_presence(activity=Save_game, status=discord.Status.dnd)
         if self.debug:
             return
-        gs2 = list(Guild_settings.keys())
+        gs2 = list(self.bot.guild_settings.keys())
         for gs in gs2:
             if self.get_guild(gs) is None:
-                del Guild_settings[gs]
+                del self.bot.guild_settings[gs]
         # r = str(self.raw_config)
         # ar = []
         # PastebinAPI.paste(PB_key, r, paste_private = "private",paste_expire_date = None)
@@ -191,7 +212,7 @@ class SevenBot(commands.Bot):
 
         # file.write(r)
         # file.close()
-        for gk, gv in Guild_settings.items():
+        for gk, gv in self.bot.guild_settings.items():
             r = json.loads(json.dumps(gv))
             r["gid"] = gk
             res = await self.db.guild_settings.replace_one({"gid": gk}, r)
@@ -218,7 +239,7 @@ class SevenBot(commands.Bot):
 
     def get_txt(self, guild_id, name):
         try:
-            return Texts[Guild_settings[guild_id]["lang"]][name]
+            return Texts[self.guild_settings[guild_id]["lang"]][name]
         except KeyError:
             return Texts["ja"].get(name, "*" + name + "*")
 
@@ -259,15 +280,7 @@ class SevenBot(commands.Bot):
         )
 
 
-bot = SevenBot(
-    command_prefix=prefix,
-    help_command=None,
-    allowed_mentions=discord.AllowedMentions(everyone=False, replied_user=False),
-    intents=intent,
-    strip_after_prefix=True,
-    case_insensitive=True,
-    enable_debug_events=True,
-)
+bot = SevenBot()
 
 
 @bot.command()
@@ -287,6 +300,7 @@ async def on_message(msg):
 @bot.event
 async def on_socket_raw_receive(event):
     bot.dispatch("socket_response", json.loads(event))
+
 
 Texts = common_resources.Texts
 

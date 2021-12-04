@@ -15,10 +15,10 @@ from common_resources.consts import (
 
 class AutoTextCog(commands.Cog):
     def __init__(self, bot):
-        global Guild_settings, Texts, Official_emojis, Auto_text_channels
+        global Texts, Official_emojis, Auto_text_channels
         global get_txt
         self.bot: commands.Bot = bot
-        Guild_settings = bot.guild_settings
+        self.bot.guild_settings = bot.guild_settings
         Official_emojis = bot.consts["oe"]
         Texts = bot.texts
         get_txt = bot.get_txt
@@ -40,7 +40,7 @@ class AutoTextCog(commands.Cog):
                     "VCが条件を満たしていません。", "VCはカテゴリに入っている必要があります。", color=Error
                 )
             )
-        elif channel.id in Guild_settings[ctx.guild.id]["auto_text"]:
+        elif channel.id in self.bot.guild_settings[ctx.guild.id]["auto_text"]:
             return await ctx.reply(
                 embed=SEmbed(
                     "VCはすでに有効です。",
@@ -48,7 +48,7 @@ class AutoTextCog(commands.Cog):
                     color=Error,
                 )
             )
-        Guild_settings[ctx.guild.id]["auto_text"].append(channel.id)
+        self.bot.guild_settings[ctx.guild.id]["auto_text"].append(channel.id)
         await ctx.reply(
             embed=SEmbed(
                 "自動TCを有効にしました。",
@@ -59,7 +59,7 @@ class AutoTextCog(commands.Cog):
 
     @auto_text.command("deactivate", aliases=Deactivate_aliases)
     async def auto_text_deactivate(self, ctx, channel: discord.VoiceChannel):
-        if channel.id not in Guild_settings[ctx.guild.id]["auto_text"]:
+        if channel.id not in self.bot.guild_settings[ctx.guild.id]["auto_text"]:
             return await ctx.reply(
                 embed=SEmbed(
                     "VCはすでに無効です。",
@@ -67,7 +67,7 @@ class AutoTextCog(commands.Cog):
                     color=Error,
                 )
             )
-        Guild_settings[ctx.guild.id]["auto_text"].append(channel.id)
+        self.bot.guild_settings[ctx.guild.id]["auto_text"].append(channel.id)
         await ctx.reply(
             embed=SEmbed(
                 "自動TCを無効にしました。",
@@ -90,7 +90,7 @@ class AutoTextCog(commands.Cog):
             del Auto_text_channels[before]
         if (
             after is not None
-            and after.id in Guild_settings[member.guild.id]["auto_text"]
+            and after.id in self.bot.guild_settings[member.guild.id]["auto_text"]
             and after not in Auto_text_channels
         ):
             ntc = await after.category.create_text_channel(

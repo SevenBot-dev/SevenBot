@@ -60,10 +60,10 @@ ffmpeg_options = {
 
 class TtsCog(commands.Cog):
     def __init__(self, bot):
-        global Guild_settings, Official_emojis, Tts_channels, Tts_settings
+        global Official_emojis, Tts_channels, Tts_settings
         global get_txt
         self.bot: commands.Bot = bot
-        Guild_settings = bot.guild_settings
+        self.bot.guild_settings = bot.guild_settings
         get_txt = bot.get_txt
         Official_emojis = bot.consts["oe"]
         Tts_channels = bot.consts["tc"]
@@ -177,11 +177,11 @@ class TtsCog(commands.Cog):
                 name = member.display_name
                 if f"<@{member.id}>" in map(
                     lambda m: m.replace("!", ""),
-                    Guild_settings[member.guild.id]["tts_dicts"].keys(),
+                    self.bot.guild_settings[member.guild.id]["tts_dicts"].keys(),
                 ):
-                    name = Guild_settings[member.guild.id]["tts_dicts"].get(
+                    name = self.bot.guild_settings[member.guild.id]["tts_dicts"].get(
                         f"<@{member.id}>"
-                    ) or Guild_settings[member.guild.id]["tts_dicts"].get(
+                    ) or self.bot.guild_settings[member.guild.id]["tts_dicts"].get(
                         f"<@!{member.id}>"
                     )
                 if after.channel.id in Tts_channels.keys():
@@ -290,10 +290,9 @@ class TtsCog(commands.Cog):
     @tts_dicts.command(name="add", aliases=["set"])
     # @commands.has_guild_permissions(manage_messages=True)
     async def tts_dicts_add(self, ctx, base, *, reply):
-        global Guild_settings
         dat = base + reply
         rid = hashlib.md5(dat.encode()).hexdigest()[0:8]
-        Guild_settings[ctx.guild.id]["tts_dicts"][rid] = [base, reply]
+        self.bot.guild_settings[ctx.guild.id]["tts_dicts"][rid] = [base, reply]
         e = discord.Embed(
             title=get_txt(ctx.guild.id, "tts_dicts_add"),
             description=get_txt(ctx.guild.id, "tts_dicts_add_desc").format(
@@ -306,20 +305,19 @@ class TtsCog(commands.Cog):
     @tts_dicts.command(name="remove", aliases=["del", "delete", "rem"])
     # @commands.has_guild_permissions(manage_messages=True)
     async def tts_dicts_remove(self, ctx, *, txt):
-        global Guild_settings
         res = ""
         count = 0
         new = {}
-        if txt in Guild_settings[ctx.guild.id]["tts_dicts"].keys():
+        if txt in self.bot.guild_settings[ctx.guild.id]["tts_dicts"].keys():
             res += (
-                "`" + Guild_settings[ctx.guild.id]["tts_dicts"][txt][1] + "`\n"
+                "`" + self.bot.guild_settings[ctx.guild.id]["tts_dicts"][txt][1] + "`\n"
             )
-            for ark, ar in Guild_settings[ctx.guild.id]["tts_dicts"].items():
+            for ark, ar in self.bot.guild_settings[ctx.guild.id]["tts_dicts"].items():
                 if ark != txt:
                     new[ark] = ar
             count = 1
         else:
-            for ark, ar in Guild_settings[ctx.guild.id]["tts_dicts"].items():
+            for ark, ar in self.bot.guild_settings[ctx.guild.id]["tts_dicts"].items():
                 if ar[0] == txt:
                     count += 1
                     res += "`" + ar[1] + "`\n"
@@ -339,13 +337,13 @@ class TtsCog(commands.Cog):
                 description=res,
                 color=Success,
             )
-            Guild_settings[ctx.guild.id]["tts_dicts"] = new
+            self.bot.guild_settings[ctx.guild.id]["tts_dicts"] = new
         await ctx.reply(embed=e)
 
     @tts_dicts.command(name="list")
     async def tts_dicts_list(self, ctx):
         g = ctx.guild.id
-        gs = Guild_settings[g]
+        gs = self.bot.guild_settings[g]
         if gs["tts_dicts"] == {}:
             e = discord.Embed(
                 title="登録されていません。",
@@ -387,7 +385,7 @@ class TtsCog(commands.Cog):
             guild = message["guild"]
             message = None
 
-        for _, dv in Guild_settings[message.guild.id]["tts_dicts"].items():
+        for _, dv in self.bot.guild_settings[message.guild.id]["tts_dicts"].items():
             txt = txt.replace(dv[0].lower(), dv[1].lower())
 
         ts = Tts_settings.get(user.id, {})

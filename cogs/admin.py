@@ -29,11 +29,11 @@ ret = {}
 
 class AdminCog(commands.Cog):
     def __init__(self, bot):
-        global Guild_settings, Official_emojis, Global_chat, Global_mute
+        global Official_emojis, Global_chat, Global_mute
         global Private_chat_info, Sevennet_channels, GBan, Blacklists
         global get_txt
         self.bot: SevenBot = bot
-        Guild_settings = bot.guild_settings
+        self.bot.guild_settings = bot.guild_settings
         Global_chat = bot.raw_config["gc"]
         GBan = bot.raw_config["gb"]
         Blacklists = bot.raw_config["bs"]
@@ -52,17 +52,15 @@ class AdminCog(commands.Cog):
     @commands.command(hidden=True)
     @commands.is_owner()
     async def sl(self, ctx):
-        global Guild_settings
-        # Guild_settings[ctx.guild.id]
-        await ctx.send(f"**SevenBotが使われているサーバー({len(list(Guild_settings.keys()))}個)：**")
-        for gi, gid in enumerate(Guild_settings.keys()):
+        # self.bot.guild_settings[ctx.guild.id]
+        await ctx.send(f"**SevenBotが使われているサーバー({len(list(self.bot.guild_settings.keys()))}個)：**")
+        for gi, gid in enumerate(self.bot.guild_settings.keys()):
             g = self.bot.get_guild(gid)
             await ctx.send(f"`{gi+1}` : `{g.name}` - `{g.id}`")
 
     @commands.command(hidden=True)
     @commands.is_owner()
     async def gd(self, ctx, li: int, c: int):
-        global Guild_settings
         for gc in Global_chat:
             gcc = self.bot.get_channel(gc)
             cn = 0
@@ -150,8 +148,7 @@ class AdminCog(commands.Cog):
     @commands.command(hidden=True)
     @commands.is_owner()
     async def sc(self, ctx, gid=0):
-        global Guild_settings
-        # Guild_settings[ctx.guild.id]
+        # self.bot.guild_settings[ctx.guild.id]
 
         r = ""
         i = ""
@@ -179,8 +176,7 @@ class AdminCog(commands.Cog):
     @commands.command(hidden=True)
     @commands.is_owner()
     async def c_h(self, ctx, cid=0, count=10):
-        global Guild_settings
-        # Guild_settings[ctx.guild.id]
+        # self.bot.guild_settings[ctx.guild.id]
 
         g = self.bot.get_channel(int(cid))
         if g is None:
@@ -217,8 +213,7 @@ class AdminCog(commands.Cog):
     @commands.command(hidden=True)
     @commands.is_owner()
     async def gl(self, ctx):
-        global Guild_settings
-        # Guild_settings[ctx.guild.id]
+        # self.bot.guild_settings[ctx.guild.id]
         r = ""
         i = ""
         for gid in Global_chat:
@@ -233,8 +228,7 @@ class AdminCog(commands.Cog):
     @commands.command(hidden=True)
     @commands.is_owner()
     async def sn(self, ctx):
-        global Guild_settings
-        # Guild_settings[ctx.guild.id]
+        # self.bot.guild_settings[ctx.guild.id]
         r = ""
         i = ""
         for gid in Sevennet_channels:
@@ -349,7 +343,7 @@ class AdminCog(commands.Cog):
                 msg = await msg.edit(embed=e)
                 GBan[user.id] = "SevenBot#1769によりGBanされました。\n理由：" + reason
                 for g in self.bot.guilds:
-                    if not Guild_settings[g.id]["gban_enabled"]:
+                    if not self.bot.guild_settings[g.id]["gban_enabled"]:
                         continue
                     try:
                         await g.ban(

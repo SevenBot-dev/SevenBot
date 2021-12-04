@@ -42,10 +42,10 @@ Private_chat_info = {}
 
 class GlobalCog(commands.Cog):
     def __init__(self, bot):
-        global Guild_settings, Official_emojis, Global_chat, Global_mute, Private_chat_info
+        global Official_emojis, Global_chat, Global_mute, Private_chat_info
         global get_txt, is_command
         self.bot: commands.Bot = bot
-        Guild_settings = bot.guild_settings
+        self.bot.guild_settings = bot.guild_settings
         Global_chat = bot.raw_config["gc"]
         Official_emojis = bot.consts["oe"]
         Global_mute = bot.raw_config["gm"]

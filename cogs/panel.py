@@ -11,10 +11,10 @@ from common_resources.tools import convert_timedelta
 
 class PanelCog(commands.Cog):
     def __init__(self, bot):
-        global Guild_settings, Texts, Official_emojis, Number_emojis
+        global Texts, Official_emojis, Number_emojis
         global get_txt
         self.bot: commands.Bot = bot
-        Guild_settings = bot.guild_settings
+        self.bot.guild_settings = bot.guild_settings
         Official_emojis = bot.consts["oe"]
         Texts = bot.texts
         get_txt = bot.get_txt
@@ -50,14 +50,14 @@ class PanelCog(commands.Cog):
             title=get_txt(g.id, "voting")[0], color=Widget, timestamp=dt
         )
         e.add_field(
-            name=Texts[Guild_settings[g.id]["lang"]]["voting"][1],
+            name=Texts[self.bot.guild_settings[g.id]["lang"]]["voting"][1],
             value=title,
             inline=False,
         )
         e.add_field(
             name=get_txt(g.id, "voting")[2],
             value=(
-                Texts[Guild_settings[g.id]["lang"]]["voting"][3][0]
+                Texts[self.bot.guild_settings[g.id]["lang"]]["voting"][3][0]
                 if multi
                 else get_txt(g.id, "voting")[3][1]
             ),
@@ -68,7 +68,7 @@ class PanelCog(commands.Cog):
             em = Official_emojis["b" + str(sfi + 1)]
             s += f":black_small_square:｜{em}：{sf}\n"
         e.add_field(
-            name=Texts[Guild_settings[g.id]["lang"]]["voting"][4],
+            name=Texts[self.bot.guild_settings[g.id]["lang"]]["voting"][4],
             value=s,
             inline=False,
         )
@@ -105,7 +105,6 @@ class PanelCog(commands.Cog):
     @commands.command(name="lang")
     @commands.has_guild_permissions(manage_guild=True)
     async def change_lang(self, ctx, lang_to):
-        global Guild_settings
         if lang_to not in Texts.keys():
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "change_lang")[0][0],
@@ -115,7 +114,7 @@ class PanelCog(commands.Cog):
                 color=Error,
             )
             return await ctx.reply(embed=e)
-        Guild_settings[ctx.guild.id]["lang"] = lang_to
+        self.bot.guild_settings[ctx.guild.id]["lang"] = lang_to
         e = discord.Embed(
             title=get_txt(ctx.guild.id, "change_lang")[1][0],
             description=get_txt(ctx.guild.id, "change_lang")[1][1].format(

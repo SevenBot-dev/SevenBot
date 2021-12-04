@@ -17,10 +17,10 @@ from common_resources.consts import (
 
 class ServerStatCog(commands.Cog):
     def __init__(self, bot):
-        global Guild_settings, Texts, Official_emojis
+        global Texts, Official_emojis
         global get_txt
         self.bot: commands.Bot = bot
-        Guild_settings = bot.guild_settings
+        self.bot.guild_settings = bot.guild_settings
         Official_emojis = bot.consts["oe"]
         Texts = bot.texts
         get_txt = bot.get_txt
@@ -35,7 +35,6 @@ class ServerStatCog(commands.Cog):
     @server_stat.command(name="activate", aliases=Activate_aliases)
     @commands.has_permissions(manage_guild=True)
     async def ss_activate(self, ctx, *stats):
-        global Guild_settings
         cat = None
         if not stats:
             e = discord.Embed(
@@ -52,8 +51,8 @@ class ServerStatCog(commands.Cog):
                     color=Error,
                 )
                 return await ctx.reply(embed=e)
-        if Guild_settings[ctx.guild.id]["do_stat_channels"]:
-            for sc in Guild_settings[ctx.guild.id]["stat_channels"].values():
+        if self.bot.guild_settings[ctx.guild.id]["do_stat_channels"]:
+            for sc in self.bot.guild_settings[ctx.guild.id]["stat_channels"].values():
                 c = self.bot.get_channel(sc)
                 if isinstance(c, CategoryChannel):
                     cat = c
@@ -71,9 +70,9 @@ class ServerStatCog(commands.Cog):
             n = await ctx.guild.create_voice_channel(
                 f"{Stat_dict[stat]}： --", category=cat
             )
-            Guild_settings[ctx.guild.id]["stat_channels"][stat] = n.id
-        Guild_settings[ctx.guild.id]["stat_channels"]["category"] = cat.id
-        Guild_settings[ctx.guild.id]["do_stat_channels"] = True
+            self.bot.guild_settings[ctx.guild.id]["stat_channels"][stat] = n.id
+        self.bot.guild_settings[ctx.guild.id]["stat_channels"]["category"] = cat.id
+        self.bot.guild_settings[ctx.guild.id]["do_stat_channels"] = True
         e = discord.Embed(
             title="統計チャンネルが有効になりました。",
             description="無効化するには`sb#server_stat deactivate`を実行してください。",
@@ -84,14 +83,13 @@ class ServerStatCog(commands.Cog):
     @server_stat.command(name="deactivate", aliases=Deactivate_aliases)
     @commands.has_permissions(manage_guild=True)
     async def ss_deactivate(self, ctx):
-        global Guild_settings
-        if Guild_settings[ctx.guild.id]["do_stat_channels"]:
-            for sc in Guild_settings[ctx.guild.id]["stat_channels"].values():
+        if self.bot.guild_settings[ctx.guild.id]["do_stat_channels"]:
+            for sc in self.bot.guild_settings[ctx.guild.id]["stat_channels"].values():
                 c = self.bot.get_channel(sc)
                 if c is not None:
                     await c.delete()
-            Guild_settings[ctx.guild.id]["stat_channels"] = {}
-            Guild_settings[ctx.guild.id]["do_stat_channels"] = False
+            self.bot.guild_settings[ctx.guild.id]["stat_channels"] = {}
+            self.bot.guild_settings[ctx.guild.id]["do_stat_channels"] = False
             e = discord.Embed(
                 title="統計チャンネルが無効になりました。",
                 description="もう一度有効にするには`sb#server_stat activate`を使用してください。",
@@ -103,8 +101,8 @@ class ServerStatCog(commands.Cog):
     async def batch_update_stat_channel(self):
         for g in self.bot.guilds:
             try:
-                if Guild_settings[g.id]["do_stat_channels"]:
-                    for sck, scv in Guild_settings[g.id][
+                if self.bot.guild_settings[g.id]["do_stat_channels"]:
+                    for sck, scv in self.bot.guild_settings[g.id][
                         "stat_channels"
                     ].items():
                         if sck == "category":
@@ -127,7 +125,7 @@ class ServerStatCog(commands.Cog):
                                 len(g.text_channels)
                                 + len(g.voice_channels)
                                 - len(
-                                    Guild_settings[g.id]["stat_channels"].keys()
+                                    self.bot.guild_settings[g.id]["stat_channels"].keys()
                                 )
                                 + 1
                             )
@@ -137,7 +135,7 @@ class ServerStatCog(commands.Cog):
                             val = (
                                 len(g.voice_channels)
                                 - len(
-                                    Guild_settings[g.id]["stat_channels"].keys()
+                                    self.bot.guild_settings[g.id]["stat_channels"].keys()
                                 )
                                 + 1
                             )

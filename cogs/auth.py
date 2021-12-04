@@ -19,11 +19,11 @@ from common_resources.tokens import web_pass
 
 class AuthCog(commands.Cog):
     def __init__(self, bot):
-        global Guild_settings, Texts, Official_emojis
+        global Texts, Official_emojis
         global get_txt
         self.bot: commands.Bot = bot
         Official_emojis = self.bot.consts["oe"]
-        Guild_settings = bot.guild_settings
+        self.bot.guild_settings = bot.guild_settings
         Texts = bot.texts
         get_txt = bot.get_txt
 
@@ -63,7 +63,7 @@ class AuthCog(commands.Cog):
                 )
             except IndexError:
                 r = guild.get_role(
-                    Guild_settings[pl.guild_id]["auth_role"]
+                    self.bot.guild_settings[pl.guild_id]["auth_role"]
                 )
             if message.embeds[0].title == "認証ボタン" or message.embeds[
                 0
@@ -189,7 +189,7 @@ class AuthCog(commands.Cog):
                 )
             except IndexError:
                 r = guild.get_role(
-                    Guild_settings[com.guild.id]["auth_role"]
+                    self.bot.guild_settings[com.guild.id]["auth_role"]
                 )
             if m0.title.endswith("ワンクリック"):
                 if r not in user.roles:
@@ -271,9 +271,8 @@ class AuthCog(commands.Cog):
     @auth.command(name="click")
     @commands.has_guild_permissions(manage_roles=True)
     async def auth_click(self, ctx, role: discord.Role = 0):
-        global Guild_settings
         if (
-            Guild_settings[ctx.guild.id]["auth_role"] == 0
+            self.bot.guild_settings[ctx.guild.id]["auth_role"] == 0
             and role == 0
         ):
             e = discord.Embed(
@@ -285,7 +284,7 @@ class AuthCog(commands.Cog):
             return
         if role == 0:
             role = ctx.guild.get_role(
-                Guild_settings[ctx.guild.id]["auth_role"]
+                self.bot.guild_settings[ctx.guild.id]["auth_role"]
             )
         if (
             role.position > ctx.author.top_role.position
@@ -309,9 +308,9 @@ class AuthCog(commands.Cog):
             await ctx.reply(embed=e)
             return
         if role != 0:
-            Guild_settings[ctx.guild.id]["auth_role"] = role.id
+            self.bot.guild_settings[ctx.guild.id]["auth_role"] = role.id
         role_mention = ctx.guild.get_role(
-            Guild_settings[ctx.guild.id]["auth_role"]
+            self.bot.guild_settings[ctx.guild.id]["auth_role"]
         ).mention
         e = discord.Embed(
             title="認証ボタン - ワンクリック",
@@ -330,9 +329,8 @@ class AuthCog(commands.Cog):
     @auth.command(name="react")
     @commands.has_guild_permissions(manage_roles=True)
     async def auth_react(self, ctx, role: discord.Role = 0):
-        global Guild_settings
         if (
-            Guild_settings[ctx.guild.id]["auth_role"] == 0
+            self.bot.guild_settings[ctx.guild.id]["auth_role"] == 0
             and role == 0
         ):
             e = discord.Embed(
@@ -344,7 +342,7 @@ class AuthCog(commands.Cog):
             return
         if role == 0:
             role = ctx.guild.get_role(
-                Guild_settings[ctx.guild.id]["auth_role"]
+                self.bot.guild_settings[ctx.guild.id]["auth_role"]
             )
         if (
             role.position > ctx.author.top_role.position
@@ -368,9 +366,9 @@ class AuthCog(commands.Cog):
             await ctx.reply(embed=e)
             return
         if role != 0:
-            Guild_settings[ctx.guild.id]["auth_role"] = role.id
+            self.bot.guild_settings[ctx.guild.id]["auth_role"] = role.id
         role_mention = ctx.guild.get_role(
-            Guild_settings[ctx.guild.id]["auth_role"]
+            self.bot.guild_settings[ctx.guild.id]["auth_role"]
         ).mention
         e = discord.Embed(
             title="認証ボタン - リアクション",
@@ -385,9 +383,8 @@ class AuthCog(commands.Cog):
     @auth.command(name="image", aliases=["img"])
     @commands.has_guild_permissions(manage_roles=True)
     async def auth_image(self, ctx, role: discord.Role = 0):
-        global Guild_settings
         if (
-            Guild_settings[ctx.guild.id]["auth_role"] == 0
+            self.bot.guild_settings[ctx.guild.id]["auth_role"] == 0
             and role == 0
         ):
             e = discord.Embed(
@@ -399,7 +396,7 @@ class AuthCog(commands.Cog):
             return
         if role == 0:
             role = ctx.guild.get_role(
-                Guild_settings[ctx.guild.id]["auth_role"]
+                self.bot.guild_settings[ctx.guild.id]["auth_role"]
             )
         if (
             role.position > ctx.author.top_role.position
@@ -423,9 +420,9 @@ class AuthCog(commands.Cog):
             await ctx.reply(embed=e)
             return
         if role != 0:
-            Guild_settings[ctx.guild.id]["auth_role"] = role.id
+            self.bot.guild_settings[ctx.guild.id]["auth_role"] = role.id
         role_mention = ctx.guild.get_role(
-            Guild_settings[ctx.guild.id]["auth_role"]
+            self.bot.guild_settings[ctx.guild.id]["auth_role"]
         ).mention
         e = discord.Embed(
             title="認証ボタン - 画像認証",
@@ -444,9 +441,8 @@ class AuthCog(commands.Cog):
     @auth.command(name="react_image", aliases=["react_img"])
     @commands.has_guild_permissions(manage_roles=True)
     async def auth_react_image(self, ctx, role: discord.Role = 0):
-        global Guild_settings
         if (
-            Guild_settings[ctx.guild.id]["auth_role"] == 0
+            self.bot.guild_settings[ctx.guild.id]["auth_role"] == 0
             and role == 0
         ):
             e = discord.Embed(
@@ -458,7 +454,7 @@ class AuthCog(commands.Cog):
             return
         if role == 0:
             role = ctx.guild.get_role(
-                Guild_settings[ctx.guild.id]["auth_role"]
+                self.bot.guild_settings[ctx.guild.id]["auth_role"]
             )
         if (
             role.position > ctx.author.top_role.position
@@ -482,9 +478,9 @@ class AuthCog(commands.Cog):
             await ctx.reply(embed=e)
             return
         if role != 0:
-            Guild_settings[ctx.guild.id]["auth_role"] = role.id
+            self.bot.guild_settings[ctx.guild.id]["auth_role"] = role.id
         role_mention = ctx.guild.get_role(
-            Guild_settings[ctx.guild.id]["auth_role"]
+            self.bot.guild_settings[ctx.guild.id]["auth_role"]
         ).mention
         e = discord.Embed(
             title="認証ボタン - 画像認証",
@@ -499,9 +495,8 @@ class AuthCog(commands.Cog):
     @auth.command(name="react_web")
     @commands.has_guild_permissions(manage_roles=True)
     async def auth_react_web(self, ctx, role: discord.Role = 0):
-        global Guild_settings
         if (
-            Guild_settings[ctx.guild.id]["auth_role"] == 0
+            self.bot.guild_settings[ctx.guild.id]["auth_role"] == 0
             and role == 0
         ):
             e = discord.Embed(
@@ -513,7 +508,7 @@ class AuthCog(commands.Cog):
             return
         if role == 0:
             role = ctx.guild.get_role(
-                Guild_settings[ctx.guild.id]["auth_role"]
+                self.bot.guild_settings[ctx.guild.id]["auth_role"]
             )
         if (
             role.position > ctx.author.top_role.position
@@ -537,9 +532,9 @@ class AuthCog(commands.Cog):
             await ctx.reply(embed=e)
             return
         if role != 0:
-            Guild_settings[ctx.guild.id]["auth_role"] = role.id
+            self.bot.guild_settings[ctx.guild.id]["auth_role"] = role.id
         role_mention = ctx.guild.get_role(
-            Guild_settings[ctx.guild.id]["auth_role"]
+            self.bot.guild_settings[ctx.guild.id]["auth_role"]
         ).mention
         e = discord.Embed(
             title="認証ボタン - Web認証",
@@ -554,9 +549,8 @@ class AuthCog(commands.Cog):
     @auth.command(name="web")
     @commands.has_guild_permissions(manage_roles=True)
     async def auth_web(self, ctx, role: discord.Role = 0):
-        global Guild_settings
         if (
-            Guild_settings[ctx.guild.id]["auth_role"] == 0
+            self.bot.guild_settings[ctx.guild.id]["auth_role"] == 0
             and role == 0
         ):
             e = discord.Embed(
@@ -579,9 +573,9 @@ class AuthCog(commands.Cog):
             await ctx.reply(embed=e)
             return
         if role != 0:
-            Guild_settings[ctx.guild.id]["auth_role"] = role.id
+            self.bot.guild_settings[ctx.guild.id]["auth_role"] = role.id
         role_mention = ctx.guild.get_role(
-            Guild_settings[ctx.guild.id]["auth_role"]
+            self.bot.guild_settings[ctx.guild.id]["auth_role"]
         ).mention
         e = discord.Embed(
             title="認証ボタン - Web認証",

@@ -152,12 +152,12 @@ BRACKET_TRANS = str.maketrans(BRACKET_DICT)
 
 class FunCog(commands.Cog):
     def __init__(self, _bot):
-        global Guild_settings, Official_emojis, get_txt, is_command, Texts, Number_emojis
+        global Official_emojis, get_txt, is_command, Texts, Number_emojis
         self.bot = _bot
         get_txt = _bot.get_txt
         is_command = _bot.is_command
         Texts = _bot.texts
-        Guild_settings = _bot.guild_settings
+        self.bot.guild_settings = _bot.guild_settings
         Official_emojis = _bot.consts["oe"]
         Number_emojis = _bot.consts["ne"]
 
@@ -168,7 +168,7 @@ class FunCog(commands.Cog):
             return
         elif (
             message.channel.id
-            not in Guild_settings[message.guild.id]["lainan_talk"]
+            not in self.bot.guild_settings[message.guild.id]["lainan_talk"]
         ):
             return
         elif is_command(message):
@@ -271,7 +271,7 @@ class FunCog(commands.Cog):
                                         "title"
                                     ]
                                     + " - "
-                                    + Texts[Guild_settings[guild.id]["lang"]][
+                                    + Texts[self.bot.guild_settings[guild.id]["lang"]][
                                         "big-number"
                                     ]["input"],
                                     description=get_txt(guild.id, "big-number")[
@@ -284,7 +284,7 @@ class FunCog(commands.Cog):
                                         "title"
                                     ]
                                     + " - "
-                                    + Texts[Guild_settings[guild.id]["lang"]][
+                                    + Texts[self.bot.guild_settings[guild.id]["lang"]][
                                         "big-number"
                                     ]["input2"],
                                     description=get_txt(guild.id, "big-number")[
@@ -334,7 +334,7 @@ class FunCog(commands.Cog):
                                             )["title"]
                                             + " - "
                                             + Texts[
-                                                Guild_settings[guild.id]["lang"]
+                                                self.bot.guild_settings[guild.id]["lang"]
                                             ]["big-number"]["input"],
                                             description=get_txt(
                                                 guild.id, "big-number"
@@ -374,7 +374,7 @@ class FunCog(commands.Cog):
                                             )["title"]
                                             + " - "
                                             + Texts[
-                                                Guild_settings[guild.id]["lang"]
+                                                self.bot.guild_settings[guild.id]["lang"]
                                             ]["big-number"]["cancel"],
                                             description=get_txt(
                                                 guild.id, "big-number"
@@ -394,7 +394,7 @@ class FunCog(commands.Cog):
                                         ]
                                         + " - "
                                         + Texts[
-                                            Guild_settings[guild.id]["lang"]
+                                            self.bot.guild_settings[guild.id]["lang"]
                                         ]["big-number"]["cancel"],
                                         description=get_txt(
                                             guild.id, "big-number"
@@ -484,7 +484,7 @@ class FunCog(commands.Cog):
                             e = discord.Embed(
                                 title=get_txt(guild.id, "big-number")["title"]
                                 + " - "
-                                + Texts[Guild_settings[guild.id]["lang"]][
+                                + Texts[self.bot.guild_settings[guild.id]["lang"]][
                                     "big-number"
                                 ]["cancel"],
                                 description=get_txt(guild.id, "canceled"),
@@ -608,14 +608,14 @@ class FunCog(commands.Cog):
 
                                         ga.append(mn.send(embed=e))
                                         if guild.get_role(
-                                            Guild_settings[guild.id]["ww_role"][
+                                            self.bot.guild_settings[guild.id]["ww_role"][
                                                 "alive"
                                             ]
                                         ):
                                             ga.append(
                                                 mn.add_roles(
                                                     guild.get_role(
-                                                        Guild_settings[
+                                                        self.bot.guild_settings[
                                                             guild.id
                                                         ]["ww_role"]["alive"]
                                                     )
@@ -629,7 +629,7 @@ class FunCog(commands.Cog):
                                             ]
                                             + " - "
                                             + Texts[
-                                                Guild_settings[guild.id]["lang"]
+                                                self.bot.guild_settings[guild.id]["lang"]
                                             ]["ww"]["cancel"],
                                             description=get_txt(guild.id, "ww")[
                                                 "no_dm"
@@ -957,25 +957,25 @@ class FunCog(commands.Cog):
                                     )
                                     died_role.append(wolf_roles[res])
                                     if guild.get_role(
-                                        Guild_settings[guild.id]["ww_role"][
+                                        self.bot.guild_settings[guild.id]["ww_role"][
                                             "alive"
                                         ]
                                     ):
                                         await res.remove_roles(
                                             guild.get_role(
-                                                Guild_settings[guild.id][
+                                                self.bot.guild_settings[guild.id][
                                                     "ww_role"
                                                 ]["alive"]
                                             )
                                         )
                                     if guild.get_role(
-                                        Guild_settings[guild.id]["ww_role"][
+                                        self.bot.guild_settings[guild.id]["ww_role"][
                                             "dead"
                                         ]
                                     ):
                                         await res.add_roles(
                                             guild.get_role(
-                                                Guild_settings[guild.id][
+                                                self.bot.guild_settings[guild.id][
                                                     "ww_role"
                                                 ]["dead"]
                                             )
@@ -1073,7 +1073,7 @@ class FunCog(commands.Cog):
                                                             "team"
                                                         ][
                                                             Texts[
-                                                                Guild_settings[
+                                                                self.bot.guild_settings[
                                                                     guild.id
                                                                 ]["lang"]
                                                             ]["ww"]["roles"][
@@ -1145,7 +1145,7 @@ class FunCog(commands.Cog):
                                             + get_txt(guild.id, "ww")["night"]
                                             + " - "
                                             + Texts[
-                                                Guild_settings[guild.id]["lang"]
+                                                self.bot.guild_settings[guild.id]["lang"]
                                             ]["ww"]["night_txt"][
                                                 wolf_roles[wm]
                                             ][
@@ -1200,25 +1200,25 @@ class FunCog(commands.Cog):
                                     for wt, wtm in wolf_targets.items():
                                         if wtm:
                                             if guild.get_role(
-                                                Guild_settings[guild.id][
+                                                self.bot.guild_settings[guild.id][
                                                     "ww_role"
                                                 ]["alive"]
                                             ):
                                                 await wt.remove_roles(
                                                     guild.get_role(
-                                                        Guild_settings[
+                                                        self.bot.guild_settings[
                                                             guild.id
                                                         ]["ww_role"]["alive"]
                                                     )
                                                 )
                                             if guild.get_role(
-                                                Guild_settings[guild.id][
+                                                self.bot.guild_settings[guild.id][
                                                     "ww_role"
                                                 ]["dead"]
                                             ):
                                                 await wt.add_roles(
                                                     guild.get_role(
-                                                        Guild_settings[
+                                                        self.bot.guild_settings[
                                                             guild.id
                                                         ]["ww_role"]["dead"]
                                                     )
@@ -1262,32 +1262,32 @@ class FunCog(commands.Cog):
                                 for k, v in wolf_roles.items():
                                     everyone_roles += f'__{k.mention}__ - {get_txt(guild.id,"ww")["roles"][v][0]}'
                                     if guild.get_role(
-                                        Guild_settings[guild.id]["ww_role"][
+                                        self.bot.guild_settings[guild.id]["ww_role"][
                                             "alive"
                                         ]
                                     ):
                                         await k.remove_roles(
                                             guild.get_role(
-                                                Guild_settings[guild.id][
+                                                self.bot.guild_settings[guild.id][
                                                     "ww_role"
                                                 ]["alive"]
                                             )
                                         )
                                     if guild.get_role(
-                                        Guild_settings[guild.id]["ww_role"][
+                                        self.bot.guild_settings[guild.id]["ww_role"][
                                             "dead"
                                         ]
                                     ):
                                         await k.remove_roles(
                                             guild.get_role(
-                                                Guild_settings[guild.id][
+                                                self.bot.guild_settings[guild.id][
                                                     "ww_role"
                                                 ]["dead"]
                                             )
                                         )
                                     if k not in wolf_members:
                                         everyone_roles += Texts[
-                                            Guild_settings[guild.id]["lang"]
+                                            self.bot.guild_settings[guild.id]["lang"]
                                         ]["ww"]["dead"]
                                     everyone_roles += "\n"
                                 if wc * 2 == len(wolf_members):
@@ -1332,7 +1332,7 @@ class FunCog(commands.Cog):
                             e = discord.Embed(
                                 title=get_txt(guild.id, "ww")["title"]
                                 + " - "
-                                + Texts[Guild_settings[guild.id]["lang"]]["ww"][
+                                + Texts[self.bot.guild_settings[guild.id]["lang"]]["ww"][
                                     "cancel"
                                 ],
                                 description=get_txt(guild.id, "canceled"),
@@ -1418,7 +1418,7 @@ class FunCog(commands.Cog):
             )
             return await ctx.reply(embed=e)
         if role is None:
-            Guild_settings[ctx.guild.id]["ww_role"][rtype.lower()] = None
+            self.bot.guild_settings[ctx.guild.id]["ww_role"][rtype.lower()] = None
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "ww")["role_set_none"].format(
                     get_txt(ctx.guild.id, "ww")[f"role_{rtype.lower()}"]
@@ -1435,7 +1435,7 @@ class FunCog(commands.Cog):
                 color=Error,
             )
             return await ctx.reply(embed=e)
-        Guild_settings[ctx.guild.id]["ww_role"][rtype.lower()] = role.id
+        self.bot.guild_settings[ctx.guild.id]["ww_role"][rtype.lower()] = role.id
         e = discord.Embed(
             title=get_txt(ctx.guild.id, "ww")["role_set"].format(
                 get_txt(ctx.guild.id, "ww")[f"role_{rtype.lower()}"],
@@ -1690,7 +1690,7 @@ class FunCog(commands.Cog):
             return
         elif (
             message.channel.id
-            not in Guild_settings[message.guild.id]["auto_parse"]
+            not in self.bot.guild_settings[message.guild.id]["auto_parse"]
         ):
             return
         elif is_command(message):
@@ -1772,7 +1772,7 @@ class FunCog(commands.Cog):
         except commands.errors.MessageNotFound:
             txt = base
         langs = random.sample(get_txt(ctx.guild.id, "lang_name").keys(), 24) + [
-            Guild_settings[ctx.guild.id]["lang"]
+            self.bot.guild_settings[ctx.guild.id]["lang"]
         ]
         ltxt = ""
         for lang in langs:

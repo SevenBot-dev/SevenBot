@@ -46,6 +46,7 @@ pyproject-flake8 = "^0.0.1-alpha.2"
 [tool.flake8]
 max-line-length=120
 extend-ignore="E203,W503"
+extend-exclude=".venv,__gi_*"
 
 [build-system]
 requires = ["poetry-core>=1.0.0", "setuptools", "wheel"]

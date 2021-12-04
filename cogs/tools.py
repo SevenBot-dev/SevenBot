@@ -46,10 +46,10 @@ Message_url_re = re.compile(
 
 class ToolCog(commands.Cog):
     def __init__(self, _bot):
-        global Guild_settings, Official_emojis, Texts, get_txt
+        global Official_emojis, Texts, get_txt
 
         self.bot = _bot
-        Guild_settings = self.bot.guild_settings
+        self.bot.guild_settings = self.bot.guild_settings
         get_txt = self.bot.get_txt
         Texts = self.bot.texts
         Official_emojis = self.bot.consts["oe"]
@@ -67,7 +67,7 @@ class ToolCog(commands.Cog):
         if [j for j in js if j["uid"] == message.author.id]:
 
             await self.bot.db.afks.delete_one({"uid": message.author.id})
-            d = Texts[Guild_settings[message.guild.id]["lang"]][
+            d = Texts[self.bot.guild_settings[message.guild.id]["lang"]][
                 "afk_off_desc"
             ].format(
                 len([j for j in js if j["uid"] == message.author.id][0]["urls"])
@@ -77,13 +77,13 @@ class ToolCog(commands.Cog):
                 rids = re.match(Message_url_re, ac)
                 ids = [int(i) for i in [rids[1], rids[2], rids[3]]]
                 c = self.bot.get_channel(ids[1])
-                t_txt = Texts[Guild_settings[message.guild.id]["lang"]][
+                t_txt = Texts[self.bot.guild_settings[message.guild.id]["lang"]][
                     "afk_off"
                 ]
                 if c is None:
                     tt = (
                         "\n"
-                        + Texts[Guild_settings[message.guild.id]["lang"]][
+                        + Texts[self.bot.guild_settings[message.guild.id]["lang"]][
                             "afk_off_unknown"
                         ]
                     )
@@ -172,14 +172,14 @@ class ToolCog(commands.Cog):
                     if j["reason"]:
                         d = (
                             "**"
-                            + Texts[Guild_settings[message.guild.id]["lang"]][
+                            + Texts[self.bot.guild_settings[message.guild.id]["lang"]][
                                 "afk_reason"
                             ]
                             + "**\n"
                             + j["reason"].encode().decode("utf-8")
                         )
                     else:
-                        d = Texts[Guild_settings[message.guild.id]["lang"]][
+                        d = Texts[self.bot.guild_settings[message.guild.id]["lang"]][
                             "afk_reason_none"
                         ]
                     # print(2)

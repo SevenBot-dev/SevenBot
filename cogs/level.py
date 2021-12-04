@@ -22,10 +22,10 @@ from common_resources.tools import remove_emoji, chrsize_len
 
 class LevelCog(commands.Cog):
     def __init__(self, bot):
-        global Guild_settings, Texts, GBan, SB_Bans, Official_emojis
+        global Texts, GBan, SB_Bans, Official_emojis
         global get_txt, is_command
         self.bot: commands.Bot = bot
-        Guild_settings = bot.guild_settings
+        self.bot.guild_settings = bot.guild_settings
         Texts = bot.texts
         get_txt = bot.get_txt
         is_command = self.bot.is_command
@@ -41,7 +41,7 @@ class LevelCog(commands.Cog):
             return
         if (
             message.author.bot
-            # or message.channel.id in Guild_settings[message.guild.id]["lainan_talk"]
+            # or message.channel.id in self.bot.guild_settings[message.guild.id]["lainan_talk"]
         ):
             return
         if message.guild is None:
@@ -74,27 +74,27 @@ class LevelCog(commands.Cog):
             if SB_Bans[message.author.id] > time.time():
                 return
         if (
-            Guild_settings[message.guild.id]["level_active"]
-            and message.channel.id not in Guild_settings[message.guild.id]["level_ignore_channel"]
+            self.bot.guild_settings[message.guild.id]["level_active"]
+            and message.channel.id not in self.bot.guild_settings[message.guild.id]["level_ignore_channel"]
         ):
-            if message.author.id not in Guild_settings[message.guild.id]["level_counts"].keys():
-                Guild_settings[message.guild.id]["level_counts"][message.author.id] = 0
-                Guild_settings[message.guild.id]["levels"][message.author.id] = 0
+            if message.author.id not in self.bot.guild_settings[message.guild.id]["level_counts"].keys():
+                self.bot.guild_settings[message.guild.id]["level_counts"][message.author.id] = 0
+                self.bot.guild_settings[message.guild.id]["levels"][message.author.id] = 0
             if not is_command(message):
                 fax = 1
                 for r in message.author.roles:
-                    fax *= Guild_settings[message.guild.id]["level_boosts"].get(r.id, 1)
-                fax *= Guild_settings[message.guild.id]["level_boosts"].get(message.author.id, 1)
-                Guild_settings[message.guild.id]["level_counts"][message.author.id] += int(fax)
+                    fax *= self.bot.guild_settings[message.guild.id]["level_boosts"].get(r.id, 1)
+                fax *= self.bot.guild_settings[message.guild.id]["level_boosts"].get(message.author.id, 1)
+                self.bot.guild_settings[message.guild.id]["level_counts"][message.author.id] += int(fax)
             if (
-                Guild_settings[message.guild.id]["levels"][message.author.id] * 10
-                <= Guild_settings[message.guild.id]["level_counts"][message.author.id]
+                self.bot.guild_settings[message.guild.id]["levels"][message.author.id] * 10
+                <= self.bot.guild_settings[message.guild.id]["level_counts"][message.author.id]
             ):
-                Guild_settings[message.guild.id]["level_counts"][message.author.id] = 0
-                Guild_settings[message.guild.id]["levels"][message.author.id] += 1
-                lv = Guild_settings[message.guild.id]["levels"][message.author.id]
+                self.bot.guild_settings[message.guild.id]["level_counts"][message.author.id] = 0
+                self.bot.guild_settings[message.guild.id]["levels"][message.author.id] += 1
+                lv = self.bot.guild_settings[message.guild.id]["levels"][message.author.id]
                 extra = ""
-                rr = Guild_settings[message.guild.id]["level_roles"].get(lv)
+                rr = self.bot.guild_settings[message.guild.id]["level_roles"].get(lv)
                 if rr:
                     rr2 = message.guild.get_role(rr)
                     if rr2:
@@ -115,17 +115,19 @@ class LevelCog(commands.Cog):
                         await message.author.send(embed=e)
                     except discord.errors.Forbidden:
                         pass
-                if Guild_settings[message.guild.id]["level_channel"]:
+                if self.bot.guild_settings[message.guild.id]["level_channel"]:
                     e2 = discord.Embed(
                         title="レベルアップ！",
                         description=f"{message.author.mention}のレベルが{lv}に上がりました！\n{extra}",
                         color=Level,
                     )
-                    await self.bot.get_channel(Guild_settings[message.guild.id]["level_channel"]).send(embed=e2)
+                    await self.bot.get_channel(self.bot.guild_settings[message.guild.id]["level_channel"]).send(
+                        embed=e2
+                    )
 
     @commands.command(aliases=["lv"])
     async def level(self, ctx, user: discord.User = None):
-        if not Guild_settings[ctx.guild.id]["level_active"]:
+        if not self.bot.guild_settings[ctx.guild.id]["level_active"]:
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "ls")["not_active"],
                 description=get_txt(ctx.guild.id, "ls")["not_active_desc2"],
@@ -144,8 +146,8 @@ class LevelCog(commands.Cog):
                     color=Level,
                 )
                 return await ctx.reply(embed=e)
-            lv = Guild_settings[ctx.guild.id]["levels"][u.id]
-            mc = Guild_settings[ctx.guild.id]["level_counts"][u.id]
+            lv = self.bot.guild_settings[ctx.guild.id]["levels"][u.id]
+            mc = self.bot.guild_settings[ctx.guild.id]["level_counts"][u.id]
             nm = lv * 10
             if nm == 0:
                 p = 0
@@ -179,7 +181,7 @@ class LevelCog(commands.Cog):
 
     @commands.command(aliases=["level_rank"])
     async def level_ranking(self, ctx):
-        if not Guild_settings[ctx.guild.id]["level_active"]:
+        if not self.bot.guild_settings[ctx.guild.id]["level_active"]:
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "ls")["not_active"],
                 description=get_txt(ctx.guild.id, "ls")["not_active_desc2"],
@@ -192,11 +194,11 @@ class LevelCog(commands.Cog):
         table.set_cols_align(["r", "l", "r", "r"])
         res = [get_txt(ctx.guild.id, "ls")["rank"]]
         tmp_ary = {}
-        for k in Guild_settings[ctx.guild.id]["levels"].keys():
-            if Guild_settings[ctx.guild.id]["levels"][k] not in tmp_ary.keys():
-                tmp_ary[Guild_settings[ctx.guild.id]["levels"][k]] = []
-            tmp_ary[Guild_settings[ctx.guild.id]["levels"][k]].append(
-                [k, Guild_settings[ctx.guild.id]["level_counts"][k]]
+        for k in self.bot.guild_settings[ctx.guild.id]["levels"].keys():
+            if self.bot.guild_settings[ctx.guild.id]["levels"][k] not in tmp_ary.keys():
+                tmp_ary[self.bot.guild_settings[ctx.guild.id]["levels"][k]] = []
+            tmp_ary[self.bot.guild_settings[ctx.guild.id]["levels"][k]].append(
+                [k, self.bot.guild_settings[ctx.guild.id]["level_counts"][k]]
             )
         for tak, tav in tmp_ary.copy().items():
             tmp_ary[tak] = sorted(tav, key=lambda a: a[1], reverse=True)
@@ -229,8 +231,8 @@ class LevelCog(commands.Cog):
                 a = [
                     str(i) + ".",
                     remove_emoji(str(ctx.author)),
-                    Guild_settings[ctx.guild.id]["levels"][ctx.author.id],
-                    Guild_settings[ctx.guild.id]["level_counts"][ctx.author.id],
+                    self.bot.guild_settings[ctx.guild.id]["levels"][ctx.author.id],
+                    self.bot.guild_settings[ctx.guild.id]["level_counts"][ctx.author.id],
                 ]
                 res.append([" ", " ", " ", " "])
                 res.append(a)
@@ -255,8 +257,7 @@ class LevelCog(commands.Cog):
     @ls.command(name="activate", aliases=Activate_aliases)
     @commands.has_guild_permissions(manage_guild=True)
     async def ls_activate(self, ctx):
-        global Guild_settings
-        if Guild_settings[ctx.guild.id]["level_active"]:
+        if self.bot.guild_settings[ctx.guild.id]["level_active"]:
             e = discord.Embed(
                 title="既に有効です。",
                 description="レベルシステムを無効にするには`sb#level_settings deactivate`を使用してください。",
@@ -264,7 +265,7 @@ class LevelCog(commands.Cog):
             )
             return await ctx.reply(embed=e)
         else:
-            Guild_settings[ctx.guild.id]["level_active"] = True
+            self.bot.guild_settings[ctx.guild.id]["level_active"] = True
             e = discord.Embed(
                 title="レベルシステムが有効になりました。",
                 description="レベルシステムを無効にするには`sb#level_settings deactivate`を使用してください。",
@@ -275,8 +276,7 @@ class LevelCog(commands.Cog):
     @ls.command(name="deactivate", aliases=Deactivate_aliases)
     @commands.has_guild_permissions(manage_guild=True)
     async def ls_deactivate(self, ctx):
-        global Guild_settings
-        if not Guild_settings[ctx.guild.id]["level_active"]:
+        if not self.bot.guild_settings[ctx.guild.id]["level_active"]:
             e = discord.Embed(
                 title="既に無効です。",
                 description="レベルシステムを有効にするには`sb#level_settings activate`を使用してください。",
@@ -284,7 +284,7 @@ class LevelCog(commands.Cog):
             )
             return await ctx.reply(embed=e)
         else:
-            Guild_settings[ctx.guild.id]["level_active"] = False
+            self.bot.guild_settings[ctx.guild.id]["level_active"] = False
             e = discord.Embed(
                 title="レベルシステムが無効になりました。",
                 description="レベルシステムを有効にするには`sb#level_settings activate`を使用してください。",
@@ -294,7 +294,7 @@ class LevelCog(commands.Cog):
 
     @ls.group(name="manage", invoke_without_command=True, aliases=["m"])
     async def ls_manage(self, ctx):
-        if not Guild_settings[ctx.guild.id]["level_active"]:
+        if not self.bot.guild_settings[ctx.guild.id]["level_active"]:
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "ls")["not_active"],
                 description=get_txt(ctx.guild.id, "ls")["not_active_desc"],
@@ -308,7 +308,7 @@ class LevelCog(commands.Cog):
     async def ls_manage_add(
         self, ctx, targets: Greedy[Union[discord.Member, discord.Role, Literal["!everyone", "!here"]]], xp: int
     ):
-        if not Guild_settings[ctx.guild.id]["level_active"]:
+        if not self.bot.guild_settings[ctx.guild.id]["level_active"]:
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "ls")["not_active"],
                 description=get_txt(ctx.guild.id, "ls")["not_active_desc"],
@@ -335,18 +335,18 @@ class LevelCog(commands.Cog):
                 e = discord.Embed(title=get_txt(ctx.guild.id, "no_member"), color=Error)
                 return await ctx.reply(embed=e)
             for member in members:
-                if member.id not in Guild_settings[ctx.guild.id]["level_counts"].keys():
-                    Guild_settings[ctx.guild.id]["level_counts"][member.id] = 0
-                    Guild_settings[ctx.guild.id]["levels"][member.id] = 0
-                Guild_settings[ctx.guild.id]["level_counts"][member.id] += xp
+                if member.id not in self.bot.guild_settings[ctx.guild.id]["level_counts"].keys():
+                    self.bot.guild_settings[ctx.guild.id]["level_counts"][member.id] = 0
+                    self.bot.guild_settings[ctx.guild.id]["levels"][member.id] = 0
+                self.bot.guild_settings[ctx.guild.id]["level_counts"][member.id] += xp
                 while (
-                    Guild_settings[ctx.guild.id]["levels"][member.id] * 10
-                    <= Guild_settings[ctx.guild.id]["level_counts"][member.id]
+                    self.bot.guild_settings[ctx.guild.id]["levels"][member.id] * 10
+                    <= self.bot.guild_settings[ctx.guild.id]["level_counts"][member.id]
                 ):
-                    Guild_settings[ctx.guild.id]["level_counts"][member.id] -= (
-                        Guild_settings[ctx.guild.id]["levels"][member.id] * 10
+                    self.bot.guild_settings[ctx.guild.id]["level_counts"][member.id] -= (
+                        self.bot.guild_settings[ctx.guild.id]["levels"][member.id] * 10
                     )
-                    Guild_settings[ctx.guild.id]["levels"][member.id] += 1
+                    self.bot.guild_settings[ctx.guild.id]["levels"][member.id] += 1
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "ls")["manage"]["add"].format(len(members), xp),
                 color=Success,
@@ -357,7 +357,7 @@ class LevelCog(commands.Cog):
     async def ls_manage_remove(
         self, ctx, targets: Greedy[Union[discord.Member, discord.Role, Literal["!everyone", "!here"]]], xp: int
     ):
-        if not Guild_settings[ctx.guild.id]["level_active"]:
+        if not self.bot.guild_settings[ctx.guild.id]["level_active"]:
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "ls")["not_active"],
                 description=get_txt(ctx.guild.id, "ls")["not_active_desc"],
@@ -381,19 +381,18 @@ class LevelCog(commands.Cog):
                 e = discord.Embed(title=get_txt(ctx.guild.id, "no_member"), color=Error)
                 return await ctx.reply(embed=e)
             for member in members:
-                if member.id in Guild_settings[ctx.guild.id]["levels"].keys():
-                    if Guild_settings[ctx.guild.id]["levels"][member.id] > 1:
-                        Guild_settings[ctx.guild.id]["level_counts"][member.id] -= xp
+                if member.id in self.bot.guild_settings[ctx.guild.id]["levels"].keys():
+                    if self.bot.guild_settings[ctx.guild.id]["levels"][member.id] > 1:
+                        self.bot.guild_settings[ctx.guild.id]["level_counts"][member.id] -= xp
                         if (
-                            Guild_settings[ctx.guild.id]["level_counts"][member.id]
-                            < 0
-                            and Guild_settings[ctx.guild.id]["levels"][member.id] > 1
+                            self.bot.guild_settings[ctx.guild.id]["level_counts"][member.id] < 0
+                            and self.bot.guild_settings[ctx.guild.id]["levels"][member.id] > 1
                         ):
-                            Guild_settings[ctx.guild.id]["level_counts"][member.id] += xp
-                            Guild_settings[ctx.guild.id]["levels"][member.id] -= 1
+                            self.bot.guild_settings[ctx.guild.id]["level_counts"][member.id] += xp
+                            self.bot.guild_settings[ctx.guild.id]["levels"][member.id] -= 1
                     else:
-                        del Guild_settings[ctx.guild.id]["levels"][member.id]
-                        del Guild_settings[ctx.guild.id]["level_counts"][member.id]
+                        del self.bot.guild_settings[ctx.guild.id]["levels"][member.id]
+                        del self.bot.guild_settings[ctx.guild.id]["level_counts"][member.id]
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "ls")["manage"]["remove"].format(len(members), xp),
                 color=Success,
@@ -404,7 +403,7 @@ class LevelCog(commands.Cog):
     async def ls_manage_reset(self, ctx):
         if ctx.invoked_subcommand is not None:
             return
-        elif not Guild_settings[ctx.guild.id]["level_active"]:
+        elif not self.bot.guild_settings[ctx.guild.id]["level_active"]:
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "ls")["not_active"],
                 description=get_txt(ctx.guild.id, "ls")["not_active_desc"],
@@ -412,8 +411,8 @@ class LevelCog(commands.Cog):
             )
             return await ctx.reply(embed=e)
         else:
-            Guild_settings[ctx.guild.id]["level_counts"] = {}
-            Guild_settings[ctx.guild.id]["levels"] = {}
+            self.bot.guild_settings[ctx.guild.id]["level_counts"] = {}
+            self.bot.guild_settings[ctx.guild.id]["levels"] = {}
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "ls")["manage"]["reset"],
                 color=Success,
@@ -423,10 +422,9 @@ class LevelCog(commands.Cog):
     @ls.command(name="channel")
     @commands.has_guild_permissions(manage_guild=True)
     async def ls_channel(self, ctx, to: discord.TextChannel = None):
-        global Guild_settings
         if ctx.invoked_subcommand is not None:
             return
-        elif not Guild_settings[ctx.guild.id]["level_active"]:
+        elif not self.bot.guild_settings[ctx.guild.id]["level_active"]:
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "ls")["not_active"],
                 description=get_txt(ctx.guild.id, "ls")["not_active_desc"],
@@ -435,12 +433,12 @@ class LevelCog(commands.Cog):
             return await ctx.reply(embed=e)
         else:
             if to is None:
-                Guild_settings[ctx.guild.id]["level_channel"] = False
+                self.bot.guild_settings[ctx.guild.id]["level_channel"] = False
                 d = "レベルアップお知らせチャンネルはなくなりました。"
             else:
                 if to is None:
                     to = ctx.channel
-                Guild_settings[ctx.guild.id]["level_channel"] = to.id
+                self.bot.guild_settings[ctx.guild.id]["level_channel"] = to.id
                 d = f"レベルアップお知らせチャンネルは{to.mention}になりました。"
             e = discord.Embed(title="レベルアップお知らせチャンネル変更", description=d, color=Success)
             return await ctx.reply(embed=e)
@@ -449,7 +447,7 @@ class LevelCog(commands.Cog):
     async def ls_boost(self, ctx):
         if ctx.invoked_subcommand is not None:
             return
-        elif not Guild_settings[ctx.guild.id]["level_active"]:
+        elif not self.bot.guild_settings[ctx.guild.id]["level_active"]:
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "ls")["not_active"],
                 description=get_txt(ctx.guild.id, "ls")["not_active_desc"],
@@ -461,8 +459,7 @@ class LevelCog(commands.Cog):
 
     @ls_boost.command(name="add", aliases=["set"])
     async def ls_boost_add(self, ctx, target: Union[discord.Role, discord.Member], fax: float):
-        global Guild_settings
-        if not Guild_settings[ctx.guild.id]["level_active"]:
+        if not self.bot.guild_settings[ctx.guild.id]["level_active"]:
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "ls")["not_active"],
                 description=get_txt(ctx.guild.id, "ls")["not_active_desc"],
@@ -470,7 +467,7 @@ class LevelCog(commands.Cog):
             )
             return await ctx.reply(embed=e)
         else:
-            Guild_settings[ctx.guild.id]["level_boosts"][target.id] = fax
+            self.bot.guild_settings[ctx.guild.id]["level_boosts"][target.id] = fax
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "ls")["boost"]["add"].format(fax),
                 color=Success,
@@ -479,8 +476,7 @@ class LevelCog(commands.Cog):
 
     @ls_boost.command(name="remove", aliases=["del", "delete", "rem"])
     async def ls_boost_remove(self, ctx, target: Union[discord.Role, discord.Member]):
-        global Guild_settings
-        if not Guild_settings[ctx.guild.id]["level_active"]:
+        if not self.bot.guild_settings[ctx.guild.id]["level_active"]:
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "ls")["not_active"],
                 description=get_txt(ctx.guild.id, "ls")["not_active_desc"],
@@ -489,7 +485,7 @@ class LevelCog(commands.Cog):
             return await ctx.reply(embed=e)
         else:
             try:
-                del Guild_settings[ctx.guild.id]["level_boosts"][target.id]
+                del self.bot.guild_settings[ctx.guild.id]["level_boosts"][target.id]
                 e = discord.Embed(
                     title=get_txt(ctx.guild.id, "ls")["boost"]["remove"].format(target.name),
                     color=Success,
@@ -504,8 +500,8 @@ class LevelCog(commands.Cog):
     @ls_boost.command(name="list")
     async def ls_boost_list(self, ctx):
         g = ctx.guild.id
-        global Guild_settings
-        if not Guild_settings[ctx.guild.id]["level_active"]:
+
+        if not self.bot.guild_settings[ctx.guild.id]["level_active"]:
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "ls")["not_active"],
                 description=get_txt(ctx.guild.id, "ls")["not_active_desc"],
@@ -513,7 +509,7 @@ class LevelCog(commands.Cog):
             )
             return await ctx.reply(embed=e)
         else:
-            gs = Guild_settings[g]
+            gs = self.bot.guild_settings[g]
             if gs["level_boosts"] == {}:
                 e = discord.Embed(
                     title="登録されていません。",
@@ -553,7 +549,7 @@ class LevelCog(commands.Cog):
     async def ls_roles(self, ctx):
         if ctx.invoked_subcommand is not None:
             return
-        elif not Guild_settings[ctx.guild.id]["level_active"]:
+        elif not self.bot.guild_settings[ctx.guild.id]["level_active"]:
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "ls")["not_active"],
                 description=get_txt(ctx.guild.id, "ls")["not_active_desc"],
@@ -565,8 +561,7 @@ class LevelCog(commands.Cog):
 
     @ls_roles.command(name="add", aliases=["set"])
     async def ls_role_add(self, ctx, lv: int, role: discord.Role):
-        global Guild_settings
-        if not Guild_settings[ctx.guild.id]["level_active"]:
+        if not self.bot.guild_settings[ctx.guild.id]["level_active"]:
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "ls")["not_active"],
                 description=get_txt(ctx.guild.id, "ls")["not_active_desc"],
@@ -574,7 +569,7 @@ class LevelCog(commands.Cog):
             )
             return await ctx.reply(embed=e)
         else:
-            Guild_settings[ctx.guild.id]["level_roles"][lv] = role.id
+            self.bot.guild_settings[ctx.guild.id]["level_roles"][lv] = role.id
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "ls")["roles"]["add"].format(lv),
                 color=Success,
@@ -583,8 +578,7 @@ class LevelCog(commands.Cog):
 
     @ls_roles.command(name="remove", aliases=["del", "delete", "rem"])
     async def ls_role_remove(self, ctx, lv: int):
-        global Guild_settings
-        if not Guild_settings[ctx.guild.id]["level_active"]:
+        if not self.bot.guild_settings[ctx.guild.id]["level_active"]:
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "ls")["not_active"],
                 description=get_txt(ctx.guild.id, "ls")["not_active_desc"],
@@ -593,7 +587,7 @@ class LevelCog(commands.Cog):
             return await ctx.reply(embed=e)
         else:
             try:
-                del Guild_settings[ctx.guild.id]["level_roles"][lv]
+                del self.bot.guild_settings[ctx.guild.id]["level_roles"][lv]
                 e = discord.Embed(
                     title=get_txt(ctx.guild.id, "ls")["roles"]["remove"].format(lv),
                     color=Success,
@@ -608,8 +602,8 @@ class LevelCog(commands.Cog):
     @ls_roles.command(name="list")
     async def ls_role_list(self, ctx):
         g = ctx.guild.id
-        global Guild_settings
-        if not Guild_settings[ctx.guild.id]["level_active"]:
+
+        if not self.bot.guild_settings[ctx.guild.id]["level_active"]:
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "ls")["not_active"],
                 description=get_txt(ctx.guild.id, "ls")["not_active_desc"],
@@ -617,7 +611,7 @@ class LevelCog(commands.Cog):
             )
             return await ctx.reply(embed=e)
         else:
-            gs = Guild_settings[g]
+            gs = self.bot.guild_settings[g]
             if gs["level_roles"] == {}:
                 e = discord.Embed(
                     title="登録されていません。",

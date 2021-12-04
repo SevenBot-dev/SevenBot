@@ -17,11 +17,11 @@ from common_resources.tools import (
 
 class TimedRoleCog(commands.Cog):
     def __init__(self, bot):
-        global Guild_settings, Texts, Official_emojis, Timed_roles
+        global Texts, Official_emojis, Timed_roles
         global get_txt
         self.bot: commands.Bot = bot
         Timed_roles = self.bot.raw_config["tr"]
-        Guild_settings = bot.guild_settings
+        self.bot.guild_settings = bot.guild_settings
         Official_emojis = bot.consts["oe"]
         Texts = bot.texts
         get_txt = bot.get_txt
@@ -31,8 +31,8 @@ class TimedRoleCog(commands.Cog):
     async def on_member_update(self, before, after):
         nr = set(after.roles) - set(before.roles)
         for r in nr:
-            if r.id in Guild_settings[after.guild.id]["timed_role"]:
-                t = Guild_settings[after.guild.id]["timed_role"][r.id]
+            if r.id in self.bot.guild_settings[after.guild.id]["timed_role"]:
+                t = self.bot.guild_settings[after.guild.id]["timed_role"][r.id]
                 Timed_roles.append(
                     {
                         "time": time.time() + t,
@@ -50,8 +50,7 @@ class TimedRoleCog(commands.Cog):
     @timed_role.command(name="add", aliases=["set"])
     @commands.has_guild_permissions(manage_messages=True)
     async def tr_add(self, ctx, role: discord.Role, limit: convert_timedelta):
-        global Guild_settings
-        Guild_settings[ctx.guild.id]["timed_role"][
+        self.bot.guild_settings[ctx.guild.id]["timed_role"][
             role.id
         ] = limit.total_seconds()
         e = discord.Embed(
@@ -64,11 +63,10 @@ class TimedRoleCog(commands.Cog):
     @timed_role.command(name="remove", aliases=["del", "delete", "rem"])
     @commands.has_guild_permissions(manage_messages=True)
     async def tr_remove(self, ctx, *role: discord.Role):
-        global Guild_settings
         count = 0
         for r in role:
             try:
-                del Guild_settings[ctx.guild.id]["timed_role"][r.id]
+                del self.bot.guild_settings[ctx.guild.id]["timed_role"][r.id]
                 count += 1
             except KeyError:
                 pass
@@ -81,9 +79,9 @@ class TimedRoleCog(commands.Cog):
     @timed_role.command(name="list")
     async def tr_list(self, ctx):
         g = ctx.guild.id
-        if g not in Guild_settings:
+        if g not in self.bot.guild_settings:
             await self.reset(ctx)
-        gs = Guild_settings[g]
+        gs = self.bot.guild_settings[g]
         if gs["timed_role"] == {}:
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "tr_list_no"),

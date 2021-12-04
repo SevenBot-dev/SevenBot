@@ -19,10 +19,10 @@ Message_url_re = re.compile(
 
 class MessageExpandCog(commands.Cog):
     def __init__(self, bot):
-        global Guild_settings, Texts, Official_emojis, GBan
+        global Texts, Official_emojis, GBan
         global get_txt
         self.bot: commands.Bot = bot
-        Guild_settings = bot.guild_settings
+        self.bot.guild_settings = bot.guild_settings
         Official_emojis = bot.consts["oe"]
         GBan = bot.raw_config["gb"]
         Texts = bot.texts
@@ -36,13 +36,13 @@ class MessageExpandCog(commands.Cog):
             return
         if message.guild is None:
             return
-        if message.guild.id not in Guild_settings.keys():
+        if message.guild.id not in self.bot.guild_settings.keys():
             return
         if message.author.bot:
             return
         if (
             re.match(Message_url_re, message.content) is not None
-            and Guild_settings[message.guild.id]["expand_message"]
+            and self.bot.guild_settings[message.guild.id]["expand_message"]
         ):
             rids = re.match(Message_url_re, message.content)
             ids = [int(i) for i in [rids[1], rids[2], rids[3]]]
@@ -90,12 +90,12 @@ class MessageExpandCog(commands.Cog):
                             m.author.display_avatar, "url", discord.Embed.Empty
                         ),
                     )
-                    footer = Texts[Guild_settings[message.guild.id]["lang"]][
+                    footer = Texts[self.bot.guild_settings[message.guild.id]["lang"]][
                         "expand_message_footer"
                     ].format(m.channel)
                     if not ids[0] == message.guild.id:
                         footer = (
-                            Texts[Guild_settings[message.guild.id]["lang"]][
+                            Texts[self.bot.guild_settings[message.guild.id]["lang"]][
                                 "expand_message_footer3"
                             ].format(m.guild.name)
                             + footer
@@ -113,7 +113,7 @@ class MessageExpandCog(commands.Cog):
                     else:
                         em.set_footer(
                             text=footer
-                            + Texts[Guild_settings[message.guild.id]["lang"]][
+                            + Texts[self.bot.guild_settings[message.guild.id]["lang"]][
                                 "expand_message_footer2"
                             ].format(len(m.embeds)),
                             icon_url=getattr(
@@ -142,19 +142,18 @@ class MessageExpandCog(commands.Cog):
     @expand_message.command(name="activate", aliases=Activate_aliases)
     @commands.has_guild_permissions(manage_messages=True)
     async def expand_activate(self, ctx):
-        global Guild_settings
         gi = ctx.guild.id
-        if Guild_settings[ctx.guild.id]["expand_message"]:
+        if self.bot.guild_settings[ctx.guild.id]["expand_message"]:
             e = discord.Embed(
                 title=get_txt(gi, "activate_fail"),
-                description=Texts[Guild_settings[gi]["lang"]][
+                description=Texts[self.bot.guild_settings[gi]["lang"]][
                     "activate_desc"
                 ].format("sb#expand_message deactivate"),
                 color=Error,
             )
             return await ctx.reply(embed=e)
         else:
-            Guild_settings[ctx.guild.id]["expand_message"] = True
+            self.bot.guild_settings[ctx.guild.id]["expand_message"] = True
             e = discord.Embed(
                 title=get_txt(gi, "activate").format("メッセージ展開"),
                 description=get_txt(gi, "activate_desc").format(
@@ -167,9 +166,8 @@ class MessageExpandCog(commands.Cog):
     @expand_message.command(name="deactivate", aliases=Deactivate_aliases)
     @commands.has_guild_permissions(manage_messages=True)
     async def expand_deactivate(self, ctx):
-        global Guild_settings
         gi = ctx.guild.id
-        if not Guild_settings[ctx.guild.id]["expand_message"]:
+        if not self.bot.guild_settings[ctx.guild.id]["expand_message"]:
             e = discord.Embed(
                 title=get_txt(gi, "deactivate_fail"),
                 description=get_txt(ctx.guild.id, "deactivate_desc").format(
@@ -179,7 +177,7 @@ class MessageExpandCog(commands.Cog):
             )
             return await ctx.reply(embed=e)
         else:
-            Guild_settings[ctx.guild.id]["expand_message"] = False
+            self.bot.guild_settings[ctx.guild.id]["expand_message"] = False
             e = discord.Embed(
                 title=get_txt(gi, "deactivate").format("メッセージ展開"),
                 description=get_txt(gi, "deactivate_desc").format(

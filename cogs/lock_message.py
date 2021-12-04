@@ -10,10 +10,10 @@ import _pathmagic  # type: ignore # noqa
 
 class LockMessageCog(commands.Cog):
     def __init__(self, bot):
-        global Guild_settings, Texts, Official_emojis
+        global Texts, Official_emojis
         global get_txt
         self.bot: commands.Bot = bot
-        Guild_settings = bot.guild_settings
+        self.bot.guild_settings = bot.guild_settings
         Official_emojis = bot.consts["oe"]
         Texts = bot.texts
         get_txt = bot.get_txt
@@ -25,7 +25,7 @@ class LockMessageCog(commands.Cog):
     @lock_message.command(name="activate", aliases=Activate_aliases + ["register"])
     @commands.has_permissions(manage_messages=True)
     async def lock_message_activate(self, ctx, *, content):
-        Guild_settings[ctx.guild.id]["lock_message_content"][str(ctx.channel.id)] = {
+        self.bot.guild_settings[ctx.guild.id]["lock_message_content"][str(ctx.channel.id)] = {
             "content": content,
             "author": ctx.author.id,
         }
@@ -41,7 +41,7 @@ class LockMessageCog(commands.Cog):
     @commands.has_permissions(manage_messages=True)
     async def lock_message_deactivate(self, ctx):
         try:
-            del Guild_settings[ctx.guild.id]["lock_message_content"][str(ctx.channel.id)]
+            del self.bot.guild_settings[ctx.guild.id]["lock_message_content"][str(ctx.channel.id)]
         except KeyError:
             await ctx.reply(
                 embed=discord.Embed(
@@ -65,8 +65,8 @@ class LockMessageCog(commands.Cog):
             if embeds := message.embeds:
                 if embeds[0].author.url and "?locked" in embeds[0].author.url:
                     return
-        if content := Guild_settings[message.guild.id]["lock_message_content"].get(message.channel.id):
-            if message_id := Guild_settings[message.guild.id]["lock_message_id"].get(message.channel.id):
+        if content := self.bot.guild_settings[message.guild.id]["lock_message_content"].get(message.channel.id):
+            if message_id := self.bot.guild_settings[message.guild.id]["lock_message_id"].get(message.channel.id):
                 if time.time() - discord.Object(message_id).created_at.timestamp() < 10:
                     return
                 try:
@@ -75,7 +75,7 @@ class LockMessageCog(commands.Cog):
                     pass
             author = message.guild.get_member(content["author"])
             if author is None:
-                del Guild_settings[message.guild.id]["lock_message_content"][message.channel.id]
+                del self.bot.guild_settings[message.guild.id]["lock_message_content"][message.channel.id]
                 return
             msg = await message.channel.send(
                 embed=sembed.SEmbed(
@@ -87,7 +87,7 @@ class LockMessageCog(commands.Cog):
                     ),
                 )
             )
-            Guild_settings[message.guild.id]["lock_message_id"][message.channel.id] = msg.id
+            self.bot.guild_settings[message.guild.id]["lock_message_id"][message.channel.id] = msg.id
 
 
 def setup(_bot):

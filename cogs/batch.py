@@ -15,7 +15,6 @@ from common_resources.tokens import botdd_token
 Last_favorite = {}
 Time_format = "%Y-%m-%d %H:%M:%S"
 Bump_alerts = {}
-Guild_settings = {}
 Batchs = []
 Number_emojis = []
 Bump_id = 302050872383242240
@@ -26,10 +25,10 @@ Dissoku_color = 0x7289DA
 
 class BatchCog(commands.Cog):
     def __init__(self, bot):
-        global Guild_settings, Bump_alerts, Dissoku_alerts
+        global Bump_alerts, Dissoku_alerts
         global get_txt
         self.bot: commands.Bot = bot
-        Guild_settings = self.bot.guild_settings
+        self.bot.guild_settings = self.bot.guild_settings
         Bump_alerts = self.bot.raw_config["ba"]
         Dissoku_alerts = self.bot.raw_config["da"]
         get_txt = self.bot.get_txt
@@ -118,7 +117,7 @@ class BatchCog(commands.Cog):
         async with self.bot.db.guild_settings.watch() as change_stream:
             async for change in change_stream:
                 if change["operationType"] == "delete":
-                    # del Guild_settings[change["documentKey"]["gid"]]
+                    # del self.bot.guild_settings[change["documentKey"]["gid"]]
                     pass  # TODO: delete guild settings
                 if change["operationType"] == "update":
                     gs = await self.bot.db.guild_settings.find_one(change["documentKey"])
@@ -130,7 +129,7 @@ class BatchCog(commands.Cog):
                         t.clear()
                         t.update(t2)
                     del gs["_id"]
-                    Guild_settings[gs["gid"]] = gs
+                    self.bot.guild_settings[gs["gid"]] = gs
                 if change["operationType"] == "insert":
                     gs = change["fullDocument"]
                     for ik in self.bot.number_keys:
@@ -141,7 +140,7 @@ class BatchCog(commands.Cog):
                         t.clear()
                         t.update(t2)
                     del gs["_id"]
-                    Guild_settings[gs["gid"]] = gs
+                    self.bot.guild_settings[gs["gid"]] = gs
 
     def cog_unload(self):
         for ba in Batchs:
