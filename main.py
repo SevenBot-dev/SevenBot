@@ -35,6 +35,11 @@ if len(sys.argv) > 1 and sys.argv[1] != "debug":
         sentry_url,
         traces_sample_rate=1.0,
     )
+    os.environ["DEBUG"] = "False"
+    db_name = "production"
+else:
+    os.environ["DEBUG"] = "True"
+    db_name = "development"
 
 Channel_ids = {
     "log": 756254787191963768,
