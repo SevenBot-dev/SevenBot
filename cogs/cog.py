@@ -716,10 +716,6 @@ class MainCog(commands.Cog):
                 url="https://sevenbot.jp/commands",
                 color=Bot_info,
             )
-            e.set_author(
-                name=f"{ctx.author.display_name}(ID:{ctx.author.id})",
-                icon_url=ctx.author.avatar.url,
-            )
             return await ctx.reply(embed=e)
         elif detail == "uses":
             desc = ""
@@ -740,10 +736,6 @@ class MainCog(commands.Cog):
                 title=get_txt(ctx.guild.id, "help_ranking"),
                 description=desc,
                 color=Bot_info,
-            )
-            e.set_author(
-                name=f"{ctx.author.display_name}(ID:{ctx.author.id})",
-                icon_url=ctx.author.avatar.url,
             )
             e.set_footer(text=get_txt(ctx.guild.id, "help_categories")[3])
             return await ctx.reply(embed=e)
@@ -767,10 +759,6 @@ class MainCog(commands.Cog):
                 description=desc,
                 color=Bot_info,
                 url="https://sevenbot.jp/commands#category-" + detail,
-            )
-            e.set_author(
-                name=f"{ctx.author.display_name}(ID:{ctx.author.id})",
-                icon_url=ctx.author.avatar.url,
             )
             e.set_footer(text=get_txt(ctx.guild.id, "help_categories")[3])
             return await ctx.reply(embed=e)
@@ -848,10 +836,6 @@ class MainCog(commands.Cog):
                         Command_counter.get(str(c).split()[0], 0)
                     ),
                     inline=False,
-                )
-                e.set_author(
-                    name=f"{ctx.author.display_name}(ID:{ctx.author.id})",
-                    icon_url=ctx.author.avatar.url,
                 )
                 return await ctx.reply(embed=e)
             else:
