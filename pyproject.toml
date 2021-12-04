@@ -6,7 +6,7 @@ authors = ["sevenc-nanashi <sevenc-nanashi@sevenbot.jp>"]
 license = "GPLv3"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.10"
 async-google-trans-new="~=1.4.2"
 authlib="~=0.15.5"
 beautifulsoup4="~=4.9.3"
