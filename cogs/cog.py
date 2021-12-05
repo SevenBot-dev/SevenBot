@@ -238,7 +238,6 @@ class MainCog(commands.Cog):
         if not self.bot.consts.get("gcm"):
             self.bot.consts["gcm"] = collections.defaultdict(dict)
         try:
-            self.bot.guild_settings = self.bot.guild_settings
             get_txt = self.bot.get_txt
             is_command = self.bot.is_command
             Global_chat = self.bot.raw_config["gc"]
