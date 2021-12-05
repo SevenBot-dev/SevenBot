@@ -329,7 +329,7 @@ class GlobalCog(commands.Cog):
                                         name=rmsg.author.name,
                                         icon_url=rmsg.author.display_avatar.url,
                                     )
-                                except discord.errors.NotFound:
+                                except discord.NotFound:
                                     rem = None
                             ga.append(
                                 webhook.send(
@@ -609,7 +609,7 @@ class GlobalCog(commands.Cog):
                 async def send_webhook(webhook, *args, **kwargs):
                     try:
                         await webhook.send(*args, **kwargs)
-                    except discord.errors.InvalidArgument:
+                    except discord.InvalidArgument:
                         pass
 
                 for c in Global_chat:

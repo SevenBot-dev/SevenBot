@@ -384,7 +384,7 @@ class ToolCog(commands.Cog):
                     )
                     try:
                         await msg.clear_reaction(self.bot.oemojis["down"])
-                    except discord.errors.Forbidden:
+                    except discord.Forbidden:
                         await msg.remove_reaction(
                             self.bot.oemojis["down"], self.bot.user
                         )

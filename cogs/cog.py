@@ -1437,7 +1437,7 @@ class MainCog(commands.Cog):
                                     if n > len(mdh):
                                         try:
                                             await message.clear_reaction(r)
-                                        except discord.errors.Forbidden:
+                                        except discord.Forbidden:
                                             pass
                                 except ValueError:
                                     pass

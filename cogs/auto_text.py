@@ -84,7 +84,7 @@ class AutoTextCog(commands.Cog):
         ):
             try:
                 await Auto_text_channels[before].delete()
-            except discord.errors.NotFound:
+            except discord.NotFound:
                 pass
             del Auto_text_channels[before]
         if (

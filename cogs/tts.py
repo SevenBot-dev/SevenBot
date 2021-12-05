@@ -194,7 +194,7 @@ class TtsCog(commands.Cog):
                 await self.play_voice(
                     txt, {"user": member, "guild": member.guild}
                 )
-        except discord.errors.ClientException:
+        except discord.ClientException:
             pass
 
     @commands.Cog.listener("on_voice_state_update")

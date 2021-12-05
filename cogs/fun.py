@@ -216,7 +216,7 @@ class FunCog(commands.Cog):
         channel = self.bot.get_channel(pl.channel_id)
         try:
             message = await channel.fetch_message(pl.message_id)
-        except (discord.errors.NotFound, discord.errors.Forbidden):
+        except (discord.NotFound, discord.Forbidden):
             return
 
         guild = self.bot.get_guild(pl.guild_id)
@@ -620,7 +620,7 @@ class FunCog(commands.Cog):
                                                 )
                                             )
 
-                                    except discord.errors.Forbidden:
+                                    except discord.Forbidden:
                                         e = discord.Embed(
                                             title=get_txt(guild.id, "ww")[
                                                 "title"

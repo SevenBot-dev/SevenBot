@@ -142,7 +142,7 @@ class ModerationCog(commands.Cog):
         await ctx.channel.purge(limit=limit, check=gcheck)
         try:
             await ctx.message.add_reaction(self.bot.oemojis["check8"])
-        except (discord.errors.Forbidden, discord.errors.NotFound):
+        except (discord.Forbidden, discord.NotFound):
             pass
 
     @commands.command(name="archive")

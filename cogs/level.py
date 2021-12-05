@@ -112,7 +112,7 @@ class LevelCog(commands.Cog):
                 if us is None or us["level_dm"]:
                     try:
                         await message.author.send(embed=e)
-                    except discord.errors.Forbidden:
+                    except discord.Forbidden:
                         pass
                 if self.bot.guild_settings[message.guild.id]["level_channel"]:
                     e2 = discord.Embed(

@@ -99,7 +99,7 @@ class BumpCog(commands.Cog):
                             embed=e,
                             allowed_mentions=discord.AllowedMentions(roles=True),
                         )
-                    except discord.errors.Forbidden:
+                    except discord.Forbidden:
                         pass
                 del Bump_alerts[guild]
         for guild, (alert_time, channel) in list(Dissoku_alerts.items()):
@@ -122,7 +122,7 @@ class BumpCog(commands.Cog):
                             embed=e,
                             allowed_mentions=discord.AllowedMentions(roles=True),
                         )
-                    except discord.errors.Forbidden:
+                    except discord.Forbidden:
                         pass
                 del Dissoku_alerts[guild]
 

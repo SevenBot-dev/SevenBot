@@ -91,7 +91,7 @@ class AutoreplyCog(commands.Cog):
                     elif cmd == "react":
                         try:
                             await message.add_reaction(cnt)
-                        except discord.errors.BadRequest:
+                        except discord.BadRequest:
                             await message.add_reaction(self.bot.oemojis["check2"])
                     elif cmd == "random":
                         random_tmp.append(cnt)

@@ -159,7 +159,7 @@ class AuthCog(commands.Cog):
                         + "\nhttps://captcha.sevenbot.jp/verify?id="
                         + session_id
                     )
-                except discord.errors.Forbidden:
+                except discord.Forbidden:
                     msg = await channel.send(
                         user.mention
                         + "\n"
@@ -322,7 +322,7 @@ class AuthCog(commands.Cog):
         )
         try:
             await ctx.message.delete()
-        except discord.errors.Forbidden:
+        except discord.Forbidden:
             pass
 
     @auth.command(name="react")
@@ -434,7 +434,7 @@ class AuthCog(commands.Cog):
         )
         try:
             await ctx.message.delete()
-        except discord.errors.Forbidden:
+        except discord.Forbidden:
             pass
 
     @auth.command(name="react_image", aliases=["react_img"])
@@ -587,7 +587,7 @@ class AuthCog(commands.Cog):
         )
         try:
             await ctx.message.delete()
-        except discord.errors.Forbidden:
+        except discord.Forbidden:
             pass
 
     async def make_image_auth_url(self, message):
