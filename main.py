@@ -123,7 +123,7 @@ class SevenBot(commands.Bot):
             "level_roles",
             "timed_role",
         ]
-        self.guild_settings: GuildSettings = {}
+        self.guild_settings: dict(int, GuildSettings) = {}
         print("Loading saves from db...", end="")
         self.load_saves()
         print("Done")
