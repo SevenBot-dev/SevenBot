@@ -8,9 +8,11 @@ on:
       - '*.py'
 
 jobs:
-  flake8_py3:
+  main:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
       - name: Setup Python
         uses: actions/setup-python@v1
         with:
