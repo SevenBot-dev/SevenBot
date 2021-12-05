@@ -95,7 +95,6 @@ class SevenBot(commands.Bot):
         self.consts = {
             "qu": {},
             "ch": {},
-            "oe": {},
             "ne": [],
             "tc": {},
             "pci": {},
@@ -112,6 +111,7 @@ class SevenBot(commands.Bot):
             "level_dm": False,
             "tts_settings": {},
         }
+        self.oemojis: dict[str, discord.Emoji] = {}
         self.number_keys = [
             "levels",
             "level_counts",
@@ -169,12 +169,12 @@ class SevenBot(commands.Bot):
             self.consts["ch"][k] = self.get_channel(v)
         g = self.get_guild(Official_discord_id)
         for oe in g.emojis:
-            self.consts["oe"][oe.name] = oe
+            self.oemojis[oe.name] = oe
         g = self.get_guild(Sub_discord_id)
         for oe in g.emojis:
-            self.consts["oe"][oe.name] = oe
+            self.oemojis[oe.name] = oe
         for i in range(11):
-            self.consts["ne"].append(self.consts["oe"]["b" + str(i)])
+            self.consts["ne"].append(self.oemojis["b" + str(i)])
         bot.load_extension("jishaku")
         bot.load_extension("dpy_peper")
         bot.load_extension("discord.ext.components")

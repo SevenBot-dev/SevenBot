@@ -19,10 +19,9 @@ from common_resources.tokens import web_pass
 
 class AuthCog(commands.Cog):
     def __init__(self, bot):
-        global Texts, Official_emojis
+        global Texts
         global get_txt
         self.bot: commands.Bot = bot
-        Official_emojis = self.bot.consts["oe"]
         self.bot.guild_settings = bot.guild_settings
         Texts = bot.texts
         get_txt = bot.get_txt
@@ -372,12 +371,12 @@ class AuthCog(commands.Cog):
         ).mention
         e = discord.Embed(
             title="認証ボタン - リアクション",
-            description=f'下の{Official_emojis["check5"]}を押して認証\n'
+            description=f'下の{self.bot.oemojis["check5"]}を押して認証\n'
             f'ロール: {role_mention}',
             color=Widget,
         )
         m = await ctx.send(embed=e)
-        await m.add_reaction(Official_emojis["check5"])
+        await m.add_reaction(self.bot.oemojis["check5"])
         await ctx.message.delete()
 
     @auth.command(name="image", aliases=["img"])
@@ -484,12 +483,12 @@ class AuthCog(commands.Cog):
         ).mention
         e = discord.Embed(
             title="認証ボタン - 画像認証",
-            description=f'下の{Official_emojis["check5"]}を押して認証\n'
+            description=f'下の{self.bot.oemojis["check5"]}を押して認証\n'
             f'ロール: {role_mention}',
             color=Widget,
         )
         m = await ctx.send(embed=e)
-        await m.add_reaction(Official_emojis["check5"])
+        await m.add_reaction(self.bot.oemojis["check5"])
         await ctx.message.delete()
 
     @auth.command(name="react_web")
@@ -538,12 +537,12 @@ class AuthCog(commands.Cog):
         ).mention
         e = discord.Embed(
             title="認証ボタン - Web認証",
-            description=f'下の{Official_emojis["check5"]}を押して認証\n'
+            description=f'下の{self.bot.oemojis["check5"]}を押して認証\n'
             f'ロール: {role_mention}',
             color=Widget,
         )
         m = await ctx.send(embed=e)
-        await m.add_reaction(Official_emojis["check5"])
+        await m.add_reaction(self.bot.oemojis["check5"])
         await ctx.message.delete()
 
     @auth.command(name="web")

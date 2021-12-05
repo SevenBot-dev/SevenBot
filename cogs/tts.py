@@ -60,12 +60,11 @@ ffmpeg_options = {
 
 class TtsCog(commands.Cog):
     def __init__(self, bot):
-        global Official_emojis, Tts_channels, Tts_settings
+        global Tts_channels, Tts_settings
         global get_txt
         self.bot: commands.Bot = bot
         self.bot.guild_settings = bot.guild_settings
         get_txt = bot.get_txt
-        Official_emojis = bot.consts["oe"]
         Tts_channels = bot.consts["tc"]
         Tts_settings = {}
         self.make_session()
@@ -408,7 +407,7 @@ class TtsCog(commands.Cog):
         speed = ["-r", str(ts.get("speed", 100) / 100.0)]
         cmd = open_jtalk + mech + htsvoice + speed + outwav
         # await message.channel.send(" ".join(cmd))
-        loop.create_task(message.add_reaction(Official_emojis["network"]))
+        loop.create_task(message.add_reaction(self.bot.oemojis["network"]))
         c = await asyncio.create_subprocess_shell(
             (" ".join(cmd)).encode(),
             stdin=asyncio.subprocess.PIPE,
@@ -423,7 +422,7 @@ class TtsCog(commands.Cog):
             c.terminate()
         loop.create_task(
             message.remove_reaction(
-                Official_emojis["network"], message.guild.me
+                self.bot.oemojis["network"], message.guild.me
             )
         )
         # await c.wait()
@@ -446,11 +445,11 @@ class TtsCog(commands.Cog):
                     ].pop(0)
                     if message:
                         loop.create_task(
-                            rm.add_reaction(Official_emojis["voice"])
+                            rm.add_reaction(self.bot.oemojis["voice"])
                         )
                         loop.create_task(
                             rm.remove_reaction(
-                                Official_emojis["queue"], self.bot.user
+                                self.bot.oemojis["queue"], self.bot.user
                             )
                         )
                     guild.voice_client.play(
@@ -463,16 +462,16 @@ class TtsCog(commands.Cog):
                     if message:
                         loop.create_task(
                             rm.remove_reaction(
-                                Official_emojis["voice"], self.bot.user
+                                self.bot.oemojis["voice"], self.bot.user
                             )
                         )
                         loop.create_task(
-                            rm.add_reaction(Official_emojis["check8"])
+                            rm.add_reaction(self.bot.oemojis["check8"])
                         )
                         # loop.create_task(msg.delete())
                         loop.create_task(
                             delay_react_remove(
-                                rm, Official_emojis["check8"], self.bot.user, 3
+                                rm["check8"], self.bot.user, 3
                             )
                         )
 
@@ -482,7 +481,7 @@ class TtsCog(commands.Cog):
                 Tts_channels[guild.voice_client.channel.id]["playing"] = False
                 raise e
         else:
-            await message.add_reaction(Official_emojis["queue"])
+            await message.add_reaction(self.bot.oemojis["queue"])
 
     async def cog_before_invoke(self, ctx):
         await self.init_tts_setting(ctx.author)

@@ -42,12 +42,11 @@ Private_chat_info = {}
 
 class GlobalCog(commands.Cog):
     def __init__(self, bot):
-        global Official_emojis, Global_chat, Global_mute, Private_chat_info
+        global Global_chat, Global_mute, Private_chat_info
         global get_txt, is_command
         self.bot: commands.Bot = bot
         self.bot.guild_settings = bot.guild_settings
         Global_chat = bot.raw_config["gc"]
-        Official_emojis = bot.consts["oe"]
         Global_mute = bot.raw_config["gm"]
         get_txt = bot.get_txt
         is_command = bot.is_command
@@ -76,14 +75,14 @@ class GlobalCog(commands.Cog):
     async def on_message_sgc(self, message):
         if message.channel.id in [SGC_ID, SGC_ID2] and message.author.id != self.bot.user.id and not SGC_STOP:
             loop = asyncio.get_event_loop()
-            loop.create_task(message.add_reaction(Official_emojis["network"]))
+            loop.create_task(message.add_reaction(self.bot.oemojis["network"]))
             try:
                 data = json.loads(message.content)
             except json.JSONDecodeError:
                 return
             await self.handle_sgc(data, message.author.id, "sgc")
-            loop.create_task(message.remove_reaction(Official_emojis["network"], self.bot.user))
-            loop.create_task(message.add_reaction(Official_emojis["check8"]))
+            loop.create_task(message.remove_reaction(self.bot.oemojis["network"], self.bot.user))
+            loop.create_task(message.add_reaction(self.bot.oemojis["check8"]))
             return
 
     async def handle_sgc(self, data, from_id, channel):
@@ -451,18 +450,18 @@ class GlobalCog(commands.Cog):
                         message.author.id in Gc_last_users.keys()
                         and time.time() - Gc_last_users[message.author.id] < slow
                     ):
-                        await message.add_reaction(Official_emojis["queue"])
+                        await message.add_reaction(self.bot.oemojis["queue"])
                         await asyncio.sleep(slow)
-                        await message.remove_reaction(Official_emojis["queue"], self.bot.user)
+                        await message.remove_reaction(self.bot.oemojis["queue"], self.bot.user)
                     Gc_last_users[message.author.id] = time.time()
-                    await message.add_reaction(Official_emojis["network"])
+                    await message.add_reaction(self.bot.oemojis["network"])
                     try:
                         await self.send_messages(message)
                         try:
-                            await message.remove_reaction(Official_emojis["network"], message.guild.me)
-                            await message.add_reaction(Official_emojis["check8"])
+                            await message.remove_reaction(self.bot.oemojis["network"], message.guild.me)
+                            await message.add_reaction(self.bot.oemojis["check8"])
                             await asyncio.sleep(2)
-                            await message.remove_reaction(Official_emojis["check8"], message.guild.me)
+                            await message.remove_reaction(self.bot.oemojis["check8"], message.guild.me)
                         except NotFound:
                             pass
                     except discord.HTTPException:
@@ -1192,8 +1191,8 @@ class GlobalCog(commands.Cog):
         user = await self.bot.fetch_user(uid)
         e = discord.Embed(title=f"`{user}`をGMuteしますか？", color=Process)
         msg = await ctx.reply(embed=e)
-        await msg.add_reaction(Official_emojis["check5"])
-        await msg.add_reaction(Official_emojis["check6"])
+        await msg.add_reaction(self.bot.oemojis["check5"])
+        await msg.add_reaction(self.bot.oemojis["check6"])
 
         def check(r, u):
             if u.id == ctx.author.id:
@@ -1286,15 +1285,15 @@ class GlobalCog(commands.Cog):
         res = ""
         for m in self.bot.get_guild(706905953320304772).get_role(773868241713627167).members:
             if m.status == discord.Status.offline:
-                res += str(Official_emojis["offline"])
+                res += str(self.bot.oemojis["offline"])
             elif m.status == discord.Status.dnd:
-                res += str(Official_emojis["dnd"])
+                res += str(self.bot.oemojis["dnd"])
             elif m.status == discord.Status.idle:
-                res += str(Official_emojis["idle"])
+                res += str(self.bot.oemojis["idle"])
             elif m.status == discord.Status.online:
-                res += str(Official_emojis["online"])
+                res += str(self.bot.oemojis["online"])
             else:
-                res += str(Official_emojis["unknown"])
+                res += str(self.bot.oemojis["unknown"])
             res += str(m) + "\n"
         e = discord.Embed(title="スーパーグローバルチャット情報", description=res, color=Info)
         e.set_footer(text="sb#gchat activate sgcでグローバルチャットに参加できます。")

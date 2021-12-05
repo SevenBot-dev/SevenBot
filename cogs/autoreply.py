@@ -18,12 +18,11 @@ from common_resources.consts import Info, Success, Error, Alert
 
 class AutoreplyCog(commands.Cog):
     def __init__(self, bot):
-        global Texts, Official_emojis, GBan, SB_Bans
+        global Texts, GBan, SB_Bans
         global get_txt, is_command
         self.bot: commands.Bot = bot
         is_command = self.bot.is_command
         self.bot.guild_settings = bot.guild_settings
-        Official_emojis = bot.consts["oe"]
         Texts = bot.texts
         get_txt = bot.get_txt
         GBan = bot.raw_config["gb"]
@@ -93,7 +92,7 @@ class AutoreplyCog(commands.Cog):
                         try:
                             await message.add_reaction(cnt)
                         except discord.errors.BadRequest:
-                            await message.add_reaction(Official_emojis["check2"])
+                            await message.add_reaction(self.bot.oemojis["check2"])
                     elif cmd == "random":
                         random_tmp.append(cnt)
                     else:

@@ -46,13 +46,12 @@ Message_url_re = re.compile(
 
 class ToolCog(commands.Cog):
     def __init__(self, _bot):
-        global Official_emojis, Texts, get_txt
+        global Texts, get_txt
 
         self.bot = _bot
         self.bot.guild_settings = self.bot.guild_settings
         get_txt = self.bot.get_txt
         Texts = self.bot.texts
-        Official_emojis = self.bot.consts["oe"]
         Batch["sync_afk"] = self.sync_afk.start()
         if "afk" not in self.bot.consts.keys():
             self.bot.consts["afk"] = {}
@@ -253,7 +252,7 @@ class ToolCog(commands.Cog):
             .replace("!key", key)
             .replace("!userid", str(ctx.author.id))
         )
-        await ctx.message.add_reaction(Official_emojis["check8"])
+        await ctx.message.add_reaction(self.bot.oemojis["check8"])
 
     @_afk.group(name="twitter", invoke_without_command=True)
     @commands.cooldown(60, 60, commands.BucketType.default)
@@ -262,7 +261,7 @@ class ToolCog(commands.Cog):
         client = AsyncOAuth1Client(
             twitter_consumer_key, twitter_consumer_secret, redirect_uri="oob"
         )
-        await ctx.message.add_reaction(Official_emojis["check8"])
+        await ctx.message.add_reaction(self.bot.oemojis["check8"])
         token = await client.fetch_request_token(
             "https://api.twitter.com/oauth/request_token"
         )
@@ -368,12 +367,12 @@ class ToolCog(commands.Cog):
                     color=Success,
                 )
                 msg = await ctx.reply(embed=e)
-                await msg.add_reaction(Official_emojis["down"])
+                await msg.add_reaction(self.bot.oemojis["down"])
                 try:
                     _ = await self.bot.wait_for(
                         "reaction_add",
                         check=lambda r, u: r.message.id == msg.id
-                        and r.emoji == Official_emojis["down"]
+                        and r.emoji == self.bot.oemojis["down"]
                         and not u.bot,
                         timeout=30,
                     )
@@ -384,14 +383,14 @@ class ToolCog(commands.Cog):
                         embed=None,
                     )
                     try:
-                        await msg.clear_reaction(Official_emojis["down"])
+                        await msg.clear_reaction(self.bot.oemojis["down"])
                     except discord.errors.Forbidden:
                         await msg.remove_reaction(
-                            Official_emojis["down"], self.bot.user
+                            self.bot.oemojis["down"], self.bot.user
                         )
                 except asyncio.TimeoutError:
                     await msg.remove_reaction(
-                        Official_emojis["down"], self.bot.user
+                        self.bot.oemojis["down"], self.bot.user
                     )
 
     @tasks.loop(minutes=10)

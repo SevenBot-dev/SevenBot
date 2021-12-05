@@ -22,12 +22,11 @@ Dissoku_color = 0x7289DA
 
 class BumpCog(commands.Cog):
     def __init__(self, bot):
-        global Texts, Official_emojis, Dissoku_alerts
+        global Texts, Dissoku_alerts
         global Bump_alerts
         global get_txt
         self.bot: commands.Bot = bot
         self.bot.guild_settings = bot.guild_settings
-        Official_emojis = bot.consts["oe"]
         Dissoku_alerts = bot.raw_config["da"]
         Bump_alerts = bot.raw_config["ba"]
         Texts = bot.texts

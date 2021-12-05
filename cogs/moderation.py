@@ -52,12 +52,10 @@ def get_warn_text(bot, ctx, p):
 
 class ModerationCog(commands.Cog):
     def __init__(self, bot):
-        global Official_emojis
         global get_txt
         self.bot: commands.Bot = bot
         self.bot.guild_settings = bot.guild_settings
         get_txt = bot.get_txt
-        Official_emojis = bot.consts["oe"]
 
     async def punish(self, target, p):
         if p["action"] == "mute":
@@ -143,7 +141,7 @@ class ModerationCog(commands.Cog):
 
         await ctx.channel.purge(limit=limit, check=gcheck)
         try:
-            await ctx.message.add_reaction(Official_emojis["check8"])
+            await ctx.message.add_reaction(self.bot.oemojis["check8"])
         except (discord.errors.Forbidden, discord.errors.NotFound):
             pass
 

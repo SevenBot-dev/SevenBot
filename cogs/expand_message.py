@@ -19,11 +19,10 @@ Message_url_re = re.compile(
 
 class MessageExpandCog(commands.Cog):
     def __init__(self, bot):
-        global Texts, Official_emojis, GBan
+        global Texts, GBan
         global get_txt
         self.bot: commands.Bot = bot
         self.bot.guild_settings = bot.guild_settings
-        Official_emojis = bot.consts["oe"]
         GBan = bot.raw_config["gb"]
         Texts = bot.texts
         get_txt = bot.get_txt

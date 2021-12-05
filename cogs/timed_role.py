@@ -17,12 +17,11 @@ from common_resources.tools import (
 
 class TimedRoleCog(commands.Cog):
     def __init__(self, bot):
-        global Texts, Official_emojis, Timed_roles
+        global Texts, Timed_roles
         global get_txt
         self.bot: commands.Bot = bot
         Timed_roles = self.bot.raw_config["tr"]
         self.bot.guild_settings = bot.guild_settings
-        Official_emojis = bot.consts["oe"]
         Texts = bot.texts
         get_txt = bot.get_txt
         self.remove_timed_role.start()

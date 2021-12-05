@@ -15,11 +15,10 @@ from common_resources.consts import (
 
 class AutoTextCog(commands.Cog):
     def __init__(self, bot):
-        global Texts, Official_emojis, Auto_text_channels
+        global Texts, Auto_text_channels
         global get_txt
         self.bot: commands.Bot = bot
         self.bot.guild_settings = bot.guild_settings
-        Official_emojis = bot.consts["oe"]
         Texts = bot.texts
         get_txt = bot.get_txt
         if self.bot.consts.get("atc"):

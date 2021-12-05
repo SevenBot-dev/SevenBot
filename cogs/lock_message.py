@@ -10,11 +10,10 @@ import _pathmagic  # type: ignore # noqa
 
 class LockMessageCog(commands.Cog):
     def __init__(self, bot):
-        global Texts, Official_emojis
+        global Texts
         global get_txt
         self.bot: commands.Bot = bot
         self.bot.guild_settings = bot.guild_settings
-        Official_emojis = bot.consts["oe"]
         Texts = bot.texts
         get_txt = bot.get_txt
 

@@ -29,7 +29,7 @@ ret = {}
 
 class AdminCog(commands.Cog):
     def __init__(self, bot):
-        global Official_emojis, Global_chat, Global_mute
+        global Global_chat, Global_mute
         global Private_chat_info, Sevennet_channels, GBan, Blacklists
         global get_txt
         self.bot: SevenBot = bot
@@ -37,7 +37,6 @@ class AdminCog(commands.Cog):
         Global_chat = bot.raw_config["gc"]
         GBan = bot.raw_config["gb"]
         Blacklists = bot.raw_config["bs"]
-        Official_emojis = bot.consts["oe"]
         Private_chat_info = bot.consts["pci"]
         Global_mute = bot.raw_config["gm"]
         Sevennet_channels = bot.raw_config["snc"]
@@ -93,8 +92,8 @@ class AdminCog(commands.Cog):
             color=Process,
         )
         msg = await ctx.send(embed=e)
-        await msg.add_reaction(Official_emojis["check5"])
-        await msg.add_reaction(Official_emojis["check6"])
+        await msg.add_reaction(self.bot.oemojis["check5"])
+        await msg.add_reaction(self.bot.oemojis["check6"])
 
         def check(r, u):
             if u.id == ctx.author.id:
@@ -272,13 +271,13 @@ class AdminCog(commands.Cog):
                 locals()["__ex"](self, self.bot, ctx, ctx, session, _print, get_msg),
                 name="exec",
             )
-            await ctx.message.add_reaction(Official_emojis["check4"])
+            await ctx.message.add_reaction(self.bot.oemojis["check4"])
             cancel_task = loop.create_task(
                 self.bot.wait_for(
                     "raw_reaction_add",
                     check=lambda payload: payload.message_id == ctx.message.id
                     and payload.user_id == ctx.author.id
-                    and payload.emoji.id == Official_emojis["check4"],
+                    and payload.emoji.id == self.bot.oemojis["check4"],
                 ),
                 name="cancel",
             )
@@ -304,8 +303,8 @@ class AdminCog(commands.Cog):
                         f"```py\n{str(task.result())[:4080]}\n```".replace(self.bot.http.token, "[Token]"),
                     )
                 )
-        await ctx.message.remove_reaction(Official_emojis["check4"], self.bot.user)
-        await ctx.message.add_reaction(Official_emojis["check8"])
+        await ctx.message.remove_reaction(self.bot.oemojis["check4"], self.bot.user)
+        await ctx.message.add_reaction(self.bot.oemojis["check8"])
         del ret[ctx.message.id]
 
     @commands.command(hidden=True, name="eval")
@@ -323,8 +322,8 @@ class AdminCog(commands.Cog):
             color=Process,
         )
         msg = await ctx.send(embed=e)
-        await msg.add_reaction(Official_emojis["check5"])
-        await msg.add_reaction(Official_emojis["check6"])
+        await msg.add_reaction(self.bot.oemojis["check5"])
+        await msg.add_reaction(self.bot.oemojis["check6"])
 
         def check(r, u):
             if u.id == ctx.author.id:
@@ -392,8 +391,8 @@ class AdminCog(commands.Cog):
         server = await self.bot.fetch_guild(sid)
         e = discord.Embed(title=f"`{server.name}`をブラックリストに入れますか？", color=Process)
         msg = await ctx.send(embed=e)
-        await msg.add_reaction(Official_emojis["check5"])
-        await msg.add_reaction(Official_emojis["check6"])
+        await msg.add_reaction(self.bot.oemojis["check5"])
+        await msg.add_reaction(self.bot.oemojis["check6"])
 
         def check(r, u):
             if u.id == ctx.author.id:
@@ -426,8 +425,8 @@ class AdminCog(commands.Cog):
         user = await self.bot.fetch_user(uid)
         e = discord.Embed(title=f"`{user}`をGUnBanしますか？", color=Process)
         msg = await ctx.send(embed=e)
-        await msg.add_reaction(Official_emojis["check5"])
-        await msg.add_reaction(Official_emojis["check6"])
+        await msg.add_reaction(self.bot.oemojis["check5"])
+        await msg.add_reaction(self.bot.oemojis["check6"])
 
         def check(r, u):
             if u.id == ctx.author.id:

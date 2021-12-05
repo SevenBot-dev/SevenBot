@@ -17,11 +17,10 @@ from common_resources.consts import (
 
 class ServerStatCog(commands.Cog):
     def __init__(self, bot):
-        global Texts, Official_emojis
+        global Texts
         global get_txt
         self.bot: commands.Bot = bot
         self.bot.guild_settings = bot.guild_settings
-        Official_emojis = bot.consts["oe"]
         Texts = bot.texts
         get_txt = bot.get_txt
         self.batch_update_stat_channel.start()

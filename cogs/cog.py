@@ -13,14 +13,14 @@ import sys
 import time
 import traceback
 import urllib.parse
-from typing import Optional, Union
+from typing import TYPE_CHECKING, Optional, Union
 
 import aiohttp
 import discord
 from async_google_trans_new import AsyncTranslator
 from discord import Forbidden, NotFound
 from discord.ext import commands, syntaxer, components
-from discord.ext.commands import BadArgument, CommandNotFound, Context, bot
+from discord.ext.commands import BadArgument, CommandNotFound, Context
 from sembed import SAuthor, SEmbed, SField
 import sentry_sdk
 from texttable import Texttable
@@ -41,6 +41,9 @@ from common_resources.consts import (
     Event_dict,
 )
 from common_resources.tools import flatten, remove_emoji
+
+if TYPE_CHECKING:
+    from ..main import SevenBot
 
 
 Categories = {
@@ -218,20 +221,6 @@ def text_to_delta(delta, ctx):
         return res + str(s % 60) + get_txt(ctx.guild.id, "delta_txt")[3] + get_txt(ctx.guild.id, "delta_txt")[4]
 
 
-async def send_reaction(channel, reactions, message):
-    m = await channel.send(**message)
-    g = []
-    for r in reactions:
-        if r in Official_emojis.keys():
-            e = Official_emojis[r]
-        else:
-            e = r
-        g.append(m.add_reaction(e))
-    ga = asyncio.gather(*g)
-    await ga
-    return m
-
-
 Number_emojis = []
 Trans = 0x1A73E8
 
@@ -242,7 +231,7 @@ translator = AsyncTranslator()
 
 class MainCog(commands.Cog):
     def __init__(self, bot):
-        global Official_emojis, Texts, Global_chat, Command_counter, Global_mute, GBan
+        global Texts, Global_chat, Command_counter, Global_mute, GBan
         global Sevennet_channels, Sevennet_posts, Blacklists
         global get_txt, is_command
         self.bot: commands.Bot = bot
@@ -251,7 +240,6 @@ class MainCog(commands.Cog):
         try:
             self.bot.guild_settings = self.bot.guild_settings
             get_txt = self.bot.get_txt
-            Official_emojis = self.bot.consts["oe"]
             is_command = self.bot.is_command
             Global_chat = self.bot.raw_config["gc"]
             Command_counter = self.bot.raw_config["cc"]
@@ -262,9 +250,22 @@ class MainCog(commands.Cog):
             GBan = self.bot.raw_config["gb"]
             Texts = self.bot.texts
             for i in range(11):
-                Number_emojis.append(Official_emojis["b" + str(i)])
+                Number_emojis.append(self.bot.oemojis["b" + str(i)])
         except Exception as e:
             raise e
+
+    async def send_reaction(self, channel, reactions, message):
+        m = await channel.send(**message)
+        g = []
+        for r in reactions:
+            if r in self.bot.oemojis.keys():
+                e = self.bot.oemojis[r]
+            else:
+                e = r
+            g.append(m.add_reaction(e))
+        ga = asyncio.gather(*g)
+        await ga
+        return m
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -492,7 +493,7 @@ class MainCog(commands.Cog):
                             Sevennet_channels.remove(c)
                         else:
                             cs.append(
-                                send_reaction(
+                                self.send_reaction(
                                     channel=cn,
                                     reactions=["up", "down", "reply", "report"],
                                     message={"embed": e},
@@ -1006,7 +1007,7 @@ class MainCog(commands.Cog):
                 color=Error,
             )
             msg = await ctx.reply(embed=e)
-            await msg.add_reaction(Official_emojis["down"])
+            await msg.add_reaction(self.bot.oemojis["down"])
             try:
                 error_msg = "".join(traceback.TracebackException.from_exception(error).format())
                 await bot.wait_for(
@@ -1097,7 +1098,7 @@ class MainCog(commands.Cog):
                     n = cl.index(rc2.count)
                 if rc2.count == 1:
                     n = 4
-                em = Official_emojis["b" + str(sfi + 1)]
+                em = self.bot.oemojis["b" + str(sfi + 1)]
                 s += f":{Squares[n]}:｜{em}：{sf}\n"
             me.set_field_at(index=2, name=get_txt(g.id, "voting")[4], value=s, inline=False)
             await m.edit(embed=me)
@@ -1152,7 +1153,7 @@ class MainCog(commands.Cog):
                             await em.delete()
                         else:
                             await em.remove_reaction(pl.emoji, cn.guild.me)
-                            await em.add_reaction(Official_emojis["check4"])
+                            await em.add_reaction(self.bot.oemojis["check4"])
                     except NotFound:
                         pass
                 return
@@ -1189,7 +1190,7 @@ class MainCog(commands.Cog):
             if not m0.title:
                 return
             if m0.title == get_txt(guild.id, "free_channel_title") and pl.emoji.name == "add":
-                loop.create_task(message.remove_reaction(Official_emojis["add"], user))
+                loop.create_task(message.remove_reaction(self.bot.oemojis["add"], user))
                 e = discord.Embed(
                     description=get_txt(guild.id, "free_channel_ask"),
                     color=Widget,
@@ -1264,7 +1265,7 @@ class MainCog(commands.Cog):
                         user: discord.PermissionOverwrite(read_messages=True, send_messages=False),
                     }
                     await channel.edit(overwrites=overwrites, name=channel.name[0:-5] + "クローズ")
-                    await message.remove_reaction(Official_emojis["lock"], user)
+                    await message.remove_reaction(self.bot.oemojis["lock"], user)
             elif message.embeds[0].title == "チケット作成":
                 await message.remove_reaction(pl.emoji, user)
                 if pl.emoji.name == "add":
@@ -1294,12 +1295,12 @@ class MainCog(commands.Cog):
                         name=f"チケット#{str(channel+1).zfill(4)}-アクティブ",
                         overwrites=ow,
                     )
-                    em = Official_emojis["lock"]
+                    em = self.bot.oemojis["lock"]
                     s = self.bot.guild_settings[guild.id]["ticket_subject"][message.id]
                     e = discord.Embed(title=s[0], description=s[1], color=Widget)
                     e.set_footer(text="下の南京錠ボタンを押して終了")
                     message = await tc.send(user.mention, embed=e)
-                    await message.add_reaction(Official_emojis["lock"])
+                    await message.add_reaction(self.bot.oemojis["lock"])
                     self.bot.guild_settings[guild.id]["ticket_message"].append(message.id)
             elif message.embeds[0].title == get_txt(guild.id, "voting")[0]:
                 ft = message.embeds[0].footer.text
@@ -1357,7 +1358,7 @@ class MainCog(commands.Cog):
                             msg = await channel.send(embed=e)
                             for n in Number_emojis[1 : len(mdh) + (2 if len(mdh) < 10 else 1)]:
                                 loop.create_task(msg.add_reaction(n))
-                            loop.create_task(msg.add_reaction(Official_emojis["check6"]))
+                            loop.create_task(msg.add_reaction(self.bot.oemojis["check6"]))
 
                             def check(r, ru):
                                 if ru.bot:
@@ -1366,14 +1367,14 @@ class MainCog(commands.Cog):
                                     r.count >= 2
                                     and r.emoji
                                     in Number_emojis[1 : len(mdh) + (2 if len(mdh) < 10 else 1)]
-                                    + [Official_emojis["check6"]]
+                                    + [self.bot.oemojis["check6"]]
                                     and ru.id == user.id
                                     and r.message.id == msg.id
                                 ):
                                     return True
 
                             r, _ = await self.bot.wait_for("reaction_add", check=check)
-                            if r.emoji == Official_emojis["check6"]:
+                            if r.emoji == self.bot.oemojis["check6"]:
                                 await message.remove_reaction(pl.emoji, self.bot.get_user(pl.user_id))
                                 return await msg.delete()
                             en = Number_emojis.index(r.emoji) - 1
@@ -1427,10 +1428,10 @@ class MainCog(commands.Cog):
                             s = ""
                             for sfi, sf in enumerate(mdh):
                                 r = sf
-                                em = Official_emojis["b" + str(sfi + 1)]
+                                em = self.bot.oemojis["b" + str(sfi + 1)]
                                 s += f"{em}：{r.mention}\n"
-                                if Official_emojis["b" + str(sfi + 1)] not in [r.emoji for r in message.reactions]:
-                                    await message.add_reaction(Official_emojis["b" + str(sfi + 1)])
+                                if self.bot.oemojis["b" + str(sfi + 1)] not in [r.emoji for r in message.reactions]:
+                                    await message.add_reaction(self.bot.oemojis["b" + str(sfi + 1)])
                             for r in message.reactions:
                                 try:
                                     n = Number_emojis.index(r.emoji)
@@ -1563,7 +1564,7 @@ class MainCog(commands.Cog):
                 return
         for sfi, sf in enumerate(roles):
             r = sf
-            em = Official_emojis["b" + str(sfi + 1)]
+            em = self.bot.oemojis["b" + str(sfi + 1)]
             s += f"{em}：{r.mention}\n"
         sn = ""
         if single:
@@ -1634,13 +1635,13 @@ class MainCog(commands.Cog):
                 else:
                     pv = ph[pk]
                 if admin:
-                    e = Official_emojis["check8"]
+                    e = self.bot.oemojis["check8"]
                     if pk == "administrator":
-                        e = Official_emojis["check"]
+                        e = self.bot.oemojis["check"]
                 elif pv:
-                    e = Official_emojis["check"]
+                    e = self.bot.oemojis["check"]
                 else:
-                    e = Official_emojis["check4"]
+                    e = self.bot.oemojis["check4"]
                 r += str(e)
                 if channel:
                     if "|" in pk:
@@ -1648,11 +1649,11 @@ class MainCog(commands.Cog):
                     else:
                         pw = ow[pk]
                     if pw is None:
-                        e = Official_emojis["check7"]
+                        e = self.bot.oemojis["check7"]
                     elif pw is False:
-                        e = Official_emojis["check4"]
+                        e = self.bot.oemojis["check4"]
                     elif pw:
-                        e = Official_emojis["check"]
+                        e = self.bot.oemojis["check"]
                     r += f"({e})"
                 r += f"`{pv3}`\n"
             em.add_field(name=tpt["name"], value=r)
@@ -1746,17 +1747,17 @@ class MainCog(commands.Cog):
             value=get_txt(ctx.guild.id, "lookup")[10][0 if u.bot else 1],
         )
         if isinstance(u, discord.User):
-            st = str(Official_emojis["unknown"]) + get_txt(ctx.guild.id, "lookup")[5][0]
+            st = str(self.bot.oemojis["unknown"]) + get_txt(ctx.guild.id, "lookup")[5][0]
         elif u.status == discord.Status.online:
-            st = str(Official_emojis["online"]) + get_txt(ctx.guild.id, "lookup")[5][1]
+            st = str(self.bot.oemojis["online"]) + get_txt(ctx.guild.id, "lookup")[5][1]
         elif u.status == discord.Status.idle:
-            st = str(Official_emojis["idle"]) + get_txt(ctx.guild.id, "lookup")[5][2]
+            st = str(self.bot.oemojis["idle"]) + get_txt(ctx.guild.id, "lookup")[5][2]
         elif u.status == discord.Status.dnd:
-            st = str(Official_emojis["dnd"]) + get_txt(ctx.guild.id, "lookup")[5][3]
+            st = str(self.bot.oemojis["dnd"]) + get_txt(ctx.guild.id, "lookup")[5][3]
         elif u.status == discord.Status.offline:
-            st = str(Official_emojis["offline"]) + get_txt(ctx.guild.id, "lookup")[5][4]
+            st = str(self.bot.oemojis["offline"]) + get_txt(ctx.guild.id, "lookup")[5][4]
         else:
-            st = str(Official_emojis["unknown"]) + str(u.status)
+            st = str(self.bot.oemojis["unknown"]) + str(u.status)
         e.add_field(
             name=Texts[self.bot.guild_settings[ctx.guild.id]["lang"]]["lookup"][5][5],
             value=st,
@@ -1797,7 +1798,7 @@ class MainCog(commands.Cog):
         )
         e.set_thumbnail(url=guild.icon.url)
         chs = (
-            str(Official_emojis["cc"])
+            str(self.bot.oemojis["cc"])
             + " "
             + get_txt(ctx.guild.id, "serverinfo")["channels"][1]
             + ":"
@@ -1805,7 +1806,7 @@ class MainCog(commands.Cog):
             + "\n"
         )
         chs += (
-            str(Official_emojis["tc"])
+            str(self.bot.oemojis["tc"])
             + " "
             + get_txt(ctx.guild.id, "serverinfo")["channels"][2]
             + ":"
@@ -1813,7 +1814,7 @@ class MainCog(commands.Cog):
             + "\n"
         )
         chs += (
-            str(Official_emojis["vc"])
+            str(self.bot.oemojis["vc"])
             + " "
             + get_txt(ctx.guild.id, "serverinfo")["channels"][3]
             + ":"
@@ -1827,8 +1828,8 @@ class MainCog(commands.Cog):
                 len(guild.members),
                 len([m for m in guild.members if not m.bot]),
                 len([m for m in guild.members if m.bot]),
-                Official_emojis["user"],
-                Official_emojis["bot"],
+                self.bot.oemojis["user"],
+                self.bot.oemojis["bot"],
             ),
         )
         e.add_field(
@@ -1889,10 +1890,10 @@ class MainCog(commands.Cog):
                 value="不快に感じる行為はしないで下さい。",
                 inline=False,
             )
-            f1 = Official_emojis["up"]
-            f2 = Official_emojis["down"]
-            f3 = Official_emojis["reply"]
-            f4 = Official_emojis["report"]
+            f1 = self.bot.oemojis["up"]
+            f2 = self.bot.oemojis["down"]
+            f3 = self.bot.oemojis["reply"]
+            f4 = self.bot.oemojis["report"]
             e3.add_field(
                 name="ボタンについて",
                 value=f"{f1}：高評価\n{f2}：低評価\n{f3}：返信（押して消えた後10秒以内に送信）\n{f4}：報告/削除",
@@ -1948,11 +1949,11 @@ class MainCog(commands.Cog):
             self.bot.guild_settings[ctx.guild.id]["ticket_category"] = cat.id
         else:
             cat = self.bot.get_channel(self.bot.guild_settings[ctx.guild.id]["ticket_category"])
-        Official_emojis["add"]
+        self.bot.oemojis["add"]
         e = discord.Embed(title="チケット作成", description=subject, color=Widget)
         e.set_footer(text="下のボタンを押してチケットを作成（1時間に1回）")
         m = await ctx.send(embed=e)
-        await m.add_reaction(Official_emojis["add"])
+        await m.add_reaction(self.bot.oemojis["add"])
         self.bot.guild_settings[ctx.guild.id]["ticket_subject"][m.id] = [
             subject,
             description,
@@ -1968,14 +1969,14 @@ class MainCog(commands.Cog):
                 position=ctx.channel.position,
             )
             await ctx.channel.edit(category=cat)
-        Official_emojis["add"]
+        self.bot.oemojis["add"]
         e = discord.Embed(
             title=get_txt(ctx.guild.id, "free_channel_title"),
-            description=get_txt(ctx.guild.id, "free_channel_desc").format(Official_emojis["add"]),
+            description=get_txt(ctx.guild.id, "free_channel_desc").format(self.bot.oemojis["add"]),
             color=Widget,
         )
         m = await ctx.send(embed=e)
-        await m.add_reaction(Official_emojis["add"])
+        await m.add_reaction(self.bot.oemojis["add"])
 
     @commands.command(name="parse")
     async def text_parse(self, ctx):
@@ -2145,7 +2146,7 @@ class MainCog(commands.Cog):
             await ctx.reply(ret)
         except BaseException:
             pass
-        await ctx.message.add_reaction(Official_emojis["check8"])
+        await ctx.message.add_reaction(self.bot.oemojis["check8"])
 
     @commands.group(invoke_without_command=True)
     @commands.has_permissions(manage_webhooks=True)
@@ -2155,12 +2156,12 @@ class MainCog(commands.Cog):
     @follow.command("announce")
     async def follow_announce(self, ctx):
         await self.bot.get_channel(738879378196267009).follow(destination=ctx.channel)
-        await ctx.message.add_reaction(Official_emojis["check8"])
+        await ctx.message.add_reaction(self.bot.oemojis["check8"])
 
     @follow.command("updates")
     async def follow_updates(self, ctx):
         await self.bot.get_channel(817751838719868950).follow(destination=ctx.channel)
-        await ctx.message.add_reaction(Official_emojis["check8"])
+        await ctx.message.add_reaction(self.bot.oemojis["check8"])
 
     @commands.command(aliases=["vote_rank"])
     async def vote_ranking(self, ctx):
@@ -2307,7 +2308,7 @@ class MainCog(commands.Cog):
             pass
 
 
-def setup(_bot):
+def setup(_bot: "SevenBot"):
     global bot
     bot = _bot
     _bot.add_cog(MainCog(_bot), override=True)
@@ -2366,7 +2367,7 @@ def setup(_bot):
             try:
                 sentry_sdk.capture_exception(ex)
                 msg = await c.send(embed=e)
-                await msg.add_reaction(Official_emojis["down"])
+                await msg.add_reaction(bot.oemojis["down"])
                 await bot.wait_for(
                     "reaction_add",
                     check=lambda r, u: r.message.id == msg.id and r.emoji.name == "down" and not u.bot,

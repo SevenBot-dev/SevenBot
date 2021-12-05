@@ -152,13 +152,11 @@ BRACKET_TRANS = str.maketrans(BRACKET_DICT)
 
 class FunCog(commands.Cog):
     def __init__(self, _bot):
-        global Official_emojis, get_txt, is_command, Texts, Number_emojis
+        global get_txt, is_command, Texts, Number_emojis
         self.bot = _bot
         get_txt = _bot.get_txt
         is_command = _bot.is_command
         Texts = _bot.texts
-        self.bot.guild_settings = _bot.guild_settings
-        Official_emojis = _bot.consts["oe"]
         Number_emojis = _bot.consts["ne"]
 
     @commands.Cog.listener("on_message")
@@ -181,7 +179,7 @@ class FunCog(commands.Cog):
         if wh is None:
             wh = await message.channel.create_webhook(
                 name="sevenbot-lainan",
-                avatar=(await Official_emojis["lainan"].url_as().read()),
+                avatar=(await self.bot.oemojis["lainan"].url_as().read()),
             )
 
         LAINAN_QUEUE.append([wh, message.content])
@@ -671,18 +669,18 @@ class FunCog(commands.Cog):
                                         description=get_txt(guild.id, "ww")[
                                             "noon_desc"
                                         ].format(
-                                            Official_emojis["skip"],
-                                            Official_emojis["info"],
+                                            self.bot.oemojis["skip"],
+                                            self.bot.oemojis["info"],
                                             wpl,
                                         ),
                                         color=Gaming,
                                     )
                                     msg = await channel.send(embed=e)
                                     await msg.add_reaction(
-                                        Official_emojis["skip"]
+                                        self.bot.oemojis["skip"]
                                     )
                                     await msg.add_reaction(
-                                        Official_emojis["info"]
+                                        self.bot.oemojis["info"]
                                     )
 
                                     def check(reaction, user):
@@ -699,7 +697,7 @@ class FunCog(commands.Cog):
                                             return False
                                         elif (
                                             reaction.emoji
-                                            != Official_emojis["skip"]
+                                            != self.bot.oemojis["skip"]
                                         ):
                                             loop.create_task(
                                                 reaction.message.remove_reaction(
@@ -1375,7 +1373,7 @@ class FunCog(commands.Cog):
             + get_txt(ctx.guild.id, "big-number")["waiting"],
             description=get_txt(ctx.guild.id, "big-number")[
                 "waiting_desc"
-            ].format(Official_emojis["check5"], Official_emojis["check6"]),
+            ].format(self.bot.oemojis["check5"]["check6"]),
             color=Gaming,
         )
         e.add_field(
@@ -1384,8 +1382,8 @@ class FunCog(commands.Cog):
         )
         msg = await ctx.reply(embed=e)
         Bignum_join[msg] = [ctx.author.mention]
-        await msg.add_reaction(Official_emojis["check5"])
-        await msg.add_reaction(Official_emojis["check6"])
+        await msg.add_reaction(self.bot.oemojis["check5"])
+        await msg.add_reaction(self.bot.oemojis["check6"])
 
     @commands.group(
         name="werewolf", invoke_without_command=True, aliases=["ww"]
@@ -1396,7 +1394,7 @@ class FunCog(commands.Cog):
             + " - "
             + get_txt(ctx.guild.id, "ww")["waiting"],
             description=get_txt(ctx.guild.id, "ww")["waiting_desc"].format(
-                Official_emojis["check5"], Official_emojis["check6"]
+                self.bot.oemojis["check5"]["check6"]
             ),
             color=Gaming,
         )
@@ -1406,8 +1404,8 @@ class FunCog(commands.Cog):
         )
         msg = await ctx.reply(embed=e)
         Wolf_join[msg.id] = [ctx.author.mention]
-        await msg.add_reaction(Official_emojis["check5"])
-        await msg.add_reaction(Official_emojis["check6"])
+        await msg.add_reaction(self.bot.oemojis["check5"])
+        await msg.add_reaction(self.bot.oemojis["check6"])
 
     @commands.has_guild_permissions(manage_roles=True)
     @ww.command(name="role")
@@ -1657,7 +1655,7 @@ class FunCog(commands.Cog):
             else:
                 await msg.edit(
                     content=get_txt(ctx.guild.id, "ox_turn").format(
-                        str(Official_emojis["ox" + str(index % 2 + 1)])
+                        str(self.bot.oemojis["ox" + str(index % 2 + 1)])
                         + turns[index % 2].mention
                     ),
                     embed=e,
@@ -1678,7 +1676,7 @@ class FunCog(commands.Cog):
             e.description = get_txt(ctx.guild.id, "ox_draw")
         else:
             e.description = get_txt(ctx.guild.id, "ox_win").format(
-                str(Official_emojis["ox" + str(2 - index % 2)])
+                str(self.bot.oemojis["ox" + str(2 - index % 2)])
                 + turns[win - 1].mention
             )
         await msg.clear_reactions()
@@ -2123,18 +2121,18 @@ class FunCog(commands.Cog):
                         )
 
                     m = await ctx.reply(embed=e)
-                    await m.add_reaction(Official_emojis["check6"])
+                    await m.add_reaction(self.bot.oemojis["check6"])
                     try:
                         _ = await self.bot.wait_for(
                             "reaction_add",
                             check=lambda r, u: r.message.id == m.id
-                            and r.emoji == Official_emojis["check6"]
+                            and r.emoji == self.bot.oemojis["check6"]
                             and not u.bot,
                         )
                         await m.edit(content="[編集済み]", embed=None)
-                        await m.clear_reaction(Official_emojis["check6"])
+                        await m.clear_reaction(self.bot.oemojis["check6"])
                     except asyncio.TimeoutError:
-                        await m.remove_reaction(Official_emojis["check6"])
+                        await m.remove_reaction(self.bot.oemojis["check6"])
 
 
 def setup(_bot):

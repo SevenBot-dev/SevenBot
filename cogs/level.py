@@ -22,7 +22,7 @@ from common_resources.tools import remove_emoji, chrsize_len
 
 class LevelCog(commands.Cog):
     def __init__(self, bot):
-        global Texts, GBan, SB_Bans, Official_emojis
+        global Texts, GBan, SB_Bans
         global get_txt, is_command
         self.bot: commands.Bot = bot
         self.bot.guild_settings = bot.guild_settings
@@ -30,7 +30,6 @@ class LevelCog(commands.Cog):
         get_txt = bot.get_txt
         is_command = self.bot.is_command
         GBan = self.bot.raw_config["gb"]
-        Official_emojis = self.bot.consts["oe"]
         SB_Bans = self.bot.raw_config["sbb"]
 
     @commands.Cog.listener("on_message")
@@ -153,17 +152,17 @@ class LevelCog(commands.Cog):
                 p = 0
             else:
                 p = math.floor(mc / nm * 100)
-            e = Official_emojis["barl"]
+            e = self.bot.oemojis["barl"]
             r = str(e)
             for i in range(10):
                 if p >= (i * 10 + 10):
-                    e = Official_emojis["barc210"]
+                    e = self.bot.oemojis["barc210"]
                 elif p <= (i * 10):
-                    e = Official_emojis["barc1"]
+                    e = self.bot.oemojis["barc1"]
                 else:
-                    e = Official_emojis[f"barc2{10-abs(p - (i*10+10))}"]
+                    e = self.bot.oemojis[f"barc2{10-abs(p - (i*10+10))}"]
                 r += str(e)
-            e = Official_emojis["barr"]
+            e = self.bot.oemojis["barr"]
             r += str(e)
             e = discord.Embed(
                 title=f"{u.display_name}のレベル",
