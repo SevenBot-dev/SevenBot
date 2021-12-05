@@ -667,7 +667,7 @@ class MainCog(commands.Cog):
         if message.channel.id in tc:
             try:
                 await message.publish()
-            except discord.errors.HTTPException:
+            except discord.HTTPException:
                 pass
 
     @commands.Cog.listener("on_message")
@@ -2332,7 +2332,7 @@ def setup(_bot: "SevenBot"):
                 return
             if isinstance(ex, (AttributeError, aiohttp.client_exceptions.ClientOSError)):
                 return
-            if isinstance(ex, discord.errors.HTTPException):
+            if isinstance(ex, discord.HTTPException):
                 if ex.status == 400:
                     if "message_reference: Unknown message" not in ex.text:
                         return sentry_sdk.capture_exception(ex)
