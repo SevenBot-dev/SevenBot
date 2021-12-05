@@ -199,10 +199,10 @@ class SevenBot(commands.Bot):
         # await self.change_presence(activity=Save_game, status=discord.Status.dnd)
         if self.debug:
             return
-        gs2 = list(self.bot.guild_settings.keys())
+        gs2 = list(self.guild_settings.keys())
         for gs in gs2:
             if self.get_guild(gs) is None:
-                del self.bot.guild_settings[gs]
+                del self.guild_settings[gs]
         # r = str(self.raw_config)
         # ar = []
         # PastebinAPI.paste(PB_key, r, paste_private = "private",paste_expire_date = None)
@@ -211,7 +211,7 @@ class SevenBot(commands.Bot):
 
         # file.write(r)
         # file.close()
-        for gk, gv in self.bot.guild_settings.items():
+        for gk, gv in self.guild_settings.items():
             r = json.loads(json.dumps(gv))
             r["gid"] = gk
             res = await self.db.guild_settings.replace_one({"gid": gk}, r)
