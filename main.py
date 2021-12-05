@@ -42,7 +42,6 @@ if len(sys.argv) > 1 and sys.argv[1] != "debug":
 else:
     os.environ["DEBUG"] = "True"
     db_name = "development"
-    logger.setLevel(logging.DEBUG)
 
 Channel_ids = {
     "log": 756254787191963768,
