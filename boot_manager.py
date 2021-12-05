@@ -7,7 +7,7 @@ if sys.platform == "win32":
     cmd = "python main.py"
 else:
     cmd = "exec python3.9 main.py"
-p = subprocess.Popen(cmd, shell=True)
+p = subprocess.Popen(cmd, shell=True, stdout=sys.stdout, stderr=sys.stderr)
 
 while True:
     res = subprocess.run(
@@ -24,7 +24,7 @@ while True:
             stderr=subprocess.STDOUT,
             text=True,
         )
-        p = subprocess.Popen(cmd, shell=True)
+        p = subprocess.Popen(cmd, shell=True, stdout=sys.stdout, stderr=sys.stderr)
     elif "origin/" in res.stdout:
         subprocess.run(
             "git pull origin main".split(), stdout=subprocess.DEVNULL
