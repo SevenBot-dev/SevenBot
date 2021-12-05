@@ -1,0 +1,25 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Lint
+
+on:
+  push:
+    paths:
+      - '*.py'
+
+jobs:
+  flake8_py3:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.9
+          architecture: x64
+      - name: Install poetry
+        run: pip install poetry
+      - name: Setup virtualenv
+        run: poetry install
+      - name: Run pflake8
+        run: |
+          poetry run pflake8
