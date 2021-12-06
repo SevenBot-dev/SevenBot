@@ -2,10 +2,16 @@ import time
 
 import discord
 import sembed
-from common_resources.consts import Activate_aliases, Chat, Deactivate_aliases, Error, Success
 from discord.ext import commands
 
 import _pathmagic  # type: ignore # noqa
+from common_resources.consts import (
+    Activate_aliases,
+    Chat,
+    Deactivate_aliases,
+    Error,
+    Success,
+)
 
 
 class LockMessageCog(commands.Cog):

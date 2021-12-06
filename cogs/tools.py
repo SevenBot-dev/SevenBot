@@ -18,10 +18,7 @@ from discord.ext import commands, tasks
 
 import _pathmagic  # type: ignore # noqa: F401
 from common_resources.consts import Deactivate_aliases, Info, Success
-from common_resources.tokens import (
-    twitter_consumer_key,
-    twitter_consumer_secret,
-)
+from common_resources.tokens import twitter_consumer_key, twitter_consumer_secret
 
 
 def hmac_sha1(input_str, key):

@@ -19,10 +19,10 @@ from discord.ext import commands, levenshtein
 from motor import motor_asyncio as motor
 
 from common_resources import consts as common_resources
-from common_resources.tokens import TOKEN, cstr, dbl_token, web_pass, sentry_url
 from common_resources.consts import Official_discord_id, Sub_discord_id
-from common_resources.tools import flatten
 from common_resources.settings import GuildSettings
+from common_resources.tokens import TOKEN, cstr, dbl_token, sentry_url, web_pass
+from common_resources.tools import flatten
 
 logger = logging.getLogger("discord")
 logger.setLevel(logging.INFO)

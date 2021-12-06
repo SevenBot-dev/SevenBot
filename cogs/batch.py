@@ -10,8 +10,8 @@ import psutil
 from discord.ext import commands, tasks
 
 import _pathmagic  # type: ignore # noqa
-from common_resources.tokens import botdd_token
 from common_resources.settings import GuildSettings
+from common_resources.tokens import botdd_token
 
 Last_favorite = {}
 Time_format = "%Y-%m-%d %H:%M:%S"

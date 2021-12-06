@@ -7,13 +7,13 @@ import time
 import zlib
 
 import discord
+import re2 as re
 from discord.ext import commands, components
 from discord.ext.commands.converter import TextChannelConverter
-import re2 as re
 from texttable import Texttable
 
 import _pathmagic  # type: ignore # noqa
-from common_resources.consts import Info, Success, Error, Alert
+from common_resources.consts import Alert, Error, Info, Success
 
 
 class AutoreplyCog(commands.Cog):

@@ -13,7 +13,7 @@ from discord.ext import commands
 from texttable import Texttable
 
 import _pathmagic  # type: ignore # noqa
-from common_resources.consts import Info, Success, Error, Premium_color
+from common_resources.consts import Error, Info, Premium_color, Success
 from common_resources.tools import delay_react_remove
 
 

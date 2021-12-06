@@ -17,28 +17,28 @@ from typing import TYPE_CHECKING, Optional, Union
 
 import aiohttp
 import discord
+import sentry_sdk
 from async_google_trans_new import AsyncTranslator
 from discord import Forbidden, NotFound
-from discord.ext import commands, syntaxer, components
+from discord.ext import commands, components, syntaxer
 from discord.ext.commands import BadArgument, CommandNotFound, Context
 from sembed import SAuthor, SEmbed, SField
-import sentry_sdk
 from texttable import Texttable
 
 import _pathmagic  # type: ignore # noqa: F401
 from common_resources.consts import (
     Activate_aliases,
     Alert,
+    Bot_info,
     Chat,
     Deactivate_aliases,
     Error,
+    Event_dict,
     Info,
     Official_discord_id,
+    Owner_ID,
     Success,
     Widget,
-    Bot_info,
-    Owner_ID,
-    Event_dict,
 )
 from common_resources.tools import flatten, remove_emoji
 

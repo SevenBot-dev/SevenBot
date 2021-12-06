@@ -3,8 +3,8 @@ import time
 from typing import Literal, Union
 
 import discord
-from discord.ext import commands
 from discord.errors import Forbidden
+from discord.ext import commands
 from discord.ext.commands import Greedy
 from texttable import Texttable
 
@@ -12,12 +12,12 @@ import _pathmagic  # type: ignore # noqa
 from common_resources.consts import (
     Activate_aliases,
     Deactivate_aliases,
-    Info,
-    Success,
     Error,
+    Info,
     Level,
+    Success,
 )
-from common_resources.tools import remove_emoji, chrsize_len
+from common_resources.tools import chrsize_len, remove_emoji
 
 
 class LevelCog(commands.Cog):

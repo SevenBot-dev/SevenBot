@@ -4,7 +4,7 @@ from discord.ext import commands
 from texttable import Texttable
 
 import _pathmagic  # type: ignore # noqa
-from common_resources.consts import Info, Success, Error
+from common_resources.consts import Error, Info, Success
 from common_resources.tools import remove_emoji
 
 

@@ -1,8 +1,8 @@
 import asyncio
-import math
 import datetime
 import io
 import json
+import math
 import random
 import time
 
@@ -12,10 +12,16 @@ from discord.ext.commands import bot
 from sembed import SEmbed
 from texttable import Texttable
 
-
 import _pathmagic  # type: ignore # noqa
-from common_resources.consts import Info, Success, Error, Chat, Activate_aliases, Deactivate_aliases
-from common_resources.tools import flatten, convert_timedelta
+from common_resources.consts import (
+    Activate_aliases,
+    Chat,
+    Deactivate_aliases,
+    Error,
+    Info,
+    Success,
+)
+from common_resources.tools import convert_timedelta, flatten
 
 
 def delta_to_text(delta, ctx):

@@ -7,12 +7,7 @@ import discord
 from discord.ext import commands, tasks
 
 import _pathmagic  # type: ignore # noqa
-from common_resources.consts import (
-    Activate_aliases,
-    Error,
-    Success,
-    Deactivate_aliases,
-)
+from common_resources.consts import Activate_aliases, Deactivate_aliases, Error, Success
 
 Bump_id = 302050872383242240
 Dissoku_id = 761562078095867916

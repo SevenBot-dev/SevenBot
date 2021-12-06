@@ -6,9 +6,9 @@ import _pathmagic  # type: ignore # noqa
 from common_resources.consts import (
     Activate_aliases,
     Deactivate_aliases,
+    Error,
     Info,
     Success,
-    Error,
 )
 
 

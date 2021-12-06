@@ -1,19 +1,19 @@
 import asyncio
 import hashlib
 import io
-from itertools import product
 import random
 import time
+from itertools import product
 
 import aiohttp
 import discord
+from discord.errors import Forbidden, NotFound
 from discord.ext import commands, components
-from discord.errors import NotFound, Forbidden
 from PIL import Image, ImageDraw, ImageFont
 from sembed import SEmbed
 
 import _pathmagic  # type: ignore # noqa
-from common_resources.consts import Process, Success, Error, Widget
+from common_resources.consts import Error, Process, Success, Widget
 from common_resources.tokens import web_pass
 
 

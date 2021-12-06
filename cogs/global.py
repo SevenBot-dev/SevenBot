@@ -11,6 +11,11 @@ import urllib.parse
 import aiohttp
 import discord
 import websockets
+from discord.errors import Forbidden, NotFound
+from discord.ext import commands, components, tasks
+from sembed import SAuthor, SEmbed, SField  # , SField, SAuthor, SFooter
+
+import _pathmagic  # type: ignore # noqa
 from common_resources.consts import (
     Activate_aliases,
     Chat,
@@ -24,11 +29,6 @@ from common_resources.consts import (
 )
 from common_resources.tokens import wsgc_token
 from common_resources.tools import flatten
-from discord.errors import Forbidden, NotFound
-from discord.ext import commands, components, tasks
-from sembed import SAuthor, SEmbed, SField  # , SField, SAuthor, SFooter
-
-import _pathmagic  # type: ignore # noqa
 
 SGC_ID = 707158257818664991
 SGC_ID2 = 799184205316751391

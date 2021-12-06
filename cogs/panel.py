@@ -5,7 +5,7 @@ import discord
 from discord.ext import commands
 
 import _pathmagic  # type: ignore # noqa
-from common_resources.consts import Success, Error, Widget
+from common_resources.consts import Error, Success, Widget
 from common_resources.tools import convert_timedelta
 
 

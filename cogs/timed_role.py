@@ -2,17 +2,12 @@ import asyncio
 import time
 
 import discord
-from discord.ext import commands, tasks, components
+from discord.ext import commands, components, tasks
 from texttable import Texttable
 
 import _pathmagic  # type: ignore # noqa
-from common_resources.consts import Info, Success, Error
-from common_resources.tools import (
-    convert_timedelta,
-    to_lts,
-    remove_emoji,
-    chrsize_len,
-)
+from common_resources.consts import Error, Info, Success
+from common_resources.tools import chrsize_len, convert_timedelta, remove_emoji, to_lts
 
 
 class TimedRoleCog(commands.Cog):

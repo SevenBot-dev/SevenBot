@@ -10,15 +10,14 @@ from discord.ext import commands, components  # , tasks
 from sembed import SEmbed  # SAuthor, SField, SFooter
 
 import _pathmagic  # type: ignore # noqa
-
 from common_resources.consts import (
-    Info,
-    Success,
-    Error,
     Chat,
-    Process,
-    Owner_ID,
+    Error,
+    Info,
     Official_discord_id,
+    Owner_ID,
+    Process,
+    Success,
 )
 
 if TYPE_CHECKING:

@@ -6,10 +6,10 @@ from discord.ext import commands, components
 import _pathmagic  # type: ignore # noqa
 from common_resources.consts import (
     Activate_aliases,
-    Deactivate_aliases,
-    Success,
-    Error,
     Chat,
+    Deactivate_aliases,
+    Error,
+    Success,
 )
 
 Message_url_re = re.compile(

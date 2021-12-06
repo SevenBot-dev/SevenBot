@@ -2,12 +2,7 @@ import discord
 from discord.ext import commands
 
 import _pathmagic  # type: ignore # noqa
-from common_resources.consts import (
-    Activate_aliases,
-    Deactivate_aliases,
-    Success,
-    Error,
-)
+from common_resources.consts import Activate_aliases, Deactivate_aliases, Error, Success
 
 
 class ChannelSettingCog(commands.Cog):
