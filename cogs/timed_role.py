@@ -44,9 +44,7 @@ class TimedRoleCog(commands.Cog):
     @timed_role.command(name="add", aliases=["set"])
     @commands.has_guild_permissions(manage_messages=True)
     async def tr_add(self, ctx, role: discord.Role, limit: convert_timedelta):
-        self.bot.guild_settings[ctx.guild.id]["timed_role"][
-            role.id
-        ] = limit.total_seconds()
+        self.bot.guild_settings[ctx.guild.id]["timed_role"][role.id] = limit.total_seconds()
         e = discord.Embed(
             title=f"時間つきロールに`@{role.name}`を追加しました。",
             description=f"戻すには`sb#timed_role remove @{role.name}`を使用してください。",
@@ -90,18 +88,8 @@ class TimedRoleCog(commands.Cog):
                 table.set_deco(Texttable.HEADER)
                 table.set_cols_width(
                     [
-                        max(
-                            [
-                                chrsize_len(str(c))
-                                for c in gs["timed_role"].keys()
-                            ]
-                        ),
-                        max(
-                            [
-                                chrsize_len(str(to_lts(c)))
-                                for c in gs["timed_role"].values()
-                            ]
-                        ),
+                        max([chrsize_len(str(c)) for c in gs["timed_role"].keys()]),
+                        max([chrsize_len(str(to_lts(c))) for c in gs["timed_role"].values()]),
                     ]
                 )
                 table.set_cols_dtype(["t", "t"])
@@ -124,12 +112,8 @@ class TimedRoleCog(commands.Cog):
                     table.add_row(
                         [
                             k,
-                            v[0].replace(
-                                "\n", get_txt(ctx.guild.id, "tr_list_br")
-                            ),
-                            v[1].replace(
-                                "\n", get_txt(ctx.guild.id, "tr_list_br")
-                            ),
+                            v[0].replace("\n", get_txt(ctx.guild.id, "tr_list_br")),
+                            v[1].replace("\n", get_txt(ctx.guild.id, "tr_list_br")),
                         ]
                     )
             res.append(table.draw())
@@ -149,8 +133,7 @@ class TimedRoleCog(commands.Cog):
                 try:
                     com = await self.bot.wait_for(
                         "button_click",
-                        check=lambda com: com.message == msg
-                        and com.member == ctx.author,
+                        check=lambda com: com.message == msg and com.member == ctx.author,
                         timeout=60,
                     )
                     await com.defer_update()
@@ -165,8 +148,7 @@ class TimedRoleCog(commands.Cog):
                     elif com.custom_id == "exit":
                         break
                     e = discord.Embed(
-                        title=get_txt(ctx.guild.id, "tr_list")
-                        + f" - {page+1}/{len(res)}",
+                        title=get_txt(ctx.guild.id, "tr_list") + f" - {page+1}/{len(res)}",
                         description=f"```asciidoc\n{res[page]}```",
                         color=Info,
                     )
@@ -184,9 +166,7 @@ class TimedRoleCog(commands.Cog):
             if t["time"] < time.time():
                 try:
                     guild = self.bot.get_guild(t["guild"])
-                    await guild.get_member(t["member"]).remove_roles(
-                        guild.get_role(t["role"])
-                    )
+                    await guild.get_member(t["member"]).remove_roles(guild.get_role(t["role"]))
                 except (AttributeError, discord.Forbidden):
                     pass
             else:

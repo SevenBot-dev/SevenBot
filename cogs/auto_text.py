@@ -33,11 +33,7 @@ class AutoTextCog(commands.Cog):
     @auto_text.command("activate", aliases=Activate_aliases)
     async def auto_text_activate(self, ctx, channel: discord.VoiceChannel):
         if channel.category is None:
-            return await ctx.reply(
-                embed=SEmbed(
-                    "VCが条件を満たしていません。", "VCはカテゴリに入っている必要があります。", color=Error
-                )
-            )
+            return await ctx.reply(embed=SEmbed("VCが条件を満たしていません。", "VCはカテゴリに入っている必要があります。", color=Error))
         elif channel.id in self.bot.guild_settings[ctx.guild.id]["auto_text"]:
             return await ctx.reply(
                 embed=SEmbed(
@@ -76,11 +72,7 @@ class AutoTextCog(commands.Cog):
 
     @commands.Cog.listener()
     async def on_voice_channel_update(self, member, before, after):
-        if (
-            before is not None
-            and (not before.members)
-            and before in Auto_text_channels
-        ):
+        if before is not None and (not before.members) and before in Auto_text_channels:
             try:
                 await Auto_text_channels[before].delete()
             except discord.NotFound:

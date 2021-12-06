@@ -86,10 +86,7 @@ class LockMessageCog(commands.Cog):
                 embed=sembed.SEmbed(
                     description=content["content"],
                     color=Chat,
-                    author=sembed.SAuthor(
-                        name=author.display_name,
-                        icon_url=author.display_avatar.url + "?locked"
-                    ),
+                    author=sembed.SAuthor(name=author.display_name, icon_url=author.display_avatar.url + "?locked"),
                 )
             )
             self.bot.guild_settings[message.guild.id]["lock_message_id"][message.channel.id] = msg.id

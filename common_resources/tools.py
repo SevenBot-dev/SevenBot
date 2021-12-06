@@ -18,9 +18,7 @@ Shard_re = re.compile(r"(\d+)([^\d]+)?")
 
 def flatten(li):
     for el in li:
-        if isinstance(el, collections.abc.Iterable) and not isinstance(
-            el, (str, bytes)
-        ):
+        if isinstance(el, collections.abc.Iterable) and not isinstance(el, (str, bytes)):
             yield from flatten(el)
         else:
             yield el
@@ -31,22 +29,14 @@ def to_lts(s):
     res = str((s // 60) % 60).zfill(2) + ":" + str(s % 60).zfill(2)
     if s > 3600:
         if s > 3600 * 24:
-            res = (
-                str(s // 3600 // 24)
-                + "d "
-                + str(s // 3600 % 24).zfill(2)
-                + ":"
-                + res
-            )
+            res = str(s // 3600 // 24) + "d " + str(s // 3600 % 24).zfill(2) + ":" + res
         else:
             res = str(s // 3600).zfill(2) + ":" + res
     return res
 
 
 def remove_emoji(src_str):
-    return "".join(
-        "?" if c in UNICODE_TO_DISCORD.keys() else c for c in src_str
-    )
+    return "".join("?" if c in UNICODE_TO_DISCORD.keys() else c for c in src_str)
 
 
 def recr_keys(d):
@@ -114,17 +104,13 @@ async def send_subcommands(ctx):
             + (
                 ctx.bot.get_txt(ctx.guild.id, "help_detail").get(
                     str(c),
-                    "_"
-                    + ctx.bot.get_txt(ctx.guild.id, "help_detail_none")
-                    + "_",
+                    "_" + ctx.bot.get_txt(ctx.guild.id, "help_detail_none") + "_",
                 )
             ).split("\n")[0]
             + "\n"
         )
     e = discord.Embed(
-        title=ctx.bot.get_txt(ctx.guild.id, "subcommand").format(
-            ctx.command.name
-        ),
+        title=ctx.bot.get_txt(ctx.guild.id, "subcommand").format(ctx.command.name),
         description=desc,
         color=0x00CCFF,
     )

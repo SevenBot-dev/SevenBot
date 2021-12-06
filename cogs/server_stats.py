@@ -59,16 +59,10 @@ class ServerStatCog(commands.Cog):
                 if c is not None:
                     await c.delete()
         else:
-            overwrites = {
-                ctx.guild.default_role: discord.PermissionOverwrite(
-                    connect=False
-                )
-            }
+            overwrites = {ctx.guild.default_role: discord.PermissionOverwrite(connect=False)}
             cat = await ctx.guild.create_category("統計", overwrites=overwrites)
         for stat in stats:
-            n = await ctx.guild.create_voice_channel(
-                f"{Stat_dict[stat]}： --", category=cat
-            )
+            n = await ctx.guild.create_voice_channel(f"{Stat_dict[stat]}： --", category=cat)
             self.bot.guild_settings[ctx.guild.id]["stat_channels"][stat] = n.id
         self.bot.guild_settings[ctx.guild.id]["stat_channels"]["category"] = cat.id
         self.bot.guild_settings[ctx.guild.id]["do_stat_channels"] = True
@@ -101,9 +95,7 @@ class ServerStatCog(commands.Cog):
         for g in self.bot.guilds:
             try:
                 if self.bot.guild_settings[g.id]["do_stat_channels"]:
-                    for sck, scv in self.bot.guild_settings[g.id][
-                        "stat_channels"
-                    ].items():
+                    for sck, scv in self.bot.guild_settings[g.id]["stat_channels"].items():
                         if sck == "category":
                             continue
                         s = self.bot.get_channel(scv)
@@ -114,30 +106,20 @@ class ServerStatCog(commands.Cog):
                         if sck == "members":
                             val = g.member_count
                         elif sck == "humans":
-                            val = len(
-                                list(filter(lambda m: not m.bot, g.members))
-                            )
+                            val = len(list(filter(lambda m: not m.bot, g.members)))
                         elif sck == "bots":
                             val = len(list(filter(lambda m: m.bot, g.members)))
                         elif sck == "channels":
                             val = (
                                 len(g.text_channels)
                                 + len(g.voice_channels)
-                                - len(
-                                    self.bot.guild_settings[g.id]["stat_channels"].keys()
-                                )
+                                - len(self.bot.guild_settings[g.id]["stat_channels"].keys())
                                 + 1
                             )
                         elif sck == "text_channels":
                             val = len(g.text_channels)
                         elif sck == "voice_channels":
-                            val = (
-                                len(g.voice_channels)
-                                - len(
-                                    self.bot.guild_settings[g.id]["stat_channels"].keys()
-                                )
-                                + 1
-                            )
+                            val = len(g.voice_channels) - len(self.bot.guild_settings[g.id]["stat_channels"].keys()) + 1
                         elif sck == "roles":
                             val = len(g.roles)
                         else:

@@ -26,9 +26,7 @@ while True:
         )
         p = subprocess.Popen(cmd, shell=True, stdout=sys.stdout, stderr=sys.stderr)
     elif "origin/" in res.stdout:
-        subprocess.run(
-            "git pull origin main".split(), stdout=subprocess.DEVNULL
-        )
+        subprocess.run("git pull origin main".split(), stdout=subprocess.DEVNULL)
     elif os.path.exists("./reboot"):
         os.remove("./reboot")
         p.kill()

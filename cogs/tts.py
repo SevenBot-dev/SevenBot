@@ -49,11 +49,7 @@ SLASH_PATTERN = re.compile(r"^</.+:\d+>.*$")
 DEMO_SHIFTS = {5: 3.7, 6: 3.6, 7: 3.3}
 ffmpeg_options = {
     "options": "-vn",
-    "executable": (
-        r"c:/tools/ffmpeg/bin/ffmpeg.exe"
-        if sys.platform == "win32"
-        else r"ffmpeg"
-    ),
+    "executable": (r"c:/tools/ffmpeg/bin/ffmpeg.exe" if sys.platform == "win32" else r"ffmpeg"),
     "before_options": "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 -loglevel quiet",
 }
 
@@ -92,13 +88,9 @@ class TtsCog(commands.Cog):
             return
         await ctx.author.voice.channel.connect()
         Tts_channels[ctx.author.voice.channel.id] = copy.deepcopy(Tts_default)
-        Tts_channels[ctx.author.voice.channel.id][
-            "called_channel"
-        ] = ctx.channel.id
+        Tts_channels[ctx.author.voice.channel.id]["called_channel"] = ctx.channel.id
         e = discord.Embed(
-            title=get_txt(ctx.guild.id, "tts_joined").format(
-                ctx.author.voice.channel.name
-            ),
+            title=get_txt(ctx.guild.id, "tts_joined").format(ctx.author.voice.channel.name),
             color=Success,
         )
         await ctx.reply(embed=e)
@@ -124,17 +116,12 @@ class TtsCog(commands.Cog):
         #
         elif message.author.voice.channel.id not in Tts_channels.keys():
             return
-        elif message.content.startswith(
-            tuple(await self.bot.get_prefix(message))
-        ):
+        elif message.content.startswith(tuple(await self.bot.get_prefix(message))):
             # print("pr")
             return
         # elif not message.author.voice.channel.id == message.guild.voice_client.channel.id:
         #     return
-        elif (
-            not message.channel.id
-            == Tts_channels[message.author.voice.channel.id]["called_channel"]
-        ):
+        elif not message.channel.id == Tts_channels[message.author.voice.channel.id]["called_channel"]:
             return
         elif SLASH_PATTERN.match(message.content):
             return
@@ -145,16 +132,9 @@ class TtsCog(commands.Cog):
             self.make_session()
         flag = False
         # loop = asyncio.get_event_loop()
-        if (
-            Tts_channels[message.guild.voice_client.channel.id].get(
-                "last_speaker", 0
-            )
-            != message.author.id
-        ):
+        if Tts_channels[message.guild.voice_client.channel.id].get("last_speaker", 0) != message.author.id:
             flag = True
-        Tts_channels[message.guild.voice_client.channel.id][
-            "last_speaker"
-        ] = message.author.id
+        Tts_channels[message.guild.voice_client.channel.id]["last_speaker"] = message.author.id
         txt = ""
         if flag:
             txt += message.author.display_name + "  "
@@ -170,8 +150,7 @@ class TtsCog(commands.Cog):
                 return
 
             if before.channel != after.channel and (
-                after.channel.id in Tts_channels.keys()
-                or before.channel.id in Tts_channels.keys()
+                after.channel.id in Tts_channels.keys() or before.channel.id in Tts_channels.keys()
             ):
                 name = member.display_name
                 if f"<@{member.id}>" in map(
@@ -180,20 +159,12 @@ class TtsCog(commands.Cog):
                 ):
                     name = self.bot.guild_settings[member.guild.id]["tts_dicts"].get(
                         f"<@{member.id}>"
-                    ) or self.bot.guild_settings[member.guild.id]["tts_dicts"].get(
-                        f"<@!{member.id}>"
-                    )
+                    ) or self.bot.guild_settings[member.guild.id]["tts_dicts"].get(f"<@!{member.id}>")
                 if after.channel.id in Tts_channels.keys():
-                    txt = get_txt(member.guild.id, "tts_join").format(
-                        name, len(after.channel.members)
-                    )
+                    txt = get_txt(member.guild.id, "tts_join").format(name, len(after.channel.members))
                 elif before.channel.id in Tts_channels.keys():
-                    txt = get_txt(member.guild.id, "tts_left").format(
-                        name, len(after.channel.members)
-                    )
-                await self.play_voice(
-                    txt, {"user": member, "guild": member.guild}
-                )
+                    txt = get_txt(member.guild.id, "tts_left").format(name, len(after.channel.members))
+                await self.play_voice(txt, {"user": member, "guild": member.guild})
         except discord.ClientException:
             pass
 
@@ -210,9 +181,7 @@ class TtsCog(commands.Cog):
         delete_list = []
         for t in Tts_channels.keys():
             try:
-                if self.bot.user.id not in [
-                    m.id for m in self.bot.get_channel(t).members
-                ]:
+                if self.bot.user.id not in [m.id for m in self.bot.get_channel(t).members]:
                     delete_list.append(t)
             except KeyError:
                 pass
@@ -222,9 +191,7 @@ class TtsCog(commands.Cog):
     @tts.command(name="leave", aliases=["disconnect", "dc", "kick"])
     async def tts_dc(self, ctx):
         if ctx.guild.voice_client is None:
-            e = discord.Embed(
-                title=get_txt(ctx.guild.id, "tts_dc_none"), color=Error
-            )
+            e = discord.Embed(title=get_txt(ctx.guild.id, "tts_dc_none"), color=Error)
             await ctx.reply(embed=e)
             return
         ch = ctx.guild.voice_client.channel
@@ -236,14 +203,10 @@ class TtsCog(commands.Cog):
     @tts.command(name="voice", aliases=["v"])
     async def tts_change_voice(self, ctx, voice):
         if voice.lower() not in "abcdefgh" or len(voice) != 1:
-            e = discord.Embed(
-                title=get_txt(ctx.guild.id, "tts_voice_fail"), color=Error
-            )
+            e = discord.Embed(title=get_txt(ctx.guild.id, "tts_voice_fail"), color=Error)
             await ctx.reply(embed=e)
             return
-        elif voice.lower() not in "abcd" and not self.bot.is_premium(
-            ctx.author
-        ):
+        elif voice.lower() not in "abcd" and not self.bot.is_premium(ctx.author):
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "tts_voice_fail_premium"),
                 color=Premium_color,
@@ -255,9 +218,7 @@ class TtsCog(commands.Cog):
         Tts_settings[ctx.author.id]["speaker"] = "abcde".index(voice.lower())
         await self.save_tts_setting(ctx.author)
         e = discord.Embed(
-            title=get_txt(ctx.guild.id, "tts_voice_changed").format(
-                voice.upper()
-            ),
+            title=get_txt(ctx.guild.id, "tts_voice_changed").format(voice.upper()),
             color=Success,
         )
         await ctx.reply(embed=e)
@@ -266,9 +227,7 @@ class TtsCog(commands.Cog):
     @only_premium()
     async def tts_change_speed(self, ctx, speed: int):
         if not 50 <= speed <= 400:
-            e = discord.Embed(
-                title=get_txt(ctx.guild.id, "tts_speed_range"), color=Error
-            )
+            e = discord.Embed(title=get_txt(ctx.guild.id, "tts_speed_range"), color=Error)
             await ctx.reply(embed=e)
             return
         if not Tts_settings.get(ctx.author.id):
@@ -294,9 +253,7 @@ class TtsCog(commands.Cog):
         self.bot.guild_settings[ctx.guild.id]["tts_dicts"][rid] = [base, reply]
         e = discord.Embed(
             title=get_txt(ctx.guild.id, "tts_dicts_add"),
-            description=get_txt(ctx.guild.id, "tts_dicts_add_desc").format(
-                base, rid
-            ),
+            description=get_txt(ctx.guild.id, "tts_dicts_add_desc").format(base, rid),
             color=Success,
         )
         await ctx.reply(embed=e)
@@ -308,9 +265,7 @@ class TtsCog(commands.Cog):
         count = 0
         new = {}
         if txt in self.bot.guild_settings[ctx.guild.id]["tts_dicts"].keys():
-            res += (
-                "`" + self.bot.guild_settings[ctx.guild.id]["tts_dicts"][txt][1] + "`\n"
-            )
+            res += "`" + self.bot.guild_settings[ctx.guild.id]["tts_dicts"][txt][1] + "`\n"
             for ark, ar in self.bot.guild_settings[ctx.guild.id]["tts_dicts"].items():
                 if ark != txt:
                     new[ark] = ar
@@ -330,9 +285,7 @@ class TtsCog(commands.Cog):
             )
         else:
             e = discord.Embed(
-                title=get_txt(ctx.guild.id, "tts_dicts_rem_success").format(
-                    count
-                ),
+                title=get_txt(ctx.guild.id, "tts_dicts_rem_success").format(count),
                 description=res,
                 color=Success,
             )
@@ -358,9 +311,7 @@ class TtsCog(commands.Cog):
             table.set_cols_align(["l", "l", "l"])
             res = [["ID", "置換元", "置換先"]]
             for k, v in gs["tts_dicts"].items():
-                res.append(
-                    [k, v[0].replace("\n", "[改行]"), v[1].replace("\n", "[改行]")]
-                )
+                res.append([k, v[0].replace("\n", "[改行]"), v[1].replace("\n", "[改行]")])
             table.add_rows(res)
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "tts_dicts_list"),
@@ -415,23 +366,15 @@ class TtsCog(commands.Cog):
             stderr=asyncio.subprocess.STDOUT,
         )
         try:
-            stdout, _ = await c.communicate(
-                (txt.replace("\n", " ")[:30] + "\n").encode("utf8")
-            )
+            stdout, _ = await c.communicate((txt.replace("\n", " ")[:30] + "\n").encode("utf8"))
         except asyncio.TimeoutError:
             c.terminate()
-        loop.create_task(
-            message.remove_reaction(
-                self.bot.oemojis["network"], message.guild.me
-            )
-        )
+        loop.create_task(message.remove_reaction(self.bot.oemojis["network"], message.guild.me))
         # await c.wait()
         # await message.reply((await c.stderr.read()).decode())
         bio = io.BytesIO(stdout)
         bio.seek(0)
-        msg = await (self.bot.get_channel(765528694500360212)).send(
-            file=discord.File(bio, filename="tmp.wav")
-        )
+        msg = await (self.bot.get_channel(765528694500360212)).send(file=discord.File(bio, filename="tmp.wav"))
         bio.close()
         Tts_channels[guild.voice_client.channel.id]["qu"].append((message, msg))
         if not Tts_channels[guild.voice_client.channel.id]["playing"]:
@@ -440,40 +383,18 @@ class TtsCog(commands.Cog):
                 Tts_channels[guild.voice_client.channel.id]["playing"] = True
 
                 while Tts_channels[guild.voice_client.channel.id]["qu"]:
-                    rm, msg = Tts_channels[guild.voice_client.channel.id][
-                        "qu"
-                    ].pop(0)
+                    rm, msg = Tts_channels[guild.voice_client.channel.id]["qu"].pop(0)
                     if message:
-                        loop.create_task(
-                            rm.add_reaction(self.bot.oemojis["voice"])
-                        )
-                        loop.create_task(
-                            rm.remove_reaction(
-                                self.bot.oemojis["queue"], self.bot.user
-                            )
-                        )
-                    guild.voice_client.play(
-                        discord.FFmpegOpusAudio(
-                            msg.attachments[0].url, **ffmpeg_options
-                        )
-                    )
+                        loop.create_task(rm.add_reaction(self.bot.oemojis["voice"]))
+                        loop.create_task(rm.remove_reaction(self.bot.oemojis["queue"], self.bot.user))
+                    guild.voice_client.play(discord.FFmpegOpusAudio(msg.attachments[0].url, **ffmpeg_options))
                     while guild.voice_client.is_playing():
                         await asyncio.sleep(0.1)
                     if message:
-                        loop.create_task(
-                            rm.remove_reaction(
-                                self.bot.oemojis["voice"], self.bot.user
-                            )
-                        )
-                        loop.create_task(
-                            rm.add_reaction(self.bot.oemojis["check8"])
-                        )
+                        loop.create_task(rm.remove_reaction(self.bot.oemojis["voice"], self.bot.user))
+                        loop.create_task(rm.add_reaction(self.bot.oemojis["check8"]))
                         # loop.create_task(msg.delete())
-                        loop.create_task(
-                            delay_react_remove(
-                                rm["check8"], self.bot.user, 3
-                            )
-                        )
+                        loop.create_task(delay_react_remove(rm["check8"], self.bot.user, 3))
 
                 Tts_channels[guild.voice_client.channel.id]["playing"] = False
             except Exception as e:
@@ -488,9 +409,7 @@ class TtsCog(commands.Cog):
 
     async def init_tts_setting(self, member):
         if member.id not in Tts_settings:
-            setting = await self.bot.db.user_settings.find_one(
-                {"uid": member.id}, {"tts_settings": True}
-            )
+            setting = await self.bot.db.user_settings.find_one({"uid": member.id}, {"tts_settings": True})
             if setting is None:
                 await self.bot.init_user_settings(member.id)
                 Tts_settings[member.id] = {}
