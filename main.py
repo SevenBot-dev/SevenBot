@@ -112,18 +112,7 @@ class SevenBot(commands.Bot):
             "tts_settings": {},
         }
         self.oemojis: dict[str, discord.Emoji] = {}
-        self.number_keys = [
-            "levels",
-            "level_counts",
-            "warns",
-            "warn_settings.punishments",
-            "ticket_time",
-            "ticket_subject",
-            "level_boosts",
-            "level_roles",
-            "timed_role",
-        ]
-        self.guild_settings: dict(int, GuildSettings) = {}
+        self.guild_settings: dict[int, GuildSettings] = {}
         print("Loading saves from db...", end="")
         self.load_saves()
         print("Done")
@@ -144,7 +133,7 @@ class SevenBot(commands.Bot):
             self.loop.create_task(self.load_saves_debug())
 
         for g in self.sync_dbclient[db_name].guild_settings.find({}, {"_id": False}):
-            for ik in self.number_keys:
+            for ik in GuildSettings.int_keys:
                 t = g
                 for ikc in ik.split("."):
                     t = t[ikc]

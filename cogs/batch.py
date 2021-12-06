@@ -11,6 +11,7 @@ from discord.ext import commands, tasks
 
 import _pathmagic  # type: ignore # noqa
 from common_resources.tokens import botdd_token
+from common_resources.settings import GuildSettings
 
 Last_favorite = {}
 Time_format = "%Y-%m-%d %H:%M:%S"
@@ -121,7 +122,7 @@ class BatchCog(commands.Cog):
                     pass  # TODO: delete guild settings
                 if change["operationType"] == "update":
                     gs = await self.bot.db.guild_settings.find_one(change["documentKey"])
-                    for ik in self.bot.number_keys:
+                    for ik in GuildSettings.int_keys:
                         t = gs
                         for ikc in ik.split("."):
                             t = t[ikc]
@@ -132,7 +133,7 @@ class BatchCog(commands.Cog):
                     self.bot.guild_settings[gs["gid"]] = gs
                 if change["operationType"] == "insert":
                     gs = change["fullDocument"]
-                    for ik in self.bot.number_keys:
+                    for ik in GuildSettings.int_keys:
                         t = gs
                         for ikc in ik.split("."):
                             t = t[ikc]
