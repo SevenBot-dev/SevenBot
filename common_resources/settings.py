@@ -1,4 +1,7 @@
 from __future__ import annotations
+
+import re
+import typing
 from typing import Literal, NewType, TypedDict, Union
 
 Snowflake = NewType("Snowflake", int)
@@ -15,14 +18,18 @@ class WWRole(TypedDict):
 
 
 class WarnSettings(TypedDict):
+    punishments: dict[int, WarnSettingsAction]
+
+
+class WarnSettingsAction(TypedDict):
     action: Literal["mute", "kick", "ban", "role_add", "role_remove"]
 
 
-class WarnSettingsMute(WarnSettings, total=False):
+class WarnSettingsActionMute(WarnSettingsAction, total=False):
     length: int
 
 
-class WarnSettingsRole(WarnSettings, total=False):
+class WarnSettingsActionRole(WarnSettingsAction, total=False):
     role: Snowflake
 
 
@@ -63,3 +70,45 @@ class GuildSettings(TypedDict):
     gban_enabled: bool
     lock_message_content: dict[Snowflake, LockMessageContent]
     lock_message_id: dict[Snowflake, Snowflake | None]
+
+
+def convert_union(txt: re.Match):
+    return "Union[" + txt[0].replace(" | ", ", ") + "]"
+
+
+def pass_arg(arg: typing.ForwardRef):
+    arg_str = arg.__forward_arg__
+    arg_str = (
+        re.sub(r"(\w+ \| )+(\w+)", convert_union, arg_str)
+        .replace("False", "Literal[False]")
+        .replace("True", "Literal[True]")
+        .replace("Snowflake", "int")
+    )
+    return eval(arg_str)
+
+
+settings = dict(map(lambda a: [a[0], pass_arg(a[1])], GuildSettings.__annotations__.items()))
+int_keys = []
+
+
+def get_key_type(k, v):
+    if isinstance(v, typing._TypedDictMeta):
+        val_types = dict(map(lambda a: [a[0], pass_arg(a[1])], v.__annotations__.items()))
+        for k2, v2 in val_types.items():
+            get_key_type(k + "." + k2, v2)
+        return
+    if not hasattr(v, "__origin__"):
+        return
+    if v.__origin__ is dict:
+        if v.__args__[0] is int:
+            int_keys.append(k)
+        if isinstance(v.__args__[1], typing._TypedDictMeta):
+            val_types = dict(map(lambda a: [a[0], pass_arg(a[1])], v.__args__[1].__annotations__.items()))
+            for k2, v2 in val_types.items():
+                get_key_type(k + "." + k2, v2)
+
+
+for k, v in settings.items():
+    get_key_type(k, v)
+
+GuildSettings.int_keys = int_keys
