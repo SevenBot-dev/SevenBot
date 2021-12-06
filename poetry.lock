@@ -1091,7 +1091,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "7e5b40e632c4d2b96c5965703de36154ff3467fb4a9f86ba427a96b3e5ff06de"
+content-hash = "5c70e24593a6c822f52b53571d4111d02e5bec79fa130ce940d51f90e26bf6cd"
 
 [metadata.files]
 aiohttp = [
