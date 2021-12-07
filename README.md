@@ -10,7 +10,6 @@
 |--|--|
 |tokens.py|トークンやパスワードを詰め込んだファイル。tokens.py.sampleを置き換えてください。|
 |fonts/|使うフォント。midium.OTF、bold.OTFという名前で入れて下さい。|
-|htsvoices/|htsvoice。0~4.htsvoiceのように。|
 
 ## ライセンス
 GPL 3.0で公開しています。

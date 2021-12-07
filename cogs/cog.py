@@ -68,7 +68,7 @@ Categories = {
     ],
     "info": ["lookup", "check_url", "getid", "snowflake"],
     "panel": ["vote", "party"],
-    "tools": ["translate", "afk", "tts", "shorten"],
+    "tools": ["translate", "afk", "shorten"],
     "fun": [
         "werewolf",
         "bignum",
@@ -114,7 +114,6 @@ Categories = {
 Default_settings = {
     "autoreply": {},
     "muted": {},
-    "tts_dicts": {},
     "deactivate_command": [],
     "last_everyone": {},
     "everyone_count": {},
