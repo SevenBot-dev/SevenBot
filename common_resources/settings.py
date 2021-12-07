@@ -41,7 +41,6 @@ class LockMessageContent(TypedDict):
 class GuildSettings(TypedDict):
     autoreply: dict[str, list[str, str]]
     muted: dict[Snowflake, int]
-    tts_dicts: dict[str, dict[str, str]]
     deactivate_command: list[Snowflake]
     auth_role: Snowflake
     trans_channel: dict[Snowflake, str]

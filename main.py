@@ -109,7 +109,6 @@ class SevenBot(commands.Bot):
         self.texts = common_resources.Texts
         self.default_user_settings = {
             "level_dm": False,
-            "tts_settings": {},
         }
         self.oemojis: dict[str, discord.Emoji] = {}
         self.guild_settings: dict[int, GuildSettings] = {}
