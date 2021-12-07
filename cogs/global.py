@@ -1321,6 +1321,9 @@ class GlobalCog(commands.Cog):
     @tasks.loop(minutes=5)
     async def sync_pc_data(self):
         async for c in self.bot.db.private_chat.find({}, {"_id": False}):
+            if Private_chat_info.get(c["name"]) is None:
+                await self.bot.db.private_chat.delete_one({"name": c["name"]})
+                continue
             if c != Private_chat_info[c["name"]]:
                 await self.bot.db.private_chat.update_one(
                     {"name": c["name"]}, {"$set": Private_chat_info[c["name"]]}, upsert=True
