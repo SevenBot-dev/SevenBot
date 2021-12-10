@@ -1,9 +1,7 @@
 import sys
 
-if len(sys.argv) != 1 and sys.argv[1] == "debug":
-    TOKEN = "Th1sIsN0tT0k3n.B3cause.If15howB0tW1llG3tH4cked"
-else:
-    TOKEN = 'Th1sIsN0tT0k3n.B3cause.If15howB0tW1llG3tH4cked'
+DEBUG_TOKEN = "Th1sIsN0tT0k3n.B3cause.If15howB0tW1llG3tH4cked"
+TOKEN = 'Th1sIsN0tT0k3n.B3cause.If15howB0tW1llG3tH4cked'
 YOUTUBE_API_KEY = 'YouTube API token here'
 dbl_token = "DBL token here"
 cstr = "MongoDB connection string here"

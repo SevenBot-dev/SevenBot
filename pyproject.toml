@@ -44,6 +44,7 @@ flake8 = "~=4.0.1"
 black = "~=21.11b1"
 pyproject-flake8 = "^0.0.1-alpha.2"
 isort = "^5.10.1"
+watchdog = "^2.1.6"
 
 [tool.black]
 line-length = 120

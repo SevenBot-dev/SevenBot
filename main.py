@@ -8,6 +8,8 @@ import json
 import logging
 import os
 import sys
+import time
+import traceback
 from typing import Union
 
 import discord
@@ -17,11 +19,13 @@ import sentry_sdk
 import topgg
 from discord.ext import commands, levenshtein
 from motor import motor_asyncio as motor
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEvent, FileSystemEventHandler
 
 from common_resources import consts as common_resources
 from common_resources.consts import Official_discord_id, Sub_discord_id
 from common_resources.settings import GuildSettings
-from common_resources.tokens import TOKEN, cstr, dbl_token, sentry_url, web_pass
+from common_resources.tokens import TOKEN, DEBUG_TOKEN, cstr, dbl_token, sentry_url, web_pass
 from common_resources.tools import flatten
 
 logger = logging.getLogger("discord")
@@ -32,16 +36,44 @@ logger.setLevel(logging.INFO)
 handler = logging.StreamHandler()
 handler.setFormatter(logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s"))
 logger.addHandler(handler)
-if len(sys.argv) < 2 or sys.argv[1] != "debug":
+if "debug" in sys.argv:
+    os.environ["DEBUG"] = "True"
+elif "prod" in sys.argv:
+    os.environ["DEBUG"] = "False"
+else:
+    os.environ["DEBUG"] = "True" if sys.platform == "win32" else "False"
+if os.environ["DEBUG"] == "True":
+    db_name = "development"
+    token = DEBUG_TOKEN
+else:
     sentry_sdk.init(
         sentry_url,
         traces_sample_rate=1.0,
     )
-    os.environ["DEBUG"] = "False"
+    token = TOKEN
     db_name = "production"
-else:
-    os.environ["DEBUG"] = "True"
-    db_name = "development"
+
+
+class ReloadEventHandler(FileSystemEventHandler):
+    def __init__(self, loop, bot, *args, **kwargs):
+        self._loop = loop
+        self.bot = bot
+        self.times = {}
+        super().__init__(*args, **kwargs)
+
+    def on_modified(self, event: FileSystemEvent):
+        if "__pycache__" in event.src_path:
+            return
+        if time.time() - self.times.get(event.src_path, 0) < 1:
+            return
+        self.times[event.src_path] = time.time()
+        try:
+            self.bot.reload_extension("cogs." + event.src_path.split("\\")[-1].split(".")[0])
+        except Exception:
+            print(traceback.format_exc())
+        else:
+            print(f"-- Reloaded: {event.src_path}")
+
 
 Channel_ids = {
     "log": 756254787191963768,
@@ -64,7 +96,7 @@ intent.typing = False
 
 # Save_game = discord.Game(name="Saving..." + "⠀" * 100)
 # Save_game2 = discord.Game(name="Complete!" + "⠀" * 100)
-print("Loading save from attachment...", end="")
+print("-- Loading save from attachment: ", end="")
 try:
     r = requests.get(
         f"https://discord.com/api/v9/channels/{Save_channel_id}/messages?limit=1",
@@ -75,7 +107,7 @@ try:
     s.raise_for_status()
     raw_save = s.content.decode("utf8")
 except requests.exceptions.HTTPError:
-    print("\nUnable to get save, loaded save.sample.")
+    print("\n!! Unable to get save, loaded save.sample.")
     with open("./save.sample", "r", encoding="utf8") as f:
         raw_save = f.read()
 print("Done")
@@ -92,14 +124,7 @@ class SevenBot(commands.Bot):
             case_insensitive=True,
             enable_debug_events=True,
         )
-        self.consts = {
-            "qu": {},
-            "ch": {},
-            "ne": [],
-            "tc": {},
-            "pci": {},
-            "ticket_time": {}
-        }
+        self.consts = {"qu": {}, "ch": {}, "ne": [], "tc": {}, "pci": {}, "ticket_time": {}}
         self.raw_config = ast.literal_eval(raw_save)
         self.dbclient = motor.AsyncIOMotorClient(cstr)
         self.sync_dbclient = pymongo.MongoClient(cstr)
@@ -113,10 +138,12 @@ class SevenBot(commands.Bot):
         }
         self.oemojis: dict[str, discord.Emoji] = {}
         self.guild_settings: dict[int, GuildSettings] = {}
-        print("Loading saves from db...", end="")
+        print("-- Loading saves from db: ", end="")
         self.load_saves()
         print("Done")
         print("Debug mode: " + str(self.debug))
+        if self.debug:
+            self.loop.create_task(self.auto_reload())
         self.check(commands.cooldown(2, 2))
 
     def prefix(self, bot, message):
@@ -151,6 +178,12 @@ class SevenBot(commands.Bot):
                 self.loop.create_task(
                     self.to_coro(self.dbclient["development"][c].replace_one({"_id": r["_id"]}, r, upsert=True))
                 )
+
+    async def auto_reload(self):
+        event_handler = ReloadEventHandler(self.loop, self)
+        observer = Observer()
+        observer.schedule(event_handler, "./cogs", recursive=True)
+        observer.start()
 
     async def on_ready(self):
         print("on_ready fired")
@@ -298,4 +331,4 @@ if __name__ == "__main__":
     print("  Created by 名無し。  ")
     print("*********************")
     print("ログイン中…")
-    bot.run(TOKEN)
+    bot.run(token)
