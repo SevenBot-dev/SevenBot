@@ -1734,7 +1734,7 @@ class MainCog(commands.Cog):
                 color=Error,
             )
             return await ctx.reply(embed=e)
-        if (not guild.get_member(ctx.author.id)) and not self.bot.is_owner(ctx.author):
+        if (not guild.get_member(ctx.author.id)) and not await self.bot.is_owner(ctx.author):
             e = discord.Embed(title=get_txt(ctx.guild.id, "serverinfo")["noperm"], color=Error)
             return await ctx.reply(embed=e)
         e = discord.Embed(
