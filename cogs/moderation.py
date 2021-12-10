@@ -46,16 +46,6 @@ def delta_to_text(delta, ctx) -> str:
         return res + str(s % 60) + get_txt(ctx.guild.id, "delta_txt")[3] + get_txt(ctx.guild.id, "delta_txt")[4]
 
 
-def get_warn_text(bot, ctx, p):
-    res = get_txt(ctx.guild.id, "warn_punish")[p["action"]]
-    if p["action"] == "mute":
-        res += f'({delta_to_text(datetime.timedelta(seconds=p["length"]), ctx)})'
-    elif p["action"] in ("role_add", "role_remove"):
-        r = ctx.guild.get_role(p["role"])
-        res += f"({r.name})"
-    return res
-
-
 class ModerationCog(commands.Cog):
     def __init__(self, bot):
         global get_txt
@@ -75,6 +65,15 @@ class ModerationCog(commands.Cog):
             await target.add_roles(target.guild.get_role(p["role"]))
         elif p["action"] == "role_remove":
             await target.remove_roles(target.guild.get_role(p["role"]))
+
+    def get_warn_text(self, ctx, p):
+        res = get_txt(ctx.guild.id, "warn_punish")[p["action"]]
+        if p["action"] == "mute":
+            res += f'({delta_to_text(datetime.timedelta(seconds=p["length"]), ctx)})'
+        elif p["action"] in ("role_add", "role_remove"):
+            r = ctx.guild.get_role(p["role"])
+            res += f"({r.name})"
+        return res
 
     @commands.command(aliases=["purge", "delete_log"])
     @commands.has_permissions(manage_channels=True)
@@ -434,18 +433,31 @@ class ModerationCog(commands.Cog):
         nw = self.bot.guild_settings[ctx.guild.id]["warns"][target.id]
         e.description += get_txt(ctx.guild.id, "warn_desc_info").format(target, nw) + "\n"
         if pun.get(nw):
-            e.description += (
-                get_txt(ctx.guild.id, "warn_desc_now").format(nw, get_warn_text(self.bot, ctx, pun[nw])) + "\n"
-            )
+            e.description += get_txt(ctx.guild.id, "warn_desc_now").format(nw, self.get_warn_text(ctx, pun[nw])) + "\n"
             await self.punish(target, pun[nw])
 
         if pun := [c for c in sorted(pun.keys()) if c > nw]:
             length = pun[0]
             e.description += get_txt(ctx.guild.id, "warn_desc_next").format(
-                get_warn_text(self.bot, ctx, pun[length]), length
+                self.get_warn_text(ctx, pun[length]), length
             )
         else:
             e.description += get_txt(ctx.guild.id, "warn_desc_next_none").format()
+        await ctx.reply(embed=e)
+
+    @commands.command()
+    @commands.has_permissions(kick_members=True)
+    async def unwarn(self, ctx, target: discord.Member, count: int = 1):
+        e = SEmbed(get_txt(ctx.guild.id, "un_warn").format(target, count), color=Info)
+        if not self.bot.guild_settings[ctx.guild.id]["warns"].get(target.id):
+            self.bot.guild_settings[ctx.guild.id]["warns"][target.id] = 0
+        self.bot.guild_settings[ctx.guild.id]["warns"][target.id] -= count
+        if self.bot.guild_settings[ctx.guild.id]["warns"][target.id] < 0:
+            self.bot.guild_settings[ctx.guild.id]["warns"][target.id] = 0
+        elif self.bot.guild_settings[ctx.guild.id]["warns"][target.id] >= 2 ** 64:
+            self.bot.guild_settings[ctx.guild.id]["warns"][target.id] = 2 ** 64 - 1
+        nw = self.bot.guild_settings[ctx.guild.id]["warns"][target.id]
+        e.description += get_txt(ctx.guild.id, "warn_desc_info").format(target, nw) + "\n"
         await ctx.reply(embed=e)
 
     @commands.group(aliases=["ws"])
@@ -524,12 +536,12 @@ class ModerationCog(commands.Cog):
                 return table
 
             table = make_new()
-            res = []
+            # res = []
             for k, v in gs["warn_settings"]["punishments"].items():
-                table.add_row([k, get_warn_text(self.bot, ctx, v)])
+                table.add_row([k, self.get_warn_text(ctx, v)])
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "ws_list"),
-                description=f"```asciidoc\n{res}```",
+                description=f"```asciidoc\n{table.draw()}```",
                 color=Info,
             )
             await ctx.reply(embed=e)

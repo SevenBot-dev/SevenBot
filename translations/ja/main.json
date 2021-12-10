@@ -139,6 +139,7 @@
     "dissoku_alert_desc": "`/dissoku up`で表示順を上にします。",
     "dissoku_role_set": "アップ通知メンションロールを設定しました。",
     "dissoku_role_set_none": "アップ通知メンションロールを消去しました。",
+    "un_warn": "{}の{}回のWarnを解除しました。",
     "warn": "{}を{}回Warnしました。",
     "warn_desc_info": "{}は{}回Warnされています。",
     "warn_desc_now": "{}回Warnされたため、{}されます。",

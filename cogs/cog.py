@@ -41,6 +41,7 @@ from common_resources.consts import (
     Widget,
 )
 from common_resources.tools import flatten, remove_emoji
+from common_resources.settings import DEFAULT_SETTINGS
 
 if TYPE_CHECKING:
     from ..main import SevenBot
@@ -110,64 +111,6 @@ Categories = {
         "gban_settings",
         "lock_message",
     ],
-}
-Default_settings = {
-    "autoreply": {},
-    "muted": {},
-    "deactivate_command": [],
-    "last_everyone": {},
-    "everyone_count": {},
-    "hasnt_admin": "権限がありません。",
-    "do_announce": True,
-    "announce_channel": False,
-    "auth_role": 0,
-    "trans_channel": {},
-    "event_messages": {"join": False, "leave": False},
-    "event_message_channel": 0,
-    "alarm_channels": 0,
-    "level_counts": {},
-    "levels": {},
-    "level_roles": {},
-    "level_active": False,
-    "level_channel": False,
-    "level_ignore_channel": [],
-    "bump_role": False,
-    "do_dissoku_alert": False,
-    "dissoku_role": False,
-    "do_stat_channels": False,
-    "stat_channels": {},
-    "stat_update_counter": 0,
-    "ticket_category": 0,
-    "auto_parse": [],
-    "do_everyone_alert": True,
-    "lang": "ja",
-    "expand_message": False,
-    "do_bump_alert": True,
-    "invites": [],
-    "prefix": None,
-    "autopub": [],
-    "alarms": {},
-    "2ch_link": [],
-    "role_link": {},
-    "role_keep": False,
-    "timezone": 0,
-    "archive_category": 0,
-    "ww_role": {"alive": None, "dead": None},
-    "lainan_talk": [],
-    "auth_channel": {
-        "type": None,
-        "channel": 0,
-    },
-    "starboards": {},
-    "level_boosts": {},
-    "warns": {},
-    "warn_settings": {"punishments": {}, "auto": 0},
-    "economy": {},
-    "timed_role": {},
-    "auto_text": [],
-    "gban_enabled": False,
-    "lock_message_content": {},
-    "lock_message_id": {},
 }
 Last_favorite = {}
 Time_format = "%Y-%m-%d %H:%M:%S"
@@ -288,7 +231,7 @@ class MainCog(commands.Cog):
         if g.id in Blacklists:
             await g.leave()
             return
-        self.bot.guild_settings[g.id] = copy.deepcopy(Default_settings)
+        self.bot.guild_settings[g.id] = copy.deepcopy(DEFAULT_SETTINGS)
         if g.owner_id == self.bot.user.id:
             return
         await self.bot.get_channel(756254787191963768).send(
@@ -650,7 +593,7 @@ class MainCog(commands.Cog):
         return await ctx.reply(embed=e)
 
     async def reset(self, ctx):
-        self.bot.guild_settings[ctx.guild.id] = Default_settings
+        self.bot.guild_settings[ctx.guild.id] = DEFAULT_SETTINGS
 
     @commands.Cog.listener("on_message")
     async def on_message_autopub(self, message):
@@ -2214,10 +2157,10 @@ class MainCog(commands.Cog):
             gid = tg.id
             if gid not in self.bot.guild_settings.keys():
                 fixed.append("all")
-                res[gid] = Default_settings.copy()
+                res[gid] = DEFAULT_SETTINGS.copy()
             else:
                 res[gid] = self.bot.guild_settings[gid]
-                for ds, dsv in Default_settings.items():
+                for ds, dsv in DEFAULT_SETTINGS.items():
                     if ds not in self.bot.guild_settings[gid]:
                         res[gid][ds] = dsv
                         fixed.append(ds)

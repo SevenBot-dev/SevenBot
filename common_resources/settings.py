@@ -38,6 +38,10 @@ class LockMessageContent(TypedDict):
     author: Snowflake
 
 
+class AutoMod(TypedDict):
+    token_spam: bool
+
+
 class GuildSettings(TypedDict):
     autoreply: dict[str, list[str, str]]
     muted: dict[Snowflake, int]
@@ -70,6 +74,7 @@ class GuildSettings(TypedDict):
     gban_enabled: bool
     lock_message_content: dict[Snowflake, LockMessageContent]
     lock_message_id: dict[Snowflake, Snowflake | None]
+    automod: AutoMod
 
 
 def convert_union(txt: re.Match):
@@ -112,3 +117,63 @@ for k, v in settings.items():
     get_key_type(k, v)
 
 GuildSettings.int_keys = int_keys
+
+DEFAULT_SETTINGS = {
+    "autoreply": {},
+    "muted": {},
+    "deactivate_command": [],
+    "last_everyone": {},
+    "everyone_count": {},
+    "hasnt_admin": "権限がありません。",
+    "do_announce": True,
+    "announce_channel": False,
+    "auth_role": 0,
+    "trans_channel": {},
+    "event_messages": {"join": False, "leave": False},
+    "event_message_channel": 0,
+    "alarm_channels": 0,
+    "level_counts": {},
+    "levels": {},
+    "level_roles": {},
+    "level_active": False,
+    "level_channel": False,
+    "level_ignore_channel": [],
+    "bump_role": False,
+    "do_dissoku_alert": False,
+    "dissoku_role": False,
+    "do_stat_channels": False,
+    "stat_channels": {},
+    "stat_update_counter": 0,
+    "ticket_category": 0,
+    "auto_parse": [],
+    "do_everyone_alert": True,
+    "lang": "ja",
+    "expand_message": False,
+    "do_bump_alert": True,
+    "invites": [],
+    "prefix": None,
+    "autopub": [],
+    "alarms": {},
+    "2ch_link": [],
+    "role_link": {},
+    "role_keep": False,
+    "timezone": 0,
+    "archive_category": 0,
+    "ww_role": {"alive": None, "dead": None},
+    "lainan_talk": [],
+    "auth_channel": {
+        "type": None,
+        "channel": 0,
+    },
+    "starboards": {},
+    "level_boosts": {},
+    "warns": {},
+    "warn_settings": {"punishments": {}, "auto": 0},
+    "economy": {},
+    "timed_role": {},
+    "auto_text": [],
+    "gban_enabled": False,
+    "lock_message_content": {},
+    "lock_message_id": {},
+    "automod": {"token_spam": False},
+}
