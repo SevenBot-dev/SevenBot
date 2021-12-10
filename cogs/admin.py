@@ -550,7 +550,7 @@ class AdminCog(commands.Cog):
             ],
         )
         com = await self.bot.wait_for("button_click", check=lambda c: c.message == msg)
-        await self.bot.change_presence(status=discord.Status.dnd, activity=discord.Game(name="Rebooting..." + "⠀" * ２0))
+        await self.bot.change_presence(status=discord.Status.dnd, activity=discord.Game(name="Rebooting..." + "⠀" * 20))
         if com.custom_id == "reboot_yes":
             with open("./reboot", "w"):
                 pass
