@@ -61,12 +61,24 @@ class ReloadEventHandler(FileSystemEventHandler):
         self.times = {}
         super().__init__(*args, **kwargs)
 
-    def on_created(self, event: FileSystemEvent):
+    def will_run(self, event: FileSystemEvent):
+        if not self.bot.is_ready():
+            return False
         if "__pycache__" in event.src_path:
-            return
+            return False
         if time.time() - self.times.get(event.src_path, 0) < 1:
-            return
+            return False
+        if event.is_directory:
+            return False
+        if not event.src_path.endswith(".py"):
+            return False
+
         self.times[event.src_path] = time.time()
+        return True
+
+    def on_created(self, event: FileSystemEvent):
+        if not self.will_run(event):
+            return
         try:
             self.bot.load_extension("cogs." + event.src_path.split("\\")[-1].split(".")[0])
         except Exception:
@@ -75,11 +87,8 @@ class ReloadEventHandler(FileSystemEventHandler):
             print(f"-- Loaded: {event.src_path}")
 
     def on_modified(self, event: FileSystemEvent):
-        if "__pycache__" in event.src_path:
+        if not self.will_run(event):
             return
-        if time.time() - self.times.get(event.src_path, 0) < 1:
-            return
-        self.times[event.src_path] = time.time()
         try:
             self.bot.reload_extension("cogs." + event.src_path.split("\\")[-1].split(".")[0])
         except Exception:
@@ -88,11 +97,8 @@ class ReloadEventHandler(FileSystemEventHandler):
             print(f"-- Reloaded: {event.src_path}")
 
     def on_deleted(self, event: FileSystemEvent):
-        if "__pycache__" in event.src_path:
+        if not self.will_run(event):
             return
-        if time.time() - self.times.get(event.src_path, 0) < 1:
-            return
-        self.times[event.src_path] = time.time()
         try:
             self.bot.unload_extension("cogs." + event.src_path.split("\\")[-1].split(".")[0])
         except Exception:
