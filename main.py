@@ -60,6 +60,19 @@ class ReloadEventHandler(FileSystemEventHandler):
         self.bot = bot
         self.times = {}
         super().__init__(*args, **kwargs)
+    
+    def on_created(self, event: FileSystemEvent):
+        if "__pycache__" in event.src_path:
+            return
+        if time.time() - self.times.get(event.src_path, 0) < 1:
+            return
+        self.times[event.src_path] = time.time()
+        try:
+            self.bot.load_extension("cogs." + event.src_path.split("\\")[-1].split(".")[0])
+        except Exception:
+            print(traceback.format_exc())
+        else:
+            print(f"-- Loaded: {event.src_path}")
 
     def on_modified(self, event: FileSystemEvent):
         if "__pycache__" in event.src_path:
@@ -73,6 +86,19 @@ class ReloadEventHandler(FileSystemEventHandler):
             print(traceback.format_exc())
         else:
             print(f"-- Reloaded: {event.src_path}")
+
+    def on_deleted(self, event: FileSystemEvent):
+        if "__pycache__" in event.src_path:
+            return
+        if time.time() - self.times.get(event.src_path, 0) < 1:
+            return
+        self.times[event.src_path] = time.time()
+        try:
+            self.bot.unload_extension("cogs." + event.src_path.split("\\")[-1].split(".")[0])
+        except Exception:
+            print(traceback.format_exc())
+        else:
+            print(f"-- Unloaded: {event.src_path}")
 
 
 Channel_ids = {
@@ -182,7 +208,7 @@ class SevenBot(commands.Bot):
     async def auto_reload(self):
         event_handler = ReloadEventHandler(self.loop, self)
         observer = Observer()
-        observer.schedule(event_handler, "./cogs", recursive=True)
+        observer.schedule(event_handler, "./cogs", recursive=False)
         observer.start()
 
     async def on_ready(self):
