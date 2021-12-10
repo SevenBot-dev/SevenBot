@@ -98,6 +98,7 @@ class SevenBot(commands.Bot):
             "ne": [],
             "tc": {},
             "pci": {},
+            "ticket_time": {}
         }
         self.raw_config = ast.literal_eval(raw_save)
         self.dbclient = motor.AsyncIOMotorClient(cstr)

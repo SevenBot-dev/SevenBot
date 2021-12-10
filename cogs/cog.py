@@ -138,9 +138,6 @@ Default_settings = {
     "stat_channels": {},
     "stat_update_counter": 0,
     "ticket_category": 0,
-    "ticket_time": {},
-    "ticket_subject": {},
-    "ticket_message": [],
     "auto_parse": [],
     "do_everyone_alert": True,
     "lang": "ja",
@@ -1255,51 +1252,6 @@ class MainCog(commands.Cog):
                     m0.set_field_at(2, name=f"参加者(現在{cn}人)", value="\n".join(cm))
                     await message.edit(embed=m0)
                 await message.remove_reaction(pl.emoji, user)
-            elif message.id in self.bot.guild_settings[guild.id]["ticket_message"]:
-                if pl.emoji.name == "lock":
-                    overwrites = {
-                        guild.default_role: discord.PermissionOverwrite(read_messages=False),
-                        guild.me: discord.PermissionOverwrite(read_messages=True, send_messages=True),
-                        user: discord.PermissionOverwrite(read_messages=True, send_messages=False),
-                    }
-                    await channel.edit(overwrites=overwrites, name=channel.name[0:-5] + "クローズ")
-                    await message.remove_reaction(self.bot.oemojis["lock"], user)
-            elif message.embeds[0].title == "チケット作成":
-                await message.remove_reaction(pl.emoji, user)
-                if pl.emoji.name == "add":
-                    dt = datetime.datetime.utcnow()
-                    if user.id in list(self.bot.guild_settings[guild.id]["ticket_time"].keys()):
-                        ldt = datetime.datetime.strptime(
-                            self.bot.guild_settings[guild.id]["ticket_time"][user.id],
-                            Time_format,
-                        )
-                        if ldt > dt:
-                            return
-                    dt += datetime.timedelta(hours=1)
-                    self.bot.guild_settings[guild.id]["ticket_time"][user.id] = dt.strftime(Time_format)
-                    cat = self.bot.get_channel(self.bot.guild_settings[guild.id]["ticket_category"])
-                    if cat is None:
-                        ow = {
-                            guild.default_role: discord.PermissionOverwrite(read_messages=False),
-                            guild.me: discord.PermissionOverwrite(read_messages=True, send_messages=True),
-                        }
-                        cat = await guild.create_category_channel(name="チケット", overwrites=ow)
-                        self.bot.guild_settings[guild.id]["ticket_category"] = cat.id
-                    ow = cat.overwrites
-                    ow[user] = discord.PermissionOverwrite(read_messages=True, send_messages=True)
-                    channel = len(self.bot.guild_settings[guild.id]["ticket_message"])
-                    tc = await guild.create_text_channel(
-                        category=cat,
-                        name=f"チケット#{str(channel+1).zfill(4)}-アクティブ",
-                        overwrites=ow,
-                    )
-                    em = self.bot.oemojis["lock"]
-                    s = self.bot.guild_settings[guild.id]["ticket_subject"][message.id]
-                    e = discord.Embed(title=s[0], description=s[1], color=Widget)
-                    e.set_footer(text="下の南京錠ボタンを押して終了")
-                    message = await tc.send(user.mention, embed=e)
-                    await message.add_reaction(self.bot.oemojis["lock"])
-                    self.bot.guild_settings[guild.id]["ticket_message"].append(message.id)
             elif message.embeds[0].title == get_txt(guild.id, "voting")[0]:
                 ft = message.embeds[0].footer.text
                 mt = message.embeds[0].timestamp
@@ -1934,28 +1886,6 @@ class MainCog(commands.Cog):
                 color=Error,
             )
             return await ctx.reply(embed=e)
-
-    @commands.command(name="ticket")
-    @commands.has_guild_permissions(manage_guild=True, manage_channels=True)
-    async def ticket(self, ctx, subject, description):
-        if self.bot.guild_settings[ctx.guild.id]["ticket_category"] == 0:
-            overwrites = {
-                ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False),
-                ctx.guild.me: discord.PermissionOverwrite(read_messages=True, send_messages=True),
-            }
-            cat = await ctx.guild.create_category("チケット", overwrites=overwrites)
-            self.bot.guild_settings[ctx.guild.id]["ticket_category"] = cat.id
-        else:
-            cat = self.bot.get_channel(self.bot.guild_settings[ctx.guild.id]["ticket_category"])
-        self.bot.oemojis["add"]
-        e = discord.Embed(title="チケット作成", description=subject, color=Widget)
-        e.set_footer(text="下のボタンを押してチケットを作成（1時間に1回）")
-        m = await ctx.send(embed=e)
-        await m.add_reaction(self.bot.oemojis["add"])
-        self.bot.guild_settings[ctx.guild.id]["ticket_subject"][m.id] = [
-            subject,
-            description,
-        ]
 
     @commands.command(name="free_channel")
     @commands.has_guild_permissions(manage_guild=True, manage_channels=True)

@@ -63,6 +63,7 @@ class GuildSettings(TypedDict):
     role_link: dict[Snowflake, list[list[Snowflake, Snowflake]]]
     archive_category: Snowflake
     ww_role: WWRole
+    ticket_category: Snowflake
     warns: dict[Snowflake, int]
     warn_settings: WarnSettings
     timed_role: dict[Snowflake, int]

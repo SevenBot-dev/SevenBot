@@ -73,7 +73,7 @@ class NotADatetimeFormat(commands.BadArgument):
         super().__init__('"{}" is not a datetime format.'.format(argument))
 
 
-def convert_timedelta(arg):
+def convert_timedelta(arg) -> datetime.timedelta:
     fm = Datetime_re.fullmatch(arg)
     if not fm:
         raise NotADatetimeFormat(arg)

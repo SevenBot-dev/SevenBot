@@ -24,7 +24,7 @@ from common_resources.consts import (
 from common_resources.tools import convert_timedelta, flatten
 
 
-def delta_to_text(delta, ctx):
+def delta_to_text(delta, ctx) -> str:
     s = math.floor(delta.seconds)
     res = ""
     #     if s > 3600:

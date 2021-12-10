@@ -466,9 +466,9 @@ class AdminCog(commands.Cog):
         if cog:
             try:
                 bot.reload_extension("cogs." + cog)
-            except commands.errors.ExtensionNotLoaded:
+            except discord.ExtensionNotLoaded:
                 bot.load_extension("cogs." + cog)
-            except commands.errors.NoEntryPointError:
+            except discord.NoEntryPointError:
                 pass
             self.bot.levenshtein._listup_commands(self.bot)
             self.bot.cogs["InnerLevenshtein"].command_names = self.bot.levenshtein._command_names
