@@ -82,14 +82,7 @@ Categories = {
         "reencode",
     ],
     "serverpanel": ["auth", "role", "ticket", "free_channel"],
-    "moderation": [
-        "clear_channel",
-        "mute",
-        "fatal",
-        "lockdown",
-        "archive",
-        "warn",
-    ],
+    "moderation": ["clear_channel", "mute", "fatal", "lockdown", "archive", "warn", "unwarn"],
     "global": ["gchat", "sevennet", "sgc"],
     "settings": [
         "ww_role",
@@ -107,6 +100,7 @@ Categories = {
         "change_prefix",
         "server_stat",
         "warn_settings",
+        "automod",
         "auto_text",
         "gban_settings",
         "lock_message",
