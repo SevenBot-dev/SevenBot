@@ -60,7 +60,7 @@ class ReloadEventHandler(FileSystemEventHandler):
         self.bot = bot
         self.times = {}
         super().__init__(*args, **kwargs)
-    
+
     def on_created(self, event: FileSystemEvent):
         if "__pycache__" in event.src_path:
             return
