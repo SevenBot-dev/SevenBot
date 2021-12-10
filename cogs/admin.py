@@ -485,9 +485,9 @@ class AdminCog(commands.Cog):
                 if not o.endswith(".py") or o.startswith("_"):
                     continue
                 bot.reload_extension("cogs." + os.path.splitext(os.path.basename(o))[0])
-            except commands.errors.ExtensionNotLoaded:
+            except discord.ExtensionNotLoaded:
                 bot.load_extension("cogs." + os.path.splitext(os.path.basename(o))[0])
-            except commands.errors.NoEntryPointError:
+            except discord.NoEntryPointError:
                 pass
         ci, cm = (
             subprocess.run(["git", "log", "--oneline"], stdout=subprocess.PIPE)
