@@ -30,7 +30,7 @@ class LockMessageCog(commands.Cog):
     @lock_message.command(name="activate", aliases=Activate_aliases + ["register"])
     @commands.has_permissions(manage_messages=True)
     async def lock_message_activate(self, ctx, *, content):
-        self.bot.guild_settings[ctx.guild.id]["lock_message_content"][str(ctx.channel.id)] = {
+        self.bot.guild_settings[ctx.guild.id]["lock_message_content"][ctx.channel.id] = {
             "content": content,
             "author": ctx.author.id,
         }
@@ -46,7 +46,7 @@ class LockMessageCog(commands.Cog):
     @commands.has_permissions(manage_messages=True)
     async def lock_message_deactivate(self, ctx):
         try:
-            del self.bot.guild_settings[ctx.guild.id]["lock_message_content"][str(ctx.channel.id)]
+            del self.bot.guild_settings[ctx.guild.id]["lock_message_content"][ctx.channel.id]
         except KeyError:
             await ctx.reply(
                 embed=discord.Embed(
