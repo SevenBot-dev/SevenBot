@@ -68,16 +68,14 @@ class LockMessageCog(commands.Cog):
             return
         if message.channel.id in self.working:
             return
-        self.working.add(message.channel.id)
         if message.author == self.bot.user:
             if embeds := message.embeds:
                 if embeds[0].author.url and "?locked" in embeds[0].author.url:
-                    self.working.remove(message.channel.id)
                     return
         if content := self.bot.guild_settings[message.guild.id]["lock_message_content"].get(message.channel.id):
+            self.working.add(message.channel.id)
             if message_id := self.bot.guild_settings[message.guild.id]["lock_message_id"].get(message.channel.id):
                 if time.time() - discord.Object(message_id).created_at.timestamp() < 10:
-                    self.working.remove(message.channel.id)
                     return
                 try:
                     await discord.PartialMessage(channel=message.channel, id=message_id).delete()
