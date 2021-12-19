@@ -19,7 +19,7 @@ class LockMessageCog(commands.Cog):
         global Texts
         global get_txt
         self.bot: commands.Bot = bot
-        self.bot.guild_settings = bot.guild_settings
+        self.working = set()
         Texts = bot.texts
         get_txt = bot.get_txt
 
@@ -66,13 +66,18 @@ class LockMessageCog(commands.Cog):
     async def on_message(self, message: discord.Message):
         if message.guild is None:
             return
+        if message.channel.id in self.working:
+            return
+        self.working.add(message.channel.id)
         if message.author == self.bot.user:
             if embeds := message.embeds:
                 if embeds[0].author.url and "?locked" in embeds[0].author.url:
+                    self.working.remove(message.channel.id)
                     return
         if content := self.bot.guild_settings[message.guild.id]["lock_message_content"].get(message.channel.id):
             if message_id := self.bot.guild_settings[message.guild.id]["lock_message_id"].get(message.channel.id):
                 if time.time() - discord.Object(message_id).created_at.timestamp() < 10:
+                    self.working.remove(message.channel.id)
                     return
                 try:
                     await discord.PartialMessage(channel=message.channel, id=message_id).delete()
@@ -81,6 +86,7 @@ class LockMessageCog(commands.Cog):
             author = message.guild.get_member(content["author"])
             if author is None:
                 del self.bot.guild_settings[message.guild.id]["lock_message_content"][message.channel.id]
+                self.working.remove(message.channel.id)
                 return
             msg = await message.channel.send(
                 embed=sembed.SEmbed(
@@ -90,6 +96,7 @@ class LockMessageCog(commands.Cog):
                 )
             )
             self.bot.guild_settings[message.guild.id]["lock_message_id"][message.channel.id] = msg.id
+            self.working.remove(message.channel.id)
 
 
 def setup(_bot):
