@@ -76,7 +76,7 @@ class LockMessageCog(commands.Cog):
             self.working.add(message.channel.id)
             if message_id := self.bot.guild_settings[message.guild.id]["lock_message_id"].get(message.channel.id):
                 if time.time() - discord.Object(message_id).created_at.timestamp() < 10:
-                    return
+                    return self.working.remove(message.channel.id)
                 try:
                     await discord.PartialMessage(channel=message.channel, id=message_id).delete()
                 except discord.NotFound:
