@@ -17,7 +17,7 @@ from common_resources.consts import (  # Activate_aliases,; Deactivate_aliases,;
     Error,
     Success,
 )
-from common_resources.settings import AutoMod, AutoModItem, DEFAULT_AUTOMOD_ITEM
+from common_resources.settings import DEFAULT_AUTOMOD_GLOBAL, AutoMod, AutoModItem, DEFAULT_AUTOMOD_ITEM
 
 if TYPE_CHECKING:
     from moderation import ModerationCog
@@ -191,6 +191,8 @@ class AutoModCog(commands.Cog):
         if missing_keys := (set(AutoMod.__annotations__) - set(self.automod_settings[guild.id])):
             for key in missing_keys:
                 self.automod_settings[guild.id][key] = deepcopy(DEFAULT_AUTOMOD_ITEM)
+        if "$global" not in self.automod_settings[guild.id]:
+            self.automod_settings[guild.id]["$global"] = deepcopy(DEFAULT_AUTOMOD_GLOBAL)
 
     async def cog_before_invoke(self, ctx: commands.Context) -> None:
         await self.validate_automod_settings(ctx.guild)
