@@ -90,7 +90,7 @@ class AutoModCog(commands.Cog):
             await self.check_invite_spam(message)
 
     def moderate_for(self, message: discord.Message, setting: str) -> bool:
-        global_setting = self.automod_settings[message.guild.id]["$global"]
+        global_setting = self.automod_settings[message.guild.id]["_global"]
         setting_data = self.automod_settings[message.guild.id][setting]
         if not setting_data["enabled"]:
             return False
@@ -102,7 +102,7 @@ class AutoModCog(commands.Cog):
         if TOKEN_PATTERN.search(message.content):
             warn = (
                 self.automod_settings[message.guild.id]["token_spam"]["warn"]
-                or self.automod_settings[message.guild.id]["$global"]["warn"]
+                or self.automod_settings[message.guild.id]["_global"]["warn"]
             )
             txt = await self.add_warn(message.author, message, "トークンスパム", warn)
             await message.channel.send(
@@ -117,7 +117,7 @@ class AutoModCog(commands.Cog):
         if INVITE_PATTERN.search(message.content):
             warn = (
                 self.automod_settings[message.guild.id]["invite_spam"]["warn"]
-                or self.automod_settings[message.guild.id]["$global"]["warn"]
+                or self.automod_settings[message.guild.id]["_global"]["warn"]
             )
             txt = await self.add_warn(message.author, message, "招待リンクスパム", warn)
             await message.channel.send(
@@ -191,8 +191,8 @@ class AutoModCog(commands.Cog):
         if missing_keys := (set(AutoMod.__annotations__) - set(self.automod_settings[guild.id])):
             for key in missing_keys:
                 self.automod_settings[guild.id][key] = deepcopy(DEFAULT_AUTOMOD_ITEM)
-        if "$global" not in self.automod_settings[guild.id]:
-            self.automod_settings[guild.id]["$global"] = deepcopy(DEFAULT_AUTOMOD_GLOBAL)
+        if "_global" not in self.automod_settings[guild.id]:
+            self.automod_settings[guild.id]["_global"] = deepcopy(DEFAULT_AUTOMOD_GLOBAL)
 
     async def cog_before_invoke(self, ctx: commands.Context) -> None:
         await self.validate_automod_settings(ctx.guild)
