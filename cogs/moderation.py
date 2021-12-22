@@ -56,7 +56,7 @@ class ModerationCog(commands.Cog):
     async def punish(self, target, p):
         if p["action"] == "mute":
             dt = discord.utils.utcnow() + datetime.timedelta(seconds=p["length"])
-            self.bot.guild_settings[target.guild.id]["muted"][target.id] = dt.timestamp()
+            await target.edit(communication_disabled_until=dt)
         elif p["action"] == "kick":
             await target.kick()
         elif p["action"] == "ban":
@@ -547,31 +547,8 @@ class ModerationCog(commands.Cog):
             await ctx.reply(embed=e)
 
     @commands.command()
-    @commands.has_permissions(kick_members=True)
+    @commands.has_permissions(moderate_members=True)
     async def mute(
-        self,
-        ctx,
-        u: discord.Member,
-        time: convert_timedelta = datetime.timedelta(hours=1),
-    ):
-        if u == self.bot.user:
-            return await ctx.reply(embed=SEmbed("SevenBotをミュートすることはできません。", color=Error))
-        if time.total_seconds() == 0:
-            del self.bot.guild_settings[ctx.guild.id]["muted"][u.id]
-            e = discord.Embed(title=f"`{u.display_name}`のミュートを解除しました。", color=Success)
-            await ctx.reply(embed=e)
-        else:
-            dt = discord.utils.utcnow() + time
-            self.bot.guild_settings[ctx.guild.id]["muted"][u.id] = dt.timestamp()
-            e = discord.Embed(
-                title=f"`{u.display_name}`を{discord.utils.format_dt(dt)}までミュートしました。",
-                color=Success,
-            )
-            await ctx.reply(embed=e)
-
-    @commands.command()
-    @commands.has_permissions(kick_members=True)
-    async def bmute(
         self,
         ctx,
         u: discord.Member,
@@ -580,10 +557,7 @@ class ModerationCog(commands.Cog):
         if u.bot:
             return await ctx.reply(embed=SEmbed("Botはミュートできません。", color=Error))
         dt = discord.utils.utcnow() + time
-        r = discord.http.Route(
-            "PATCH", "/guilds/{guild_id}/members/{member_id}", guild_id=ctx.guild.id, member_id=ctx.author.id
-        )
-        await self.bot.http.request(r, json={"communication_disabled_until": dt.isoformat()})
+        await u.edit(communication_disabled_until=dt)
         e = discord.Embed(
             title=f"`{u.display_name}`を{discord.utils.format_dt(dt)}までミュートしました。",
             color=Success,

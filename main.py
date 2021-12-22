@@ -8,7 +8,6 @@ import json
 import logging
 import os
 import sys
-import time
 import traceback
 from typing import Union
 
@@ -66,15 +65,26 @@ class ReloadEventHandler(FileSystemEventHandler):
             return False
         if "__pycache__" in event.src_path:
             return False
-        if time.time() - self.times.get(event.src_path, 0) < 1:
-            return False
         if event.is_directory:
             return False
         if not event.src_path.endswith(".py"):
             return False
+        self.check_loop()
 
-        self.times[event.src_path] = time.time()
-        return True
+        if event.src_path not in self.times:
+            self.times[event.src_path] = 0
+        self.times[event.src_path] += 1
+        if self.times[event.src_path] > 1:
+            self.times[event.src_path] = 0
+            return True
+        else:
+            return False
+
+    def check_loop(self):
+        try:
+            asyncio.get_event_loop()
+        except RuntimeError:
+            asyncio.set_event_loop(self._loop)
 
     def on_created(self, event: FileSystemEvent):
         if not self.will_run(event):
@@ -86,11 +96,28 @@ class ReloadEventHandler(FileSystemEventHandler):
         else:
             print(f"-- Loaded: {event.src_path}")
 
-    def on_modified(self, event: FileSystemEvent):
+    def on_modified(self, event: FileSystemEvent, import_fail: bool = False):
         if not self.will_run(event):
             return
         try:
             self.bot.reload_extension("cogs." + event.src_path.split("\\")[-1].split(".")[0])
+        except discord.ExtensionFailed as e:
+            if isinstance(e.original, ImportError) and not import_fail:
+                message = e.original.args[0]
+                cls = message.split("'")[3]
+                print("-- Detected import error in the module: " + cls)
+                print("-- Attempting to reload the module...")
+                importlib.reload(sys.modules[cls])
+                self.on_modified(event, True)
+            else:
+                traceback.print_exc()
+        except discord.ExtensionNotLoaded:
+            try:
+                self.bot.load_extension("cogs." + event.src_path.split("\\")[-1].split(".")[0])
+            except Exception:
+                print(traceback.format_exc())
+        except discord.NoEntryPointError:
+            self.on_modified(event, True)
         except Exception:
             print(traceback.format_exc())
         else:
@@ -239,7 +266,11 @@ class SevenBot(commands.Bot):
                 with open(f"./cogs/{o}") as f:
                     if f.read().startswith("# -*- ignore_on_debug -*-") and self.debug:
                         continue
-                bot.load_extension("cogs." + os.path.splitext(os.path.basename(o))[0])
+                try:
+                    bot.load_extension("cogs." + os.path.splitext(os.path.basename(o))[0])
+                except Exception as e:
+                    print("!! Failed to load extension: ", e)
+                    traceback.print_exc()
         self.levenshtein = levenshtein.Levenshtein(self, max_length=1)
         print("on_ready done")
 

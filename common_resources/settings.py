@@ -7,41 +7,6 @@ from typing import Literal, NewType, TypedDict, Union
 Snowflake = NewType("Snowflake", int)
 
 
-class EventMessages(TypedDict):
-    join: Union[False, str]
-    leave: Union[False, str]
-
-
-class WWRole(TypedDict):
-    alive: None | Snowflake
-    dead: None | Snowflake
-
-
-class WarnSettings(TypedDict):
-    punishments: dict[int, WarnSettingsAction]
-
-
-class WarnSettingsAction(TypedDict):
-    action: Literal["mute", "kick", "ban", "role_add", "role_remove"]
-
-
-class WarnSettingsActionMute(WarnSettingsAction, total=False):
-    length: int
-
-
-class WarnSettingsActionRole(WarnSettingsAction, total=False):
-    role: Snowflake
-
-
-class LockMessageContent(TypedDict):
-    content: str
-    author: Snowflake
-
-
-class AutoMod(TypedDict):
-    token_spam: bool
-
-
 class GuildSettings(TypedDict):
     autoreply: dict[str, list[str, str]]
     muted: dict[Snowflake, int]
@@ -74,51 +39,47 @@ class GuildSettings(TypedDict):
     gban_enabled: bool
     lock_message_content: dict[Snowflake, LockMessageContent]
     lock_message_id: dict[Snowflake, Snowflake | None]
-    automod: AutoMod
 
 
-def convert_union(txt: re.Match):
-    return "Union[" + txt[0].replace(" | ", ", ") + "]"
+def _get_int_keys():
+    def convert_union(txt: re.Match):
+        return "Union[" + txt[0].replace(" | ", ", ") + "]"
 
+    def pass_arg(arg: typing.ForwardRef):
+        arg_str = arg.__forward_arg__
+        arg_str = (
+            re.sub(r"(\w+ \| )+(\w+)", convert_union, arg_str)
+            .replace("False", "Literal[False]")
+            .replace("True", "Literal[True]")
+            .replace("Snowflake", "int")
+        )
+        return eval(arg_str)
 
-def pass_arg(arg: typing.ForwardRef):
-    arg_str = arg.__forward_arg__
-    arg_str = (
-        re.sub(r"(\w+ \| )+(\w+)", convert_union, arg_str)
-        .replace("False", "Literal[False]")
-        .replace("True", "Literal[True]")
-        .replace("Snowflake", "int")
-    )
-    return eval(arg_str)
+    settings = dict(map(lambda a: [a[0], pass_arg(a[1])], GuildSettings.__annotations__.items()))
+    int_keys = []
 
-
-settings = dict(map(lambda a: [a[0], pass_arg(a[1])], GuildSettings.__annotations__.items()))
-int_keys = []
-
-
-def get_key_type(k, v):
-    if isinstance(v, typing._TypedDictMeta):
-        val_types = dict(map(lambda a: [a[0], pass_arg(a[1])], v.__annotations__.items()))
-        for k2, v2 in val_types.items():
-            get_key_type(k + "." + k2, v2)
-        return
-    if not hasattr(v, "__origin__"):
-        return
-    if v.__origin__ is dict:
-        if v.__args__[0] is int:
-            int_keys.append(k)
-        if isinstance(v.__args__[1], typing._TypedDictMeta):
-            val_types = dict(map(lambda a: [a[0], pass_arg(a[1])], v.__args__[1].__annotations__.items()))
+    def get_key_type(k, v):
+        if isinstance(v, typing._TypedDictMeta):
+            val_types = dict(map(lambda a: [a[0], pass_arg(a[1])], v.__annotations__.items()))
             for k2, v2 in val_types.items():
                 get_key_type(k + "." + k2, v2)
+            return
+        if not hasattr(v, "__origin__"):
+            return
+        if v.__origin__ is dict:
+            if v.__args__[0] is int:
+                int_keys.append(k)
+            if isinstance(v.__args__[1], typing._TypedDictMeta):
+                val_types = dict(map(lambda a: [a[0], pass_arg(a[1])], v.__args__[1].__annotations__.items()))
+                for k2, v2 in val_types.items():
+                    get_key_type(k + "." + k2, v2)
+
+    for k, v in settings.items():
+        get_key_type(k, v)
+    return int_keys
 
 
-for k, v in settings.items():
-    get_key_type(k, v)
-
-GuildSettings.int_keys = int_keys
-
-DEFAULT_SETTINGS = {
+DEFAULT_SETTINGS: GuildSettings = {
     "autoreply": {},
     "muted": {},
     "deactivate_command": [],
@@ -175,5 +136,65 @@ DEFAULT_SETTINGS = {
     "gban_enabled": False,
     "lock_message_content": {},
     "lock_message_id": {},
-    "automod": {"token_spam": False},
 }
+
+
+class EventMessages(TypedDict):
+    join: Union[False, str]
+    leave: Union[False, str]
+
+
+class WWRole(TypedDict):
+    alive: None | Snowflake
+    dead: None | Snowflake
+
+
+class WarnSettings(TypedDict):
+    punishments: dict[int, WarnSettingsAction]
+
+
+class WarnSettingsAction(TypedDict):
+    action: Literal["mute", "kick", "ban", "role_add", "role_remove"]
+
+
+class WarnSettingsActionMute(WarnSettingsAction, total=False):
+    length: int
+
+
+class WarnSettingsActionRole(WarnSettingsAction, total=False):
+    role: Snowflake
+
+
+class LockMessageContent(TypedDict):
+    content: str
+    author: Snowflake
+
+
+class AutoMod(TypedDict):
+    token_spam: AutoModItem
+    invite_spam: AutoModItem
+
+
+class AutoModItem(TypedDict, total=False):
+    enabled: bool
+    warn: int | None
+    disabled_channels: list[Snowflake]
+
+
+class AutoModGlobal(TypedDict):
+    warn: int
+    disabled_channels: list[Snowflake]
+
+
+DEFAULT_AUTOMOD_ITEM: AutoModItem = {
+    "enabled": False,
+    "warn": 0,
+    "disabled_channels": [],
+}
+
+DEFAULT_AUTOMOD_GLOBAL: AutoModGlobal = {
+    "warn": 1,
+    "disabled_channels": [],
+}
+
+GuildSettings.int_keys = _get_int_keys()
