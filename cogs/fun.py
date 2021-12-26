@@ -978,7 +978,10 @@ class FunCog(commands.Cog):
     async def ww(self, ctx):
         e = discord.Embed(
             title=get_txt(ctx.guild.id, "ww")["title"] + " - " + get_txt(ctx.guild.id, "ww")["waiting"],
-            description=get_txt(ctx.guild.id, "ww")["waiting_desc"].format(self.bot.oemojis["check5"]["check6"]),
+            description=get_txt(ctx.guild.id, "ww")["waiting_desc"].format(
+                self.bot.oemojis["check5"],
+                self.bot.oemojis["check6"]
+            ),
             color=Gaming,
         )
         e.add_field(
