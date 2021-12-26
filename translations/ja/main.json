@@ -936,7 +936,7 @@
             "manage_roles": "ロールの管理",
             "manage_channels": "チャンネルの管理",
             "manage_events": "イベントの管理",
-            "manage_members": "メンバーの管理",
+            "moderate_members": "メンバーの管理",
             "kick_members": "メンバーをキック",
             "ban_members": "メンバーをBAN",
             "create_instant_invite": "招待を作成",
