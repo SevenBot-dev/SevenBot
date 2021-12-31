@@ -119,7 +119,7 @@ class PanelCog(commands.Cog):
         await ctx.send(
             embed=discord.Embed(
                 title=text,
-                color=discord.Color.green(),
+                color=Widget,
                 url=(await ctx.history(limit=1, oldest_first=True).flatten())[0].jump_url,
             )
         )
