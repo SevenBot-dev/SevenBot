@@ -1571,6 +1571,7 @@ class MainCog(commands.Cog):
         u = ctx.guild.roles
         u.reverse()
         r = ""
+        title = get_txt(ctx.guild.id, "rc_title")
         for ui in u:
             flag = False
             if ui.managed:
@@ -1586,7 +1587,12 @@ class MainCog(commands.Cog):
                     f"{ui.mention} : {mci}{Texts[self.bot.guild_settings[ctx.guild.id]['lang']]['rc_people']}"
                     + f" - {per}%\n"
                 )
-        e = discord.Embed(title=get_txt(ctx.guild.id, "rc_title"), description=r, color=Info)
+            if len(r) > 4000:
+                e = discord.Embed(title=title, description=r, color=Info)
+                await ctx.reply(embed=e)
+                r = ""
+                title = ""
+        e = discord.Embed(title=title, description=r, color=Info)
         return await ctx.reply(embed=e)
 
     @commands.command(aliases=["user", "ui", "userinfo"])
