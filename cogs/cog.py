@@ -68,7 +68,7 @@ Categories = {
         "emoji_list",
     ],
     "info": ["lookup", "check_url", "getid", "snowflake"],
-    "panel": ["vote", "party"],
+    "panel": ["vote", "party", "top"],
     "tools": ["translate", "afk", "shorten"],
     "fun": [
         "werewolf",

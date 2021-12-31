@@ -113,6 +113,17 @@ class PanelCog(commands.Cog):
         )
         return await ctx.reply(embed=e)
 
+    @commands.command(name="top")
+    @commands.has_permissions(manage_messages=True)
+    async def top(self, ctx: commands.Context, *, text="最上部へ移動"):
+        await ctx.send(
+            embed=discord.Embed(
+                title=text,
+                color=discord.Color.green(),
+                url=(await ctx.history(limit=1, oldest_first=True).flatten())[0].jump_url,
+            )
+        )
+
 
 def setup(_bot):
     global bot
