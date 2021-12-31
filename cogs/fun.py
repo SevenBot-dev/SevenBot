@@ -1323,6 +1323,8 @@ class FunCog(commands.Cog):
         msg = await ctx.reply(embed=se)
         for i, l in enumerate(langs):
             txt = await TRANSLATOR.translate(txt, l, langs[i - 1])
+            if isinstance(txt, list):
+                txt = txt[0]
             se.description = txt[:2047]
             se.footer.text = f"{ltxt} {i + 1}/25"
             await msg.edit(embed=se)
