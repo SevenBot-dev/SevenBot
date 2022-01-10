@@ -33,6 +33,8 @@ class BatchCog(commands.Cog):
         Bump_alerts = self.bot.raw_config["ba"]
         Dissoku_alerts = self.bot.raw_config["da"]
         get_txt = self.bot.get_txt
+        Batchs.append(self.restart_tasks.start())
+        time.sleep(0.1)
         Batchs.append(self.batch_change_activity.start())
         time.sleep(0.1)
         Batchs.append(self.bot.loop.create_task(self.sync_db()))
@@ -56,6 +58,18 @@ class BatchCog(commands.Cog):
                 activity=discord.Game(name=n + "⠀" * 10),
                 status=discord.Status.online,
             )
+
+    @tasks.loop(seconds=30)
+    async def restart_tasks(self):
+        value: dict[str, discord.ext.tasks.Loop] = {}
+        for c in self.bot.cogs.values():
+            for a in filter(lambda a: not a.startswith("_"), dir(c)):
+                v = getattr(c, a)
+                if isinstance(v, discord.ext.tasks.Loop):
+                    value[a] = v
+        for k, v in value.items():
+            if not v.is_running():
+                v.start()
 
     @tasks.loop(minutes=10)
     async def batch_send_status(self):
