@@ -1324,7 +1324,7 @@ class GlobalCog(commands.Cog):
             if Private_chat_info.get(c["name"]) is None:
                 await self.bot.db.private_chat.delete_one({"name": c["name"]})
                 continue
-            if c != Private_chat_info[c["name"]]:
+            if c != Private_chat_info.get(c["name"]):
                 await self.bot.db.private_chat.update_one(
                     {"name": c["name"]}, {"$set": Private_chat_info[c["name"]]}, upsert=True
                 )
