@@ -296,7 +296,7 @@ class SevenBot(commands.Bot):
 
         # file.write(r)
         # file.close()
-        for gk, gv in self.guild_settings.items():
+        for gk, gv in self.guild_settings.copy().items():
             r = json.loads(json.dumps(gv))
             r["gid"] = gk
             res = await self.db.guild_settings.replace_one({"gid": gk}, r)
