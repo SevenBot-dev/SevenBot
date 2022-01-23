@@ -1,10 +1,10 @@
 import asyncio
-from copy import deepcopy
 import datetime
-import re2 as re
+from copy import deepcopy
 from typing import TYPE_CHECKING
 
 import discord
+import re2 as re
 from discord.ext import commands, tasks
 from sembed import SEmbed
 
@@ -17,7 +17,12 @@ from common_resources.consts import (  # Activate_aliases,; Deactivate_aliases,;
     Error,
     Success,
 )
-from common_resources.settings import DEFAULT_AUTOMOD_GLOBAL, AutoMod, AutoModItem, DEFAULT_AUTOMOD_ITEM
+from common_resources.settings import (
+    DEFAULT_AUTOMOD_GLOBAL,
+    DEFAULT_AUTOMOD_ITEM,
+    AutoMod,
+    AutoModItem,
+)
 
 if TYPE_CHECKING:
     from moderation import ModerationCog

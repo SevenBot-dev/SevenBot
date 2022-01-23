@@ -18,13 +18,21 @@ import sentry_sdk
 import topgg
 from discord.ext import commands, levenshtein
 from motor import motor_asyncio as motor
-from watchdog.observers import Observer
 from watchdog.events import FileSystemEvent, FileSystemEventHandler
+from watchdog.observers import Observer
 
 from common_resources import consts as common_resources
 from common_resources.consts import Official_discord_id, Sub_discord_id
 from common_resources.settings import GuildSettings
-from common_resources.tokens import TOKEN, DEBUG_TOKEN, cstr, dbl_token, sentry_url, web_pass, emergency
+from common_resources.tokens import (
+    DEBUG_TOKEN,
+    TOKEN,
+    cstr,
+    dbl_token,
+    emergency,
+    sentry_url,
+    web_pass,
+)
 from common_resources.tools import flatten
 
 logger = logging.getLogger("discord")

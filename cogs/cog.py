@@ -40,8 +40,8 @@ from common_resources.consts import (
     Success,
     Widget,
 )
-from common_resources.tools import flatten, remove_emoji
 from common_resources.settings import DEFAULT_SETTINGS
+from common_resources.tools import flatten, remove_emoji
 
 if TYPE_CHECKING:
     from ..main import SevenBot

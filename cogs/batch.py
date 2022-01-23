@@ -11,7 +11,7 @@ from discord.ext import commands, tasks
 
 import _pathmagic  # type: ignore # noqa
 from common_resources.settings import GuildSettings
-from common_resources.tokens import botdd_token
+from common_resources.tokens import botdd_token, emergency
 
 Last_favorite = {}
 Time_format = "%Y-%m-%d %H:%M:%S"
@@ -49,14 +49,17 @@ class BatchCog(commands.Cog):
     @tasks.loop(seconds=10)
     async def batch_change_activity(self):
         s = getattr(self.bot, "custom_status", None)
-        n = s or (f"sb#help to Help | {len(self.bot.guilds)} Servers | " + ("https://sevenbot.jp"))
+        n = s or (
+            f"sb#help to Help | {len(self.bot.guilds)} Servers | "
+            + ("Emergency mode" if emergency else "https://sevenbot.jp")
+        )
         if (
             not self.bot.get_guild(715540925081714788).me.activity
             or self.bot.get_guild(715540925081714788).me.activity.name.replace("⠀", "") != n
         ):
             await self.bot.change_presence(
                 activity=discord.Game(name=n + "⠀" * 10),
-                status=discord.Status.online,
+                status=discord.Status.dnd if emergency else discord.Status.online,
             )
 
     @tasks.loop(seconds=30)
