@@ -11,3 +11,4 @@ twitter_bearer = "Twitter Bearer token here"
 botdd_token = "botdd token here"
 web_pass = "web password here"
 sentry_url = "sentry url here"
+emergency = False

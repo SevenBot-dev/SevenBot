@@ -24,7 +24,7 @@ from watchdog.events import FileSystemEvent, FileSystemEventHandler
 from common_resources import consts as common_resources
 from common_resources.consts import Official_discord_id, Sub_discord_id
 from common_resources.settings import GuildSettings
-from common_resources.tokens import TOKEN, DEBUG_TOKEN, cstr, dbl_token, sentry_url, web_pass
+from common_resources.tokens import TOKEN, DEBUG_TOKEN, cstr, dbl_token, sentry_url, web_pass, emergency
 from common_resources.tools import flatten
 
 logger = logging.getLogger("discord")
@@ -256,6 +256,8 @@ class SevenBot(commands.Bot):
             self.oemojis[oe.name] = oe
         for i in range(11):
             self.consts["ne"].append(self.oemojis["b" + str(i)])
+        if not emergency:
+            await self.get_channel(934611880146780200).send("em:shutdown")
         bot.load_extension("jishaku")
         bot.load_extension("dpy_peper")
         bot.load_extension("discord.ext.components")
