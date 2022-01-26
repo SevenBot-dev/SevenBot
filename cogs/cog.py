@@ -339,7 +339,7 @@ class MainCog(commands.Cog):
                 return
         if message.content == self.bot.user.mention or message.content == f"<@!{self.bot.user.id}>":
             await message.channel.send(
-                get_txt(message.guild.id, "mention_txt").format(self.bot.command_prefix(self.bot, message)[2])
+                get_txt(message.guild.id, "mention_txt").format(self.bot.command_prefix(self.bot, message)[0])
             )
             return
         # gs = self.bot.guild_settings.get(message.guild.id)
