@@ -1,5 +1,6 @@
 import ast
 import asyncio
+from collections import defaultdict
 import copy
 import datetime
 import importlib
@@ -9,7 +10,7 @@ import logging
 import os
 import sys
 import traceback
-from typing import Union
+from typing import DefaultDict, Union
 
 import discord
 import pymongo
@@ -33,6 +34,7 @@ from common_resources.tokens import (
     emergency,
     sentry_url,
     web_pass,
+    emergency,
 )
 from common_resources.tools import flatten
 
@@ -205,7 +207,7 @@ class SevenBot(commands.Bot):
             "level_dm": False,
         }
         self.oemojis: dict[str, discord.Emoji] = {}
-        self.guild_settings: dict[int, GuildSettings] = {}
+        self.guild_settings: DefaultDict[int, GuildSettings] = defaultdict(lambda: copy.deepcopy(DEFAULT_SETTINGS))
         print("-- Loading saves from db: ", end="")
         self.load_saves()
         print("Done")
