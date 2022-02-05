@@ -14,6 +14,7 @@ from typing import Union
 import discord
 import pymongo
 import requests
+from sembed import SEmbed
 import sentry_sdk
 import topgg
 from discord.ext import commands, levenshtein
@@ -301,9 +302,24 @@ class SevenBot(commands.Bot):
         for gk, gv in self.guild_settings.copy().items():
             r = json.loads(json.dumps(gv))
             r["gid"] = gk
-            res = await self.db.guild_settings.replace_one({"gid": gk}, r)
-            if not res.matched_count:
-                await self.db.guild_settings.insert_one(r)
+            if self.find_overflow(r):
+                guild = self.bot.get_guild(gk)
+                try:
+                    await self.bot.get_user(guild.owner_id).send(
+                        embed=SEmbed(
+                            "攻撃を発見しました",
+                            f"本サービスへの意図的な攻撃が確認されたため、`{guild.name}`から退出しました。\n"
+                            "Ban解除は[公式サーバー](https://discord.gg/GknwhnwbAV)まで。",
+                            color=discord.Colour.gold(),
+                        )
+                    )
+                except Exception:
+                    pass
+                await guild.leave()
+                self.bot.raw_config["il"].append(gk)
+
+            else:
+                await self.db.guild_settings.replace_one({"gid": gk}, r, upsert=True)
         if not self.debug:
             async for gk in self.db.guild_settings.find():
                 if not self.get_guild(gk["gid"]):
@@ -322,6 +338,25 @@ class SevenBot(commands.Bot):
             pass  # await self.change_presence(activity=Save_game2, status=discord.Status.online)
         except BaseException:
             pass
+
+    def find_overflow(self, data):
+        if isinstance(data, int):
+            if data >= 2 ** 64 - 1:
+                return True
+            else:
+                return False
+        elif isinstance(data, str):
+            return False
+        elif isinstance(data, list):
+            for i in data:
+                if self.find_overflow(i):
+                    return True
+            return False
+        elif isinstance(data, dict):
+            for i in data.values():
+                if self.find_overflow(i):
+                    return True
+            return False
 
     def get_txt(self, guild_id, name):
         try:
