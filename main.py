@@ -25,7 +25,7 @@ from watchdog.observers import Observer
 
 from common_resources import consts as common_resources
 from common_resources.consts import Official_discord_id, Sub_discord_id
-from common_resources.settings import GuildSettings
+from common_resources.settings import GuildSettings, DEFAULT_SETTINGS
 from common_resources.tokens import (
     DEBUG_TOKEN,
     TOKEN,
