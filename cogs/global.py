@@ -27,7 +27,7 @@ from common_resources.consts import (
     Process,
     Success,
 )
-from common_resources.tokens import wsgc_token
+from common_resources.tokens import wsgc_token, emergency
 from common_resources.tools import flatten
 
 SGC_ID = 707158257818664991
@@ -166,6 +166,11 @@ class GlobalCog(commands.Cog):
     async def send_mute(self, message):
         await message.delete()
         e2 = discord.Embed(title="あなたはミュートされています。", color=Error)
+        await message.author.send(embed=e2)
+
+    async def send_emergency(self, message):
+        await message.delete()
+        e2 = discord.Embed(title="現在Emergencyモードのためグローバルチャットは使用できません。", color=Error)
         await message.author.send(embed=e2)
 
     def short_line(self, data, length):
@@ -438,6 +443,8 @@ class GlobalCog(commands.Cog):
             else:
                 if message.author.id in Global_mute:
                     await self.send_mute(message)
+                elif emergency:
+                    await self.send_emergency(message)
                 else:
                     if message.channel.id in Global_chat:
                         slow = 5
