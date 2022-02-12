@@ -215,7 +215,9 @@ class GlobalCog(commands.Cog):
                         elif json_msg["t"] == "HELLO":
                             if not self.register_flag:
                                 await websocket.send(
-                                    json.dumps({"t": "CONNECT", "d": {"id": str(self.bot.user.id), "token": wsgc_token}})
+                                    json.dumps(
+                                        {"t": "CONNECT", "d": {"id": str(self.bot.user.id), "token": wsgc_token}}
+                                    )
                                 )
                         elif json_msg["t"] in ("HEARTBEAT", "CONNECTED"):
                             pass
@@ -233,6 +235,14 @@ class GlobalCog(commands.Cog):
             timestamp=message.created_at,
             color=Chat,
         )
+        sem = asyncio.Semaphore(5)
+
+        async def send_with_sem(**kwargs):
+            with await sem:
+                return await webhook.send(
+                    **kwargs,
+                )
+
         if message.attachments != []:
             u = message.attachments[0].url
             if "".join(os.path.splitext(os.path.basename(message.attachments[0].filename))[1:])[1:] not in Image_exts:
@@ -342,7 +352,7 @@ class GlobalCog(commands.Cog):
                                 except discord.NotFound:
                                     rem = None
                             ga.append(
-                                webhook.send(
+                                send_with_sem(
                                     content=content,  # content.replace("@", "@​")
                                     username=un,
                                     allowed_mentions=discord.AllowedMentions.none(),
