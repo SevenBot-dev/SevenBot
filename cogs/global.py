@@ -61,6 +61,7 @@ class GlobalCog(commands.Cog):
         self.bot.loop.create_task(self.get_pc_data())
         self.bot.loop.create_task(self.keep_websocket())
         self.websocket_flag = False
+        self.register_flag = False
 
     def make_rule_embed(self, channel):
         owner = self.bot.get_user(Private_chat_info[channel]["owner"])
@@ -207,11 +208,15 @@ class GlobalCog(commands.Cog):
                         msg = await websocket.recv()
                         json_msg = json.loads(msg)
                         if json_msg.get("t", "") == "ERROR":
-                            await self.bot.get_channel(763877469928554517).send(json_msg)
+                            if json_msg["type"] == "ALREADY_REGISTERED":
+                                self.register_flag = True
+                            else:
+                                await self.bot.get_channel(763877469928554517).send(json_msg)
                         elif json_msg["t"] == "HELLO":
-                            await websocket.send(
-                                json.dumps({"t": "CONNECT", "d": {"id": str(self.bot.user.id), "token": wsgc_token}})
-                            )
+                            if not self.register_flag:
+                                await websocket.send(
+                                    json.dumps({"t": "CONNECT", "d": {"id": str(self.bot.user.id), "token": wsgc_token}})
+                                )
                         elif json_msg["t"] in ("HEARTBEAT", "CONNECTED"):
                             pass
                         elif json_msg.get("f"):
