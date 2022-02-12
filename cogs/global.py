@@ -208,7 +208,7 @@ class GlobalCog(commands.Cog):
                         msg = await websocket.recv()
                         json_msg = json.loads(msg)
                         if json_msg.get("t", "") == "ERROR":
-                            if json_msg["type"] == "ALREADY_REGISTERED":
+                            if json_msg["d"]["type"] == "ALREADY_REGISTERED":
                                 self.register_flag = True
                             else:
                                 await self.bot.get_channel(763877469928554517).send(json_msg)
