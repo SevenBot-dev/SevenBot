@@ -237,7 +237,7 @@ class GlobalCog(commands.Cog):
         )
         sem = asyncio.Semaphore(5)
 
-        async def send_with_sem(**kwargs):
+        async def send_with_sem(webhook, **kwargs):
             with await sem:
                 return await webhook.send(
                     **kwargs,
@@ -353,6 +353,7 @@ class GlobalCog(commands.Cog):
                                     rem = None
                             ga.append(
                                 send_with_sem(
+                                    webhook,
                                     content=content,  # content.replace("@", "@​")
                                     username=un,
                                     allowed_mentions=discord.AllowedMentions.none(),
