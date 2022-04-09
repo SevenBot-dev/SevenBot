@@ -23,6 +23,8 @@ from common_resources.consts import (
 )
 from common_resources.tools import convert_timedelta, flatten
 
+get_txt = None  # temporary
+
 
 def delta_to_text(delta, ctx) -> str:
     s = math.floor(delta.seconds)
