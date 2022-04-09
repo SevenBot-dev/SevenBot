@@ -125,7 +125,7 @@ class PanelCog(commands.Cog):
         )
 
 
-def setup(_bot):
+async def setup(_bot):
     global bot
     bot = _bot
-    _bot.add_cog(PanelCog(_bot), override=True)
+    await _bot.add_cog(PanelCog(_bot), override=True)

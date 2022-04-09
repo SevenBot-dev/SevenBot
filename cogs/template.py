@@ -22,7 +22,7 @@ class TemplateCog(commands.Cog):
         get_txt = bot.get_txt
 
 
-def setup(_bot):
+async def setup(_bot):
     global bot
     bot = _bot
-    _bot.add_cog(TemplateCog(_bot), override=True)
+    await _bot.add_cog(TemplateCog(_bot), override=True)

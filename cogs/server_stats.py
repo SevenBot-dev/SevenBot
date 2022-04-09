@@ -141,7 +141,7 @@ class ServerStatCog(commands.Cog):
         self.batch_update_stat_channel.stop()
 
 
-def setup(_bot):
+async def setup(_bot):
     global bot
     bot = _bot
-    _bot.add_cog(ServerStatCog(_bot), override=True)
+    await _bot.add_cog(ServerStatCog(_bot), override=True)

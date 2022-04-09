@@ -206,7 +206,7 @@ class AutoModCog(commands.Cog):
         self.save.stop()
 
 
-def setup(_bot):
+async def setup(_bot):
     global bot
     bot = _bot
-    _bot.add_cog(AutoModCog(_bot), override=True)
+    await _bot.add_cog(AutoModCog(_bot), override=True)

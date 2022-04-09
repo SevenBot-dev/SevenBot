@@ -598,8 +598,8 @@ class ModerationCog(commands.Cog):
             return await ctx.reply(embed=e)
 
 
-def setup(_bot):
+async def setup(_bot):
     global bot
     bot = _bot
     #     logging.info("cog.py reloaded")
-    _bot.add_cog(ModerationCog(_bot), override=True)
+    await _bot.add_cog(ModerationCog(_bot), override=True)

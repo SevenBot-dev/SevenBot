@@ -165,7 +165,7 @@ class BatchCog(commands.Cog):
             ba.cancel()
 
 
-def setup(_bot):
+async def setup(_bot):
     global bot
     bot = _bot
-    _bot.add_cog(BatchCog(_bot), override=True)
+    await _bot.add_cog(BatchCog(_bot), override=True)

@@ -598,8 +598,8 @@ class AdminCog(commands.Cog):
         await ctx.reply(embed=SEmbed("タスクの再稼働状況", "```diff" + res + "\n```", color=Info))
 
 
-def setup(_bot):
+async def setup(_bot):
     global bot
     bot = _bot
     #     logging.info("cog.py reloaded")
-    _bot.add_cog(AdminCog(_bot), override=True)
+    await _bot.add_cog(AdminCog(_bot), override=True)

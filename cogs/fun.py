@@ -1644,7 +1644,7 @@ class FunCog(commands.Cog):
                         await m.remove_reaction(self.bot.oemojis["check6"])
 
 
-def setup(_bot):
+async def setup(_bot):
     global bot
     bot = _bot
-    _bot.add_cog(FunCog(_bot), override=True)
+    await _bot.add_cog(FunCog(_bot), override=True)

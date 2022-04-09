@@ -609,8 +609,8 @@ class ToolCog(commands.Cog):
         Batch["sync_afk"].cancel()
 
 
-def setup(_bot):
+async def setup(_bot):
     global bot
     bot = _bot
     #     logging.info("cog.py reloaded")
-    _bot.add_cog(ToolCog(_bot), override=True)
+    await _bot.add_cog(ToolCog(_bot), override=True)

@@ -218,7 +218,7 @@ class BumpCog(commands.Cog):
         self.batch_bump_alert.stop()
 
 
-def setup(_bot):
+async def setup(_bot):
     global bot
     bot = _bot
-    _bot.add_cog(BumpCog(_bot), override=True)
+    await _bot.add_cog(BumpCog(_bot), override=True)

@@ -29,5 +29,5 @@ class TopGG(commands.Cog):
         self.upload_stats.stop()
 
 
-def setup(bot):
-    bot.add_cog(TopGG(bot))
+async def setup(bot):
+    await bot.add_cog(TopGG(bot))

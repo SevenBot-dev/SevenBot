@@ -31,7 +31,6 @@ from common_resources.tokens import (
     TOKEN,
     cstr,
     dbl_token,
-    emergency,
     sentry_url,
     web_pass,
     emergency,
@@ -269,9 +268,9 @@ class SevenBot(commands.Bot):
             self.consts["ne"].append(self.oemojis["b" + str(i)])
         if not emergency:
             await self.get_channel(934611880146780200).send("em:shutdown")
-        bot.load_extension("jishaku")
-        bot.load_extension("dpy_peper")
-        bot.load_extension("discord.ext.components")
+        await bot.load_extension("jishaku")
+        await bot.load_extension("dpy_peper")
+        await bot.load_extension("discord.ext.components")
         if not self.debug:
             self.DBL_client = topgg.DBLClient(self, dbl_token, autopost=True)
         for o in os.listdir("./cogs"):
@@ -280,7 +279,7 @@ class SevenBot(commands.Bot):
                     if f.read().startswith("# -*- ignore_on_debug -*-") and self.debug:
                         continue
                 try:
-                    bot.load_extension("cogs." + os.path.splitext(os.path.basename(o))[0])
+                    await bot.load_extension("cogs." + os.path.splitext(os.path.basename(o))[0])
                 except Exception as e:
                     print("!! Failed to load extension: ", e)
                     traceback.print_exc()

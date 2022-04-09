@@ -1364,8 +1364,8 @@ class GlobalCog(commands.Cog):
         self.websocket_flag = True
 
 
-def setup(_bot):
+async def setup(_bot):
     global bot
     bot = _bot
     #     logging.info("cog.py reloaded")
-    _bot.add_cog(GlobalCog(_bot), override=True)
+    await _bot.add_cog(GlobalCog(_bot), override=True)

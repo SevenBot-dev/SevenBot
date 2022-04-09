@@ -297,7 +297,7 @@ class AutoreplyCog(commands.Cog):
             await ctx.reply(embed=discord.Embed(title="自動返信を読み込みました。", color=Success))
 
 
-def setup(_bot):
+async def setup(_bot):
     global bot
     bot = _bot
-    _bot.add_cog(AutoreplyCog(_bot), override=True)
+    await _bot.add_cog(AutoreplyCog(_bot), override=True)

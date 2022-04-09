@@ -187,7 +187,7 @@ class RoleLinkCog(commands.Cog):
             return await ctx.reply(embed=e)
 
 
-def setup(_bot):
+async def setup(_bot):
     global bot
     bot = _bot
-    _bot.add_cog(RoleLinkCog(_bot), override=True)
+    await _bot.add_cog(RoleLinkCog(_bot), override=True)

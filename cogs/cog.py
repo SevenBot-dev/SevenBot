@@ -2179,10 +2179,10 @@ class MainCog(commands.Cog):
             pass
 
 
-def setup(_bot: "SevenBot"):
+async def setup(_bot: "SevenBot"):
     global bot
     bot = _bot
-    _bot.add_cog(MainCog(_bot), override=True)
+    await _bot.add_cog(MainCog(_bot), override=True)
 
     @bot.before_invoke
     async def count_commands(ctx):

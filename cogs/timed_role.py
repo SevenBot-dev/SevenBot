@@ -179,7 +179,7 @@ class TimedRoleCog(commands.Cog):
         self.remove_timed_role.stop()
 
 
-def setup(_bot):
+async def setup(_bot):
     global bot
     bot = _bot
-    _bot.add_cog(TimedRoleCog(_bot), override=True)
+    await _bot.add_cog(TimedRoleCog(_bot), override=True)
