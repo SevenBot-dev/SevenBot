@@ -235,7 +235,7 @@ class GlobalCog(commands.Cog):
             timestamp=message.created_at,
             color=Chat,
         )
-        sem = asyncio.Semaphore()
+        sem = asyncio.Semaphore(50)
 
         async def send_with_sem(webhook, **kwargs):
             async with sem:
