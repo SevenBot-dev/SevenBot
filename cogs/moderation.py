@@ -486,13 +486,13 @@ class ModerationCog(commands.Cog):
 
     @warn_settings.command(name="remove", aliases=["del", "delete", "rem"])
     @commands.has_guild_permissions(kick_members=True)
-    async def ws_remove(self, ctx, *, count):
+    async def ws_remove(self, ctx, *, count: int):
         if count in self.bot.guild_settings[ctx.guild.id]["warn_settings"]["punishments"]:
             del self.bot.guild_settings[ctx.guild.id]["warn_settings"]["punishments"][count]
             e = discord.Embed(title="処罰を削除しました。", color=Success)
         else:
             e = discord.Embed(
-                title=f"Warn`{txt}`回の処罰はありません。",
+                title=f"Warn`{count}`回の処罰はありません。",
                 description="`sb#warn_settings list`で確認してください。",
                 color=Error,
             )
