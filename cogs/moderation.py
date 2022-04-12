@@ -486,32 +486,16 @@ class ModerationCog(commands.Cog):
 
     @warn_settings.command(name="remove", aliases=["del", "delete", "rem"])
     @commands.has_guild_permissions(kick_members=True)
-    async def ws_remove(self, ctx, *, txt):
-        res = ""
-        count = 0
-        new = {}
-        if txt in self.bot.guild_settings[ctx.guild.id]["warn_settings"]["punishments"].keys():
-            res += "`" + self.bot.guild_settings[ctx.guild.id]["warn_settings"]["punishments"][txt][1] + "`\n"
-            for ark, ar in self.bot.guild_settings[ctx.guild.id]["warn_settings"]["punishments"].items():
-                if ark != txt:
-                    new[ark] = ar
-            count = 1
+    async def ws_remove(self, ctx, *, count):
+        if count in self.bot.guild_settings[ctx.guild.id]["warn_settings"]["punishments"]:
+            del self.bot.guild_settings[ctx.guild.id]["warn_settings"]["punishments"][count]
+            e = discord.Embed(title="処罰を削除しました。", color=Success)
         else:
-            for ark, ar in self.bot.guild_settings[ctx.guild.id]["warn_settings"]["punishments"].items():
-                if ar[0] == txt:
-                    count += 1
-                    res += "`" + ar[1] + "`\n"
-                else:
-                    new[ark] = ar
-        if count == 0:
             e = discord.Embed(
                 title=f"Warn`{txt}`回の処罰はありません。",
                 description="`sb#warn_settings list`で確認してください。",
                 color=Error,
             )
-        else:
-            e = discord.Embed(title="処罰を削除しました。", description=res, color=Success)
-            self.bot.guild_settings[ctx.guild.id]["warn_settings"]["punishments"] = new
         await ctx.reply(embed=e)
 
     @warn_settings.command(name="list")
