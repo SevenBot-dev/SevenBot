@@ -243,11 +243,12 @@ class SevenBot(commands.Bot):
         await f
 
     async def load_saves_debug(self):
-        for c in await self.dbclient["production"].list_collection_names():
-            async for r in self.dbclient["production"][c].find():
-                self.loop.create_task(
-                    self.to_coro(self.dbclient["development"][c].replace_one({"_id": r["_id"]}, r, upsert=True))
-                )
+        pass
+        # for c in await self.dbclient["production"].list_collection_names():
+        #     async for r in self.dbclient["production"][c].find():
+        #         self.loop.create_task(
+        #             self.to_coro(self.dbclient["development"][c].replace_one({"_id": r["_id"]}, r, upsert=True))
+        #         )
 
     async def auto_reload(self):
         event_handler = ReloadEventHandler(self.loop, self)
