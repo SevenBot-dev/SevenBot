@@ -34,7 +34,6 @@ from common_resources.tokens import (
     emergency,
     sentry_url,
     web_pass,
-    emergency,
 )
 from common_resources.tools import flatten
 
