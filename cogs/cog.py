@@ -933,6 +933,7 @@ class MainCog(commands.Cog):
             e = discord.Embed(title=get_txt(ctx.guild.id, "not_nsfw"), color=Error)
             return await ctx.reply(embed=e)
         else:
+            sentry_sdk.capture_exception(error)
             e = discord.Embed(
                 title=get_txt(ctx.guild.id, "error"),
                 description=f"```\n{error}```",
