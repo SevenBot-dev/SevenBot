@@ -61,7 +61,7 @@ class AutoTextCog(commands.Cog):
                     color=Error,
                 )
             )
-        self.bot.guild_settings[ctx.guild.id]["auto_text"].append(channel.id)
+        self.bot.guild_settings[ctx.guild.id]["auto_text"].remove(channel.id)
         await ctx.reply(
             embed=SEmbed(
                 "自動TCを無効にしました。",
@@ -71,7 +71,9 @@ class AutoTextCog(commands.Cog):
         )
 
     @commands.Cog.listener()
-    async def on_voice_channel_update(self, member, before, after):
+    async def on_voice_channel_update(
+        self, member: discord.Member, before: discord.VoiceState, after: discord.VoiceState
+    ):
         if before is not None and (not before.members) and before in Auto_text_channels:
             try:
                 await Auto_text_channels[before].delete()
@@ -80,19 +82,19 @@ class AutoTextCog(commands.Cog):
             del Auto_text_channels[before]
         if (
             after is not None
-            and after.id in self.bot.guild_settings[member.guild.id]["auto_text"]
-            and after not in Auto_text_channels
+            and after.channel.id in self.bot.guild_settings[member.guild.id]["auto_text"]
+            and after.channel.id not in Auto_text_channels
         ):
             ntc = await after.category.create_text_channel(
                 after.name,
-                topic=f"このチャンネルは{after.mention}に誰もいなくなったら自動的に消去されます。",
+                topic=f"このチャンネルは{after.channel.mention}に誰もいなくなったら自動的に消去されます。",
             )
             Auto_text_channels[after] = ntc
             await ntc.send(
                 member.mention,
                 embed=SEmbed(
                     "",
-                    f"このチャンネルは{after.mention}に誰もいなくなったら自動的に消去されます。",
+                    f"このチャンネルは{after.channel.mention}に誰もいなくなったら自動的に消去されます。",
                     color=Info,
                 ),
             )
