@@ -438,8 +438,8 @@ class ModerationCog(commands.Cog):
             e.description += get_txt(ctx.guild.id, "warn_desc_now").format(nw, self.get_warn_text(ctx, pun[nw])) + "\n"
             await self.punish(target, pun[nw])
 
-        if pun := [c for c in sorted(pun.keys()) if c > nw]:
-            length = pun[0]
+        if pun_list := [c for c in sorted(pun.keys()) if c > nw]:
+            length = pun_list[0]
             e.description += get_txt(ctx.guild.id, "warn_desc_next").format(
                 self.get_warn_text(ctx, pun[length]), length
             )
