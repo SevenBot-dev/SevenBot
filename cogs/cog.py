@@ -215,6 +215,8 @@ class MainCog(commands.Cog):
     async def on_guild_remove(self, g):
         if g.id in Blacklists:
             return
+        elif g.name is None:
+            return
         await self.bot.get_channel(756254787191963768).send(
             "サーバー退出", embeds=[SEmbed("<サーバー退出>", f"名前：{g.name}\nID：{g.id}", color=discord.Color.red())]
         )
