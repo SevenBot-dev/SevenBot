@@ -313,9 +313,9 @@ class SevenBot(commands.Bot):
             r = json.loads(json.dumps(gv))
             r["gid"] = gk
             if self.find_overflow(r):
-                guild = self.bot.get_guild(gk)
+                guild = self.get_guild(gk)
                 try:
-                    await self.bot.get_user(guild.owner_id).send(
+                    await self.get_user(guild.owner_id).send(
                         embed=SEmbed(
                             "攻撃を発見しました",
                             f"本サービスへの意図的な攻撃が確認されたため、`{guild.name}`から退出しました。\n"
