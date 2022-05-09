@@ -814,7 +814,7 @@ class MainCog(commands.Cog):
         )
         e.add_field(
             name=get_txt(ctx.guild.id, "abouts")[2],
-            value=f"`python {platform.python_version()}`,`Pycord {discord.__version__}`",
+            value=f"`python {platform.python_version()}`, `Pycord {discord.__version__}`",
         )
         e.add_field(
             name=get_txt(ctx.guild.id, "abouts")[3],
