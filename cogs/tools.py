@@ -596,8 +596,8 @@ class ToolCog(commands.Cog):
         res = []
         for b in bins:
             res.append(int(b, 2))
-        dt_utc_aware = datetime.datetime.fromtimestamp((res[0] + 1420070400000) / 1000.0, datetime.timezone.utc)
-        res[0] = str(dt_utc_aware)
+        
+        res[0] = f"<t:{(res[0] + 1420070400000) // 1000}:F>"
         e = discord.Embed(
             title=get_txt(ctx.guild.id, "snowflake")[0],
             description=get_txt(ctx.guild.id, "snowflake")[1].format(*res),
