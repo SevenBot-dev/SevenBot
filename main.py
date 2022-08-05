@@ -182,7 +182,7 @@ except requests.exceptions.HTTPError:
 print("Done")
 
 
-class SevenBot(commands.Bot):
+class SevenBot(commands.AutoShardedBot):
     def __init__(self):
         super().__init__(
             command_prefix=self.prefix,
