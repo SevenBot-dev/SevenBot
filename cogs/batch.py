@@ -1,4 +1,5 @@
 import asyncio
+import collections
 import datetime
 
 # import sys
@@ -28,7 +29,7 @@ class BatchCog(commands.Cog):
     def __init__(self, bot):
         global Bump_alerts, Dissoku_alerts
         global get_txt
-        self.bot: commands.Bot = bot
+        self.bot: commands.AutoShardedBot = bot
         self.bot.guild_settings = self.bot.guild_settings
         Bump_alerts = self.bot.raw_config["ba"]
         Dissoku_alerts = self.bot.raw_config["da"]
@@ -46,20 +47,20 @@ class BatchCog(commands.Cog):
             time.sleep(0.1)
             Batchs.append(self.batch_send_status.start())
 
-    @tasks.loop(seconds=10)
+    @tasks.loop(minutes=1)
     async def batch_change_activity(self):
         s = getattr(self.bot, "custom_status", None)
-        n = s or (
-            f"sb#help to Help | {len(self.bot.guilds)} Servers | "
-            + ("Emergency mode" if emergency else "https://sevenbot.jp")
-        )
-        if (
-            not self.bot.get_guild(715540925081714788).me.activity
-            or self.bot.get_guild(715540925081714788).me.activity.name.replace("⠀", "") != n
-        ):
+        guild_count = collections.Counter(map(lambda g: g.shard_id, self.bot.guilds))
+        for i in self.bot.shards:
+            n = s or (
+                f"sb#help to Help | {len(self.bot.guilds)} ({guild_count[i]}) Servers | "
+                + f"Shard {i} / {self.bot.shard_count}"
+                + ("Emergency mode" if emergency else "https://sevenbot.jp")
+            )
             await self.bot.change_presence(
                 activity=discord.Game(name=n + "⠀" * 10),
                 status=discord.Status.dnd if emergency else discord.Status.online,
+                shard_id=i,
             )
 
     @tasks.loop(seconds=30)
