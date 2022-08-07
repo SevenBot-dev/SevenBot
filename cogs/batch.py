@@ -54,7 +54,7 @@ class BatchCog(commands.Cog):
         for i in self.bot.shards:
             n = s or (
                 f"sb#help to Help | {len(self.bot.guilds)} ({guild_count[i]}) Servers | "
-                + f"Shard {i} / {self.bot.shard_count} | "
+                + f"Shard {i + 1} / {self.bot.shard_count} | "
                 + ("Emergency mode" if emergency else "https://sevenbot.jp")
             )
             await self.bot.change_presence(
