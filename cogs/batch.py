@@ -53,7 +53,7 @@ class BatchCog(commands.Cog):
         guild_count = collections.Counter(map(lambda g: g.shard_id, self.bot.guilds))
         for i in self.bot.shards:
             n = s or (
-                f"sb#help to Help | {len(self.bot.guilds)} ({guild_count[i]}) Servers | "
+                f"sb#help | {len(self.bot.guilds)} ({guild_count[i]}) Servers | "
                 + f"Shard {i + 1} / {self.bot.shard_count} | "
                 + ("Emergency mode" if emergency else "https://sevenbot.jp")
             )
