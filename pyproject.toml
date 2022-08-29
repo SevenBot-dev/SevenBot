@@ -28,7 +28,8 @@ py = "~=1.10.0"
 pylint = "~=2.8.3"
 pynacl = "~=1.4.0"
 pyre2 = "~=0.3.6"
-py-cord = { git = "https://github.com/pycord-development/pycord" }
+# py-cord = { git = "https://github.com/pycord-development/pycord" }
+py-cord = "~=2.1.1"
 
 sembed = "~=1.1.2"
 sentry-sdk = "~=1.5.0"
