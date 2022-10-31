@@ -1352,7 +1352,7 @@ class GlobalCog(commands.Cog):
                 )
         for name, data in Private_chat_info.copy().items():
             if not await self.bot.db.private_chat.find_one({"name": name}):
-                await self.bot.db.private_chat.insert_one(data)
+                await self.bot.db.private_chat.insert_one({**data, "name": name})
 
     async def get_pc_data(self):
         async with self.bot.db.private_chat.watch() as change_stream:
