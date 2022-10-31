@@ -31,7 +31,6 @@ from common_resources.tokens import wsgc_token, emergency
 from common_resources.tools import flatten
 
 SGC_ID = 707158257818664991
-SGC_ID2 = 799184205316751391
 SGC_STOP = False
 Gc_last_users = {}
 Image_exts = ["gif", "jpg", "jpeg", "jpe", "jfif", "png", "bmp", "ico"]
@@ -74,7 +73,7 @@ class GlobalCog(commands.Cog):
 
     @commands.Cog.listener("on_message")
     async def on_message_sgc(self, message):
-        if message.channel.id in [SGC_ID, SGC_ID2] and message.author.id != self.bot.user.id and not SGC_STOP:
+        if message.channel.id in SGC_ID and message.author.id != self.bot.user.id and not SGC_STOP:
             loop = asyncio.get_event_loop()
             loop.create_task(message.add_reaction(self.bot.oemojis["network"]))
             try:
@@ -506,7 +505,7 @@ class GlobalCog(commands.Cog):
                         e = pck
                         break
             if e == "sgc":
-                await self.bot.get_channel(SGC_ID2).send(
+                await self.bot.get_channel(SGC_ID).send(
                     json.dumps(
                         {"type": "delete", "messageId": str(message.id)},
                         ensure_ascii=False,
@@ -552,7 +551,7 @@ class GlobalCog(commands.Cog):
             else:
                 content = after.content
             if e == "sgc":
-                await self.bot.get_channel(SGC_ID2).send(
+                await self.bot.get_channel(SGC_ID).send(
                     json.dumps(
                         {
                             "type": "edit",
@@ -701,7 +700,7 @@ class GlobalCog(commands.Cog):
                         Private_chat_info[channel]["channels"].append(ctx.channel.id)
                         await ctx.reply(embed=e4)
                         if channel == "sgc":
-                            await self.bot.get_channel(SGC_ID2).send(
+                            await self.bot.get_channel(SGC_ID).send(
                                 json.dumps(
                                     {
                                         "type": "sb-guildJoin",
@@ -981,7 +980,7 @@ class GlobalCog(commands.Cog):
             e2.set_thumbnail(url=ctx.guild.icon.url)
             e2.set_footer(text=f"現在のチャンネル数：{len(Private_chat_info[pk]['channels'])}")
             if pk == "sgc":
-                await self.bot.get_channel(SGC_ID2).send(
+                await self.bot.get_channel(SGC_ID).send(
                     json.dumps(
                         {
                             "type": "sb-guildLeft",
