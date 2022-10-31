@@ -73,7 +73,7 @@ class GlobalCog(commands.Cog):
 
     @commands.Cog.listener("on_message")
     async def on_message_sgc(self, message):
-        if message.channel.id in SGC_ID and message.author.id != self.bot.user.id and not SGC_STOP:
+        if message.channel.id == SGC_ID and message.author.id != self.bot.user.id and not SGC_STOP:
             loop = asyncio.get_event_loop()
             loop.create_task(message.add_reaction(self.bot.oemojis["network"]))
             try:
