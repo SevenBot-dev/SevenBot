@@ -776,8 +776,9 @@ class GlobalCog(commands.Cog):
                     )
                     e2.set_thumbnail(url=ctx.guild.icon.url)
                     e2.set_footer(text=f"現在のチャンネル数：{len(Private_chat_info[channel]['channels'])}")
-                    r = await ctx.send(embed=self.make_rule_embed(channel))
-                    await r.pin()
+                    if Private_chat_info[channel].get("rule"):
+                        r = await ctx.send(embed=self.make_embed(channel))
+                        await r.pin()
                     loop = asyncio.get_event_loop()
                     for c in Private_chat_info[channel]["channels"]:
                         if c == ctx.channel.id:
