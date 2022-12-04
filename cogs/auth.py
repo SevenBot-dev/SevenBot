@@ -76,7 +76,7 @@ class AuthCog(commands.Cog):
                         await self.bot.wait_for(
                             "message",
                             check=lambda message: message.content.lower() == auth_text
-                            and message.channel == message.author.dm_channel
+                            and message.guild is None
                             and message.author == user,
                             timeout=30,
                         )
@@ -164,7 +164,7 @@ class AuthCog(commands.Cog):
                         await self.bot.wait_for(
                             "message",
                             check=lambda message: message.content.lower() == auth_text
-                            and message.channel == message.author.dm_channel
+                            and message.guild is None
                             and message.author == user,
                             timeout=30,
                         )
