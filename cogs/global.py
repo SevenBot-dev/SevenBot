@@ -435,11 +435,11 @@ class GlobalCog(commands.Cog):
             gms = self.bot.consts["gcm"]["sgc"]
             data = gms.get(message.reference.message_id)
             if data:
-                rjson["reference"] = message.reference.message_id
+                rjson["reference"] = str(message.reference.message_id)
             else:
                 msg = discord.utils.find(lambda k: message.reference.message_id in [m.id for m in gms[k]], gms.keys())
                 if msg:
-                    rjson["reference"] = msg
+                    rjson["reference"] = str(msg)
 
         return rjson
 
