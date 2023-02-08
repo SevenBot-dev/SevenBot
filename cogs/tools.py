@@ -1,6 +1,5 @@
 import asyncio
 import base64
-import datetime
 import hashlib
 import hmac
 import json
@@ -15,10 +14,11 @@ import discord
 from authlib.integrations.base_client import errors as authlib_err
 from authlib.integrations.httpx_client.oauth1_client import AsyncOAuth1Client
 from discord.ext import commands, tasks
+from sembed import SEmbed
 
 import _pathmagic  # type: ignore # noqa: F401
-from common_resources.consts import Deactivate_aliases, Info, Success
-from common_resources.tokens import twitter_consumer_key, twitter_consumer_secret
+from common_resources.consts import Deactivate_aliases, Info, Success, Error
+# from common_resources.tokens import twitter_consumer_key, twitter_consumer_secret
 
 
 def hmac_sha1(input_str, key):
@@ -110,22 +110,22 @@ class ToolCog(commands.Cog):
                 )
             )
             # ----Twitter----
-            t = await self.bot.db.twitter_keys.find_one({"uid": message.author.id})
-            t2 = await self.bot.db.afk_twitter_text.find_one({"uid": message.author.id})
-            if t is not None:
-                txt = t2["deactivate"].replace("!user", "@" + t["name"])
-                client = AsyncOAuth1Client(
-                    twitter_consumer_key,
-                    twitter_consumer_secret,
-                    t["token"],
-                    t["secret"],
-                )
-                await client.post(
-                    "https://api.twitter.com/1.1/statuses/update.json",
-                    params={"status": txt},
-                )
-                await client.aclose()
-                # print(res.status, res.text)
+            # t = await self.bot.db.twitter_keys.find_one({"uid": message.author.id})
+            # t2 = await self.bot.db.afk_twitter_text.find_one({"uid": message.author.id})
+            # if t is not None:
+            #     txt = t2["deactivate"].replace("!user", "@" + t["name"])
+            #     client = AsyncOAuth1Client(
+            #         twitter_consumer_key,
+            #         twitter_consumer_secret,
+            #         t["token"],
+            #         t["secret"],
+            #     )
+            #     await client.post(
+            #         "https://api.twitter.com/1.1/statuses/update.json",
+            #         params={"status": txt},
+            #     )
+            #     await client.aclose()
+            #     # print(res.status, res.text)
 
         else:
             for m in message.mentions:
@@ -170,27 +170,27 @@ class ToolCog(commands.Cog):
         self.bot.consts["afk"].append({"uid": ctx.author.id, "reason": reason, "urls": []})
 
         # ----Twitter----
-        t = await self.bot.db.twitter_keys.find_one({"uid": ctx.author.id})
-        texts = await self.bot.db.afk_twitter_text.find_one({"uid": ctx.author.id})
-        if t is not None:
-            txt = (
-                texts["activate"]
-                .replace(
-                    "!reason",
-                    (reason or get_txt(ctx.guild.id, "afk_reason_none")),
-                )
-                .replace("!user", "@" + t["name"])
-            )
-            client = AsyncOAuth1Client(
-                twitter_consumer_key,
-                twitter_consumer_secret,
-                t["token"],
-                t["secret"],
-            )
-            await client.post(
-                "https://api.twitter.com/1.1/statuses/update.json",
-                params={"status": txt},
-            )
+        # t = await self.bot.db.twitter_keys.find_one({"uid": ctx.author.id})
+        # texts = await self.bot.db.afk_twitter_text.find_one({"uid": ctx.author.id})
+        # if t is not None:
+        #     txt = (
+        #         texts["activate"]
+        #         .replace(
+        #             "!reason",
+        #             (reason or get_txt(ctx.guild.id, "afk_reason_none")),
+        #         )
+        #         .replace("!user", "@" + t["name"])
+        #     )
+        #     client = AsyncOAuth1Client(
+        #         twitter_consumer_key,
+        #         twitter_consumer_secret,
+        #         t["token"],
+        #         t["secret"],
+        #     )
+        #     await client.post(
+        #         "https://api.twitter.com/1.1/statuses/update.json",
+        #         params={"status": txt},
+        #     )
 
     @_afk.command(name="key", aliases=["api", "apikey"])
     async def afk_key(self, ctx):
@@ -202,55 +202,56 @@ class ToolCog(commands.Cog):
         )
         await ctx.message.add_reaction(self.bot.oemojis["check8"])
 
-    @_afk.group(name="twitter", invoke_without_command=True)
+    @_afk.group(name="twitter")
     @commands.cooldown(60, 60, commands.BucketType.default)
     @commands.cooldown(1, 60, commands.BucketType.user)
     async def afk_twitter(self, ctx):
-        client = AsyncOAuth1Client(twitter_consumer_key, twitter_consumer_secret, redirect_uri="oob")
-        await ctx.message.add_reaction(self.bot.oemojis["check8"])
-        token = await client.fetch_request_token("https://api.twitter.com/oauth/request_token")
-        # await ctx.author.send(token)
-        url = "https://api.twitter.com/oauth/authorize?oauth_token=" + token["oauth_token"]
-        msg = await ctx.author.send(url + "\n" + get_txt(ctx.guild.id, "afk_twitter"))
-        try:
-            pin = await self.bot.wait_for(
-                "message",
-                check=lambda m: m.author.id == ctx.author.id and m.channel.id == msg.channel.id,
-                timeout=60,
-            )
-            try:
-                t = await client.fetch_access_token(
-                    "https://api.twitter.com/oauth/access_token",
-                    verifier=pin.content,
-                )
-                await self.bot.db.twitter_keys.delete_one({"uid": ctx.author.id})
-                await self.bot.db.twitter_keys.insert_one(
-                    {
-                        "uid": ctx.author.id,
-                        "token": t["oauth_token"],
-                        "secret": t["oauth_token_secret"],
-                        "twiid": t["user_id"],
-                        "name": t["screen_name"],
-                    }
-                )
-                await self.bot.db.afk_twitter_text.delete_one({"uid": ctx.author.id})
-                await self.bot.db.afk_twitter_text.insert_one(
-                    {
-                        "uid": ctx.author.id,
-                        "activate": get_txt(ctx.guild.id, "afk_twitter_content"),
-                        "deactivate": get_txt(ctx.guild.id, "afk_twitter_content2"),
-                    }
-                )
-                await ctx.author.send(get_txt(ctx.guild.id, "afk_twitter_success").format(t["screen_name"]))
-            except authlib_err.OAuthError:
-                await ctx.author.send(get_txt(ctx.guild.id, "afk_twitter_fail"))
-        except asyncio.TimeoutError:
-            await ctx.author.send(get_txt(ctx.guild.id, "timeout"))
+        await ctx.reply(embed=SEmbed("この機能はTwitter APIの有料化に伴い廃止されました。", color=Error))
+        # client = AsyncOAuth1Client(twitter_consumer_key, twitter_consumer_secret, redirect_uri="oob")
+        # await ctx.message.add_reaction(self.bot.oemojis["check8"])
+        # token = await client.fetch_request_token("https://api.twitter.com/oauth/request_token")
+        # # await ctx.author.send(token)
+        # url = "https://api.twitter.com/oauth/authorize?oauth_token=" + token["oauth_token"]
+        # msg = await ctx.author.send(url + "\n" + get_txt(ctx.guild.id, "afk_twitter"))
+        # try:
+        #     pin = await self.bot.wait_for(
+        #         "message",
+        #         check=lambda m: m.author.id == ctx.author.id and m.channel.id == msg.channel.id,
+        #         timeout=60,
+        #     )
+        #     try:
+        #         t = await client.fetch_access_token(
+        #             "https://api.twitter.com/oauth/access_token",
+        #             verifier=pin.content,
+        #         )
+        #         await self.bot.db.twitter_keys.delete_one({"uid": ctx.author.id})
+        #         await self.bot.db.twitter_keys.insert_one(
+        #             {
+        #                 "uid": ctx.author.id,
+        #                 "token": t["oauth_token"],
+        #                 "secret": t["oauth_token_secret"],
+        #                 "twiid": t["user_id"],
+        #                 "name": t["screen_name"],
+        #             }
+        #         )
+        #         await self.bot.db.afk_twitter_text.delete_one({"uid": ctx.author.id})
+        #         await self.bot.db.afk_twitter_text.insert_one(
+        #             {
+        #                 "uid": ctx.author.id,
+        #                 "activate": get_txt(ctx.guild.id, "afk_twitter_content"),
+        #                 "deactivate": get_txt(ctx.guild.id, "afk_twitter_content2"),
+        #             }
+        #         )
+        #         await ctx.author.send(get_txt(ctx.guild.id, "afk_twitter_success").format(t["screen_name"]))
+        #     except authlib_err.OAuthError:
+        #         await ctx.author.send(get_txt(ctx.guild.id, "afk_twitter_fail"))
+        # except asyncio.TimeoutError:
+        #     await ctx.author.send(get_txt(ctx.guild.id, "timeout"))
 
-    @afk_twitter.command(name="deactivate", aliases=Deactivate_aliases)
-    async def afk_twitter_off(self, ctx):
-        await self.bot.db.twitter_keys.delete_one({"uid": ctx.author.id})
-        await ctx.reply(embed=discord.Embed(title=get_txt(ctx.guild.id, "afk_twitter_off"), color=Success))
+#     @afk_twitter.command(name="deactivate", aliases=Deactivate_aliases)
+#     async def afk_twitter_off(self, ctx):
+#         await self.bot.db.twitter_keys.delete_one({"uid": ctx.author.id})
+#         await ctx.reply(embed=discord.Embed(title=get_txt(ctx.guild.id, "afk_twitter_off"), color=Success))
 
     #     @_afk.command(name="list",aliases=["l"])
     #     async def afk_list(self, ctx):
@@ -596,7 +597,7 @@ class ToolCog(commands.Cog):
         res = []
         for b in bins:
             res.append(int(b, 2))
-        
+
         res[0] = f"<t:{(res[0] + 1420070400000) // 1000}:F>"
         e = discord.Embed(
             title=get_txt(ctx.guild.id, "snowflake")[0],
