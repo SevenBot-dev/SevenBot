@@ -74,7 +74,7 @@ class ModerationCog(commands.Cog):
             res += f'({delta_to_text(datetime.timedelta(seconds=p["length"]), ctx)})'
         elif p["action"] in ("role_add", "role_remove"):
             r = ctx.guild.get_role(p["role"])
-            res += f"({r.name})"
+            res += f"({r.name if r else '?'})"
         return res
 
     @commands.command(aliases=["purge", "delete_log"])

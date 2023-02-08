@@ -73,7 +73,7 @@ class GlobalCog(commands.Cog):
 
     @commands.Cog.listener("on_message")
     async def on_message_sgc(self, message):
-        if message.channel.id in SGC_ID and message.author.id != self.bot.user.id and not SGC_STOP:
+        if message.channel.id == SGC_ID and message.author.id != self.bot.user.id and not SGC_STOP:
             loop = asyncio.get_event_loop()
             loop.create_task(message.add_reaction(self.bot.oemojis["network"]))
             try:
@@ -435,11 +435,11 @@ class GlobalCog(commands.Cog):
             gms = self.bot.consts["gcm"]["sgc"]
             data = gms.get(message.reference.message_id)
             if data:
-                rjson["reference"] = message.reference.message_id
+                rjson["reference"] = str(message.reference.message_id)
             else:
                 msg = discord.utils.find(lambda k: message.reference.message_id in [m.id for m in gms[k]], gms.keys())
                 if msg:
-                    rjson["reference"] = msg
+                    rjson["reference"] = str(msg)
 
         return rjson
 
@@ -776,8 +776,9 @@ class GlobalCog(commands.Cog):
                     )
                     e2.set_thumbnail(url=ctx.guild.icon.url)
                     e2.set_footer(text=f"現在のチャンネル数：{len(Private_chat_info[channel]['channels'])}")
-                    r = await ctx.send(embed=self.make_rule_embed(channel))
-                    await r.pin()
+                    if Private_chat_info[channel].get("rule"):
+                        r = await ctx.send(embed=self.make_embed(channel))
+                        await r.pin()
                     loop = asyncio.get_event_loop()
                     for c in Private_chat_info[channel]["channels"]:
                         if c == ctx.channel.id:
@@ -1352,7 +1353,7 @@ class GlobalCog(commands.Cog):
                 )
         for name, data in Private_chat_info.copy().items():
             if not await self.bot.db.private_chat.find_one({"name": name}):
-                await self.bot.db.private_chat.insert_one(data)
+                await self.bot.db.private_chat.insert_one({**data, "name": name})
 
     async def get_pc_data(self):
         async with self.bot.db.private_chat.watch() as change_stream:
