@@ -70,7 +70,7 @@ class AutoreplyCog(commands.Cog):
             return
         if not self.bot.is_ready():
             return
-        if message.author.bot or message.channel.id in self.bot.guild_settings[message.guild.id]["lainan_talk"]:
+        if message.author.bot or message.channel.id in self.bot.guild_settings[message.guild.id]["kana_talk"]:
             return
         if message.author.id in SB_Bans.keys() and is_command(message):
             if SB_Bans[message.author.id] > time.time():

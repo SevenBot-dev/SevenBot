@@ -121,7 +121,7 @@ DEFAULT_SETTINGS: GuildSettings = {
     "timezone": 0,
     "archive_category": 0,
     "ww_role": {"alive": None, "dead": None},
-    "lainan_talk": [],
+    "kana_talk": [],
     "auth_channel": {
         "type": None,
         "channel": 0,

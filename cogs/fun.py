@@ -20,6 +20,7 @@ from sembed import SEmbed, SField
 
 import _pathmagic  # type: ignore # noqa: F401
 from common_resources.consts import Error, Gaming, Info, Official_discord_id, Success
+from common_resources.tokens import kana_user_id, kana_user_password
 from common_resources.tools import chrsize_len, flatten
 
 Bignum_join = {}
@@ -124,8 +125,8 @@ Trans = 0x1A73E8
 
 Mention_re = re.compile(r"<@\!?(\d+?)>")
 
-LAINAN_QUEUE = []
-lainan_doing = False
+KANA_QUEUE = []
+kana_doing = False
 
 BRACKET_BASE = "()[]{}（）「」［］【】《》｢｣『』〈〉｛｝〔〕〘〙〚〛"
 BRACKET_DICT = {BRACKET_BASE[i * 2]: BRACKET_BASE[i * 2 + 1] for i in range(len(BRACKET_BASE) // 2)}
@@ -142,45 +143,53 @@ class FunCog(commands.Cog):
         Number_emojis = _bot.consts["ne"]
 
     @commands.Cog.listener("on_message")
-    async def on_message_lainan(self, message):
-        global lainan_doing
+    async def on_message_kana(self, message):
+        global kana_doing
         if message.author.bot:
             return
-        elif message.channel.id not in self.bot.guild_settings[message.guild.id]["lainan_talk"]:
+        elif message.channel.id not in self.bot.guild_settings[message.guild.id]["kana_talk"]:
             return
         elif is_command(message):
             return
-        elif "lainan" not in message.content.lower():
+        elif "kana" not in message.content.lower():
             return
-        wh = discord.utils.get((await message.channel.webhooks()), name="sevenbot-lainan")
+        wh = discord.utils.get((await message.channel.webhooks()), name="sevenbot-kana")
         if wh is None:
             wh = await message.channel.create_webhook(
-                name="sevenbot-lainan",
-                avatar=(await self.bot.oemojis["lainan"].url_as().read()),
+                name="sevenbot-kana",
+                avatar=(await self.bot.oemojis["kana"].url_as().read()),
             )
 
-        LAINAN_QUEUE.append([wh, message.content])
-        if not lainan_doing:
-            lainan_doing = True
+        KANA_QUEUE.append([wh, message.content])
+        if not kana_doing:
+            kana_doing = True
             try:
                 async with aiohttp.ClientSession() as s:
-                    while LAINAN_QUEUE:
-                        cr = LAINAN_QUEUE[0]
-                        async with s.get("https://api.lainan.one/?msg=" + urllib.parse.quote(cr[1])) as r:
+                    while KANA_QUEUE:
+                        cr = KANA_QUEUE[0]
+                        async with s.post("https://kana.renorari.net/api/v2chat", data={
+                            "message": cr[1],
+                            "user": {
+                                "id": kana_user_id,
+                                "password": kana_user_password
+                            },
+                            "character_name": "discord",
+                            "custom_character": ""
+                        }) as r:
                             if r.status != 200:
                                 return
                             data = await r.json()
                             await cr[0].send(
-                                data["reaction"],
-                                username="Lainan",
+                                data["message"],
+                                username="Kana",
                                 allowed_mentions=discord.AllowedMentions.none(),
                             )
-                        LAINAN_QUEUE.pop(0)
+                        KANA_QUEUE.pop(0)
                         await asyncio.sleep(1)
             except Exception as e:
-                lainan_doing = False
+                kana_doing = False
                 raise e
-            lainan_doing = False
+            kana_doing = False
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, pl):
@@ -412,7 +421,6 @@ class FunCog(commands.Cog):
                     if pl.emoji.name == "check5":
                         if user.mention == Wolf_join[message.id][0]:
                             if len(Wolf_join[message.id]) >= 6:
-
                                 e = discord.Embed(
                                     title=get_txt(guild.id, "ww")["title"] + " - " + get_txt(guild.id, "ww")["ready"],
                                     description=get_txt(guild.id, "ww")["ready_desc"].format(len(Wolf_join[message.id]))
@@ -530,7 +538,6 @@ class FunCog(commands.Cog):
                                         elif reaction.emoji != self.bot.oemojis["skip"]:
                                             loop.create_task(reaction.message.remove_reaction(reaction.emoji, user))
                                             if reaction.emoji.name == "info":
-
                                                 loop.create_task(user.send(embed=rce))
                                             return False
                                         return reaction.count == len(wolf_members) + 1
@@ -1125,7 +1132,6 @@ class FunCog(commands.Cog):
             Circle_width = 16
             for i, f in enumerate(fields):
                 if fields[i] == 0:
-
                     w, h = text_draw.textsize(str(i + 1), fnt)
                     text_draw.text(
                         (
@@ -1418,7 +1424,6 @@ class FunCog(commands.Cog):
         Color = tuple(map(lambda x: math.floor(x * 256), list(Color)))
         for i in range(15):
             if int(Base_hashed[i], 16) % 2 == 0:
-
                 draw.rectangle(
                     (
                         (
@@ -1591,10 +1596,10 @@ class FunCog(commands.Cog):
         await ctx.reply(embed=e)
         await ctx.message.delete()
 
-    @commands.command(aliases=["lainan", "ltalk"])
-    async def lainan_talk(self, ctx, *, text):
+    @commands.command(aliases=["kana", "ltalk"])
+    async def kana_talk(self, ctx, *, text):
         async with aiohttp.ClientSession() as s:
-            async with s.get("https://api.lainan.one/?msg=" + urllib.parse.quote(text)) as r:
+            async with s.get("https://kana.renorari.net/api/?msg=" + urllib.parse.quote(text)) as r:
                 if r.status != 200:
                     return
                 data = await r.json()

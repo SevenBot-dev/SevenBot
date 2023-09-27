@@ -114,33 +114,33 @@ class ChannelSettingCog(commands.Cog):
             e = discord.Embed(title="既に有効です。", description="", color=Error)
             return await ctx.reply(embed=e)
 
-    @channel_setting.group(name="lainan_talk", invoke_without_command=True)
+    @channel_setting.group(name="kana_talk", invoke_without_command=True)
     @commands.has_permissions(manage_channels=True)
-    async def ch_lainan_talk(self, ctx):
+    async def ch_kana_talk(self, ctx):
         await self.bot.send_subcommands(ctx)
 
-    @ch_lainan_talk.command(name="deactivate", aliases=Deactivate_aliases)
+    @ch_kana_talk.command(name="deactivate", aliases=Deactivate_aliases)
     @commands.has_permissions(manage_channels=True)
-    async def deactivate_lainan_talk(self, ctx):
-        if ctx.channel.id not in self.bot.guild_settings[ctx.guild.id]["lainan_talk"]:
+    async def deactivate_kana_talk(self, ctx):
+        if ctx.channel.id not in self.bot.guild_settings[ctx.guild.id]["kana_talk"]:
             e = discord.Embed(title="既に無効化されています。", description="", color=Error)
             return await ctx.reply(embed=e)
         else:
-            self.bot.guild_settings[ctx.guild.id]["lainan_talk"].remove(ctx.channel.id)
+            self.bot.guild_settings[ctx.guild.id]["kana_talk"].remove(ctx.channel.id)
             e = discord.Embed(
-                title=f"`#{ctx.channel.name}`でのLainan APIの返信を無効にしました。",
+                title=f"`#{ctx.channel.name}`でのKanaAPIの返信を無効にしました。",
                 description="",
                 color=Success,
             )
             return await ctx.reply(embed=e)
 
-    @ch_lainan_talk.command(name="activate", aliases=Activate_aliases)
+    @ch_kana_talk.command(name="activate", aliases=Activate_aliases)
     @commands.has_permissions(manage_channels=True)
-    async def activate_lainan_talk(self, ctx):
-        if ctx.channel.id not in self.bot.guild_settings[ctx.guild.id]["lainan_talk"]:
-            self.bot.guild_settings[ctx.guild.id]["lainan_talk"].append(ctx.channel.id)
+    async def activate_kana_talk(self, ctx):
+        if ctx.channel.id not in self.bot.guild_settings[ctx.guild.id]["kana_talk"]:
+            self.bot.guild_settings[ctx.guild.id]["kana_talk"].append(ctx.channel.id)
             e = discord.Embed(
-                title=f"`#{ctx.channel.name}`でのLainan APIの返信を有効にしました。",
+                title=f"`#{ctx.channel.name}`でのKanaAPIの返信を有効にしました。",
                 description="",
                 color=Success,
             )

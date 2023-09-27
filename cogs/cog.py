@@ -76,7 +76,7 @@ Categories = {
         "tic_tac_toe",
         "parse",
         "image",
-        "lainan_talk",
+        "kana_talk",
         "sudden_death",
         "loop_trans",
         "reencode",
