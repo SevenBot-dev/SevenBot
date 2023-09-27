@@ -12,3 +12,5 @@ botdd_token = "botdd token here"
 web_pass = "web password here"
 sentry_url = "sentry url here"
 emergency = False
+kana_user_id = "kana user id here"
+kana_user_password = "kana user password here"
