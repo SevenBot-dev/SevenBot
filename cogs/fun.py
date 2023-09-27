@@ -1599,7 +1599,7 @@ class FunCog(commands.Cog):
     @commands.command(aliases=["kana", "ltalk"])
     async def kana_talk(self, ctx, *, text):
         async with aiohttp.ClientSession() as s:
-            async with s.get("https://api.kana.renorari.net/api/?msg=" + urllib.parse.quote(text)) as r:
+            async with s.get("https://kana.renorari.net/api/?msg=" + urllib.parse.quote(text)) as r:
                 if r.status != 200:
                     return
                 data = await r.json()
